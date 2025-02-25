@@ -1,13 +1,40 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React from "react";
+import Layout from "../components/dashboard/Layout";
+import Header from "../components/dashboard/Header";
+import StatCard from "../components/dashboard/StatCard";
+import RecentProjects from "../components/dashboard/RecentProjects";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <Layout>
+      <Header title="Tableau de Bord" />
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard 
+          title="Total Étudiants" 
+          value={0} 
+          type="students" 
+        />
+        <StatCard 
+          title="Encadrants" 
+          value={0} 
+          type="supervisors" 
+        />
+        <StatCard 
+          title="Projets en Cours" 
+          value={0} 
+          type="ongoing" 
+        />
+        <StatCard 
+          title="Projets Terminés" 
+          value={0} 
+          type="completed" 
+        />
       </div>
-    </div>
+      
+      <RecentProjects />
+    </Layout>
   );
 };
 

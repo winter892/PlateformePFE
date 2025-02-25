@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -96,6 +97,45 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-dashboard-bg text-foreground;
   }
+}
+
+.sidebar-link {
+  @apply flex items-center gap-3 px-4 py-3 text-white/90 transition-all hover:bg-dashboard-sidebarHover rounded-md;
+}
+
+.sidebar-link.active {
+  @apply bg-dashboard-sidebarHover text-white;
+}
+
+.stats-card {
+  @apply bg-dashboard-cardBg rounded-lg p-6 shadow-sm flex flex-col justify-between gap-4 transition-all hover:shadow-md;
+}
+
+.stats-icon {
+  @apply w-14 h-14 flex items-center justify-center rounded-full text-white;
+}
+
+/* Animations pour les transitions entre pages */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 300ms, transform 300ms;
 }
