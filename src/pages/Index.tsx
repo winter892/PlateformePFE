@@ -3,7 +3,6 @@ import React from "react";
 import Layout from "../components/dashboard/Layout";
 import Header from "../components/dashboard/Header";
 import StatCard from "../components/dashboard/StatCard";
-import RecentProjects from "../components/dashboard/RecentProjects";
 
 const Index = () => {
   return (
@@ -32,8 +31,6 @@ const Index = () => {
           type="completed" 
         />
       </div>
-      
-      <RecentProjects />
     </Layout>
   );
 };
