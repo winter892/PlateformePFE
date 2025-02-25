@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Users, 
-  Settings, 
+  Clock, 
   BarChart3
 } from "lucide-react";
 
@@ -23,9 +23,9 @@ const Sidebar = () => {
       icon: <Users className="w-5 h-5" />
     },
     {
-      path: "/parametres",
-      name: "Paramètres",
-      icon: <Settings className="w-5 h-5" />
+      path: "/gestion-horaires",
+      name: "Gestion des horaires",
+      icon: <Clock className="w-5 h-5" />
     },
     {
       path: "/statistiques",

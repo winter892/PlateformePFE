@@ -7,9 +7,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Index from "./pages/Index";
 import Comptes from "./pages/Comptes";
-import Parametres from "./pages/Parametres";
+import GestionHoraires from "./pages/GestionHoraires";
 import Statistiques from "./pages/Statistiques";
 import NotFound from "./pages/NotFound";
+
+// Sous-pages de Gestion des horaires
+import PlanningSoutenances from "./pages/horaires/PlanningSoutenances";
+import DatesLimites from "./pages/horaires/DatesLimites";
+import ActivationPlateforme from "./pages/horaires/ActivationPlateforme";
 
 const queryClient = new QueryClient();
 
@@ -22,7 +27,10 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/comptes" element={<Comptes />} />
-          <Route path="/parametres" element={<Parametres />} />
+          <Route path="/gestion-horaires" element={<GestionHoraires />} />
+          <Route path="/gestion-horaires/soutenances" element={<PlanningSoutenances />} />
+          <Route path="/gestion-horaires/dates-limites" element={<DatesLimites />} />
+          <Route path="/gestion-horaires/activation" element={<ActivationPlateforme />} />
           <Route path="/statistiques" element={<Statistiques />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
