@@ -1,7 +1,7 @@
 
 import React from "react";
-import Layout from "../components/dashboard/Layout";
-import Header from "../components/dashboard/Header";
+import Layout from "../../../components/dashboard/Layout";
+import Header from "../../../components/dashboard/Header";
 
 const Statistiques = () => {
   return (
