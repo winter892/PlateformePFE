@@ -29,7 +29,7 @@ const Login = () => {
         navigate('/IndexEncadrant');
         break;
       case 'etudiant':
-        navigate('/indexEtudiant');
+        navigate('/IndexEtudiant');
         break;
       default:
         navigate('/');
