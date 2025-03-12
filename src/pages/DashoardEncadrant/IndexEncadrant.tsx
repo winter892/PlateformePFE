@@ -32,9 +32,9 @@ const IndexEncadrant = () => {
     <DashboardLayout onProfileClick={handleTeacherClick}>
       <div className="mb-8 section-animation">
         <h1 className="text-2xl font-semibold text-violet-900 mb-1">
-          Bienvenue, <span className="cursor-pointer hover:text-violet-700 underline" onClick={handleTeacherClick}>Jean</span>
+          Bienvenue !! <span className="cursor-pointer hover:text-violet-700 underline" onClick={handleTeacherClick}>M.OUTANOUT</span>
         </h1>
-        <p className="text-violet-500">Voici un aperçu de vos projets académiques</p>
+        <p className="text-violet-500">Voici un aperçu des projets académiques</p>
       </div>
       
       {/* Stat Cards */}

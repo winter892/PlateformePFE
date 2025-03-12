@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
@@ -12,15 +12,15 @@ import {
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
-  onProfileClick?: () => void;
+  onProfileClick?: () =>void
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
-
+  const navigate = useNavigate();
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Tableau de bord', path: '/' },
+    { icon: LayoutDashboard, label: 'Tableau de bord', path: '/IndexEncadrant' },
     { icon: Users, label: 'Groupes', path: '/groups' },
     { icon: BellRing, label: 'Notifications', path: '/notifications' },
     { icon: BarChart2, label: 'Statistiques', path: '/statistics' },
@@ -29,7 +29,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
   return (
     <div className="w-64 bg-white border-r border-violet-100 fixed h-full">
       <div className="p-6">
-        <h1 className="text-2xl font-bold text-violet-900">Edura</h1>
+        <h1 className="text-2xl font-bold text-violet-900">Encadrement Academique</h1>
         <p className="text-sm text-violet-500">Plateforme d'encadrement</p>
       </div>
       
@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
           </div>
         </div>
         
-        <button className="flex items-center w-full py-2 px-3 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+        <button className="flex items-center w-full py-2 px-3 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors" onClick={() => navigate('/login')}>
           <LogOut className="w-4 h-4 mr-2" />
           Déconnexion
         </button>

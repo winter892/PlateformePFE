@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 
@@ -8,7 +7,7 @@ interface StatCardProps {
   icon: ReactNode;
   className?: string;
   trendValue?: number;
-  trendDirection?: 'up' | 'down' | 'neutral';
+  trendDirection?: "up" | "down" | "neutral";
 }
 
 const StatCard = ({
@@ -20,26 +19,34 @@ const StatCard = ({
   trendDirection,
 }: StatCardProps) => {
   return (
-    <div className={cn("dashboard-card p-5 card-hover", className)}>
+    <div
+      className={cn(
+        "overflow-hidden rounded-xl border border-violet-100 bg-white shadow-md p-5 flex flex-col justify-between",
+        "transition-all duration-300 hover:shadow-lg", // Ajoute une légère animation au survol
+        className
+      )}
+    >
       <div className="flex items-center justify-between mb-2">
-        <h3 className="stat-label">{title}</h3>
+        <h3 className="text-sm font-medium text-gray-700">{title}</h3>
         <div className="text-violet-500">{icon}</div>
       </div>
-      
+
       <div className="flex items-end justify-between">
-        <div className="stat-number">{value}</div>
-        
+        <div className="text-2xl font-bold text-gray-900">{value}</div>
+
         {trendDirection && trendValue && (
-          <div className={cn(
-            "text-xs font-medium flex items-center",
-            trendDirection === 'up' ? 'text-green-600' : 
-            trendDirection === 'down' ? 'text-red-600' : 
-            'text-gray-500'
-          )}>
+          <div
+            className={cn(
+              "text-xs font-medium flex items-center",
+              trendDirection === "up"
+                ? "text-green-600"
+                : trendDirection === "down"
+                ? "text-red-600"
+                : "text-gray-500"
+            )}
+          >
             <span className="mr-1">
-              {trendDirection === 'up' ? '↑' : 
-               trendDirection === 'down' ? '↓' : 
-               '→'}
+              {trendDirection === "up" ? "▲" : trendDirection === "down" ? "▼" : "→"}
             </span>
             {trendValue}%
           </div>
