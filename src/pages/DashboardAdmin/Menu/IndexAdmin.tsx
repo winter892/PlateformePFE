@@ -1,10 +1,10 @@
 
 import React from "react";
-import Layout from "../components/dashboard/Layout";
-import Header from "../components/dashboard/Header";
-import StatCard from "../components/dashboard/StatCard";
+import Layout from "../../../components/dashboardAdmin/Layout";
+import Header from "../../../components/dashboardAdmin/Header";
+import StatCard from "../../../components/dashboardAdmin/StatCard";
 
-const Index = () => {
+const IndexAdmin = () => {
   return (
     <Layout>
       <Header title="Tableau de Bord" />
@@ -35,4 +35,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default IndexAdmin;

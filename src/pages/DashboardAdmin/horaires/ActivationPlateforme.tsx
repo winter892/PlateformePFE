@@ -1,10 +1,10 @@
 
 import React, { useState } from "react";
 import { Power, Bell, RefreshCw } from "lucide-react";
-import Layout from "../../components/dashboard/Layout";
-import Header from "../../components/dashboard/Header";
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
+import Layout from "../../../components/dashboardAdmin/Layout";
+import Header from "../../../components/dashboardAdmin/Header";
+import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import { Button } from "../../../components/ui/button";
 
 const ActivationPlateforme = () => {
   // État pour l'activation de la plateforme

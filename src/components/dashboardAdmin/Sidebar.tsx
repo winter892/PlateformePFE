@@ -13,7 +13,7 @@ const Sidebar = () => {
   
   const menuItems = [
     {
-      path: "/",
+      path: "/Index",
       name: "Tableau de bord",
       icon: <LayoutDashboard className="w-5 h-5" />
     },

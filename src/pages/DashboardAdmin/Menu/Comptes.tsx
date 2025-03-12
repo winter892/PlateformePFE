@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
-import Layout from "../components/dashboard/Layout";
-import Header from "../components/dashboard/Header";
+import Layout from "../../../components/dashboardAdmin/Layout";
+import Header from "../../../components/dashboardAdmin/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, User, FileArchive, RefreshCcw, ArrowLeft } from "lucide-react";
