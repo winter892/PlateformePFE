@@ -24,6 +24,10 @@ import NotificationsPage from "./pages/DashoardEncadrant/NotificationsPage";
 import StatisticsPage from "./pages/DashoardEncadrant/StatisticsPage";
 import TeacherProfile from "./pages/DashoardEncadrant/TeacherProfile";
 import DeliverableReviewPage from "./pages/DashoardEncadrant/DeliverableReviewPage";
+import IndexEtudiant from "./pages/DashboardEtudiant/IndexEtudiant";
+import Tasks from "./pages/DashboardEtudiant/Tasks";
+import Profile from "./pages/DashboardEtudiant/Profile";
+import Notifications from "./pages/DashboardEtudiant/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -51,7 +55,12 @@ const App = () => (
           <Route path="/statistics" element={<StatisticsPage />} />
           <Route path="/profile" element={<TeacherProfile />} />
           <Route path="/groups/:groupId/tasks/:taskId/deliverables/:deliverableId" element={<DeliverableReviewPage />} />
-
+          {/**Etudiant */}
+          <Route path="/IndexEtudiant" element={<IndexEtudiant />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/notifications" element={<Notifications />} />
+           
           {/**Autres */}
           <Route path="*" element={<NotFound />} />
           <Route path="/" element={<Homepage />} />
