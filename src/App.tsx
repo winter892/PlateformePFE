@@ -1,9 +1,11 @@
 
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 
 import Comptes from "./pages/DashboardAdmin/Menu/Comptes";
 import GestionHoraires from "./pages/DashboardAdmin/Menu/GestionHoraires";
@@ -28,6 +30,7 @@ import IndexEtudiant from "./pages/DashboardEtudiant/IndexEtudiant";
 import Tasks from "./pages/DashboardEtudiant/Tasks";
 import Profile from "./pages/DashboardEtudiant/Profile";
 import Notifications from "./pages/DashboardEtudiant/Notifications";
+import { Sidebar } from "./components/Sidebar";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +69,7 @@ const App = () => (
           <Route path="/" element={<Homepage />} />
           <Route path="/login" element={<Login />} />
         </Routes>
+        
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
