@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Sidebar from './Sidebar';
+import Sidebar from './EncadrantSidebar';
 import { ArrowLeft } from 'lucide-react';
 interface DashboardLayoutProps {
   children: ReactNode;

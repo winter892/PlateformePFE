@@ -16,7 +16,7 @@ interface SidebarProps {
 }
 
 
-const Sidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
+const EncadrentSidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
   const navigate = useNavigate();
@@ -81,4 +81,4 @@ const Sidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
   );
 };
 
-export default Sidebar;
+export default EncadrentSidebar;

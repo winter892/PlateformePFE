@@ -8,7 +8,7 @@ import {
   BarChart3
 } from "lucide-react";
 
-const Sidebar = () => {
+const AdminSidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -66,4 +66,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default AdminSidebar;

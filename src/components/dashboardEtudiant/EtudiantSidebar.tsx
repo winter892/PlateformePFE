@@ -5,7 +5,7 @@ import { LayoutDashboard, CheckSquare, FileText, Bell, User, LogOut } from 'luci
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
-export const Sidebar = () => {
+export const EtudiantSidebar = () => {
   const location = useLocation();
 
   const menuItems = [
@@ -110,3 +110,4 @@ export const Sidebar = () => {
     </motion.aside>
   );
 };
+export default EtudiantSidebar;

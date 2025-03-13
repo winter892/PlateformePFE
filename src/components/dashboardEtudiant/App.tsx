@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Sidebar } from "../Sidebar";
+import { EtudiantSidebar } from "./EtudiantSidebar";
 
 // Routes et pages de votre app
 import Comptes from "../../pages/DashboardAdmin/Menu/Comptes";
@@ -69,7 +69,7 @@ const App = () => {
             {/* Pages spécifiques à l'étudiant */}
             {isEtudiantPage && (
               <div className="min-h-screen bg-gray-50">
-                <Sidebar />
+                <EtudiantSidebar />
                 <Routes>
                   <Route path="/" element={<IndexEtudiant />} />
                   <Route path="/tasks" element={<Tasks />} />
