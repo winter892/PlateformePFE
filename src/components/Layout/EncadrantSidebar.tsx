@@ -23,7 +23,7 @@ const EncadrentSidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
   const menuItems = [
     { icon: LayoutDashboard, label: 'Tableau de bord', path: '/IndexEncadrant' },
     { icon: Users, label: 'Groupes', path: '/groups' },
-    { icon: BellRing, label: 'Notifications', path: '/notifications' },
+    { icon: BellRing, label: 'Notifications', path: '/EncadrantNotifications' },
     { icon: BarChart2, label: 'Statistiques', path: '/statistics' },
   ];
 
@@ -56,7 +56,7 @@ const EncadrentSidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
       <div className="absolute bottom-0 w-full border-t border-violet-100 p-4">
       {/* Bouton Profil */}
       <button
-        onClick={() => navigate("/profile")}
+        onClick={() => navigate("/EncadrantProfile")}
         className="flex items-center w-full text-left p-2 rounded-lg hover:bg-violet-100 transition duration-300"
       >
         <div className="bg-violet-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">

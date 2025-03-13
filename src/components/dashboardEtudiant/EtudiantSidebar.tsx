@@ -11,11 +11,11 @@ export const EtudiantSidebar = () => {
   const menuItems = [
     { icon: LayoutDashboard, label: "Tableau de bord", path: "/IndexEtudiant", color: "from-green-400 to-green-600" },
     { icon: CheckSquare, label: "Tâches", path: "/tasks", color: "from-green-400 to-green-600" },
-    { icon: Bell, label: "Notifications", path: "/notifications", color: "from-green-400 to-green-600" },
+    { icon: Bell, label: "Notifications", path: "/EtudiantNotifications", color: "from-green-400 to-green-600" },
   ];
 
   const bottomMenuItems = [
-    { icon: User, label: "Profile", path: "/profile", color: "from-green-400 to-green-600" },
+    { icon: User, label: "Profile", path: "/Etudiantprofile", color: "from-green-400 to-green-600" },
     { icon: LogOut, label: "Déconnexion", path: "/logout", color: "from-red-400 to-red-600" },
   ];
 

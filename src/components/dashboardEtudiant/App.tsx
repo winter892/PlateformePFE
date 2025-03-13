@@ -52,16 +52,16 @@ const App = () => (
           {/** Encadrant */}
           <Route path="/IndexEncadrant" element={<IndexEncadrant />} />
           <Route path="/groups" element={<GroupsPage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/EncadrantNotifications" element={<NotificationsPage />} />
           <Route path="/statistics" element={<StatisticsPage />} />
-          <Route path="/profile" element={<TeacherProfile />} />
+          <Route path="/EncadrantProfile" element={<TeacherProfile />} />
           <Route path="/groups/:groupId/tasks/:taskId/deliverables/:deliverableId" element={<DeliverableReviewPage />} />
 
           {/** Etudiant (Avec Sidebar) */}
           <Route path="/IndexEtudiant" element={<><EtudiantSidebar /><IndexEtudiant /></>} />
           <Route path="/tasks" element={<><EtudiantSidebar /><Tasks /></>} />
-          <Route path="/profile" element={<><EtudiantSidebar /><Profile /></>} />
-          <Route path="/notifications" element={<><EtudiantSidebar /><Notifications /></>} />
+          <Route path="/Etudiantprofile" element={<><EtudiantSidebar /><Profile /></>} />
+          <Route path="/EtudiantNotifications" element={<><EtudiantSidebar /><Notifications /></>} />
 
           {/** Autres */}
           <Route path="*" element={<NotFound />} />
