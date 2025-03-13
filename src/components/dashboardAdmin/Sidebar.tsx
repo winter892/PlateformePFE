@@ -1,15 +1,16 @@
-
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation,useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Users, 
   Clock, 
+  LogOut,
   BarChart3
 } from "lucide-react";
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   const menuItems = [
     {
@@ -45,12 +46,21 @@ const Sidebar = () => {
           <Link 
             key={item.path}
             to={item.path}
-            className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
+            className={sidebar-link ${location.pathname === item.path ? 'active' : ''}}
           >
             {item.icon}
             <span>{item.name}</span>
           </Link>
         ))}
+      </div>
+      <div className="absolute bottom-0 w-full border-t border-violet-100 p-4">
+      <button
+        className="flex items-center w-full py-2 px-3 text-sm text-balck-600 hover:bg-red-50 rounded-lg transition-colors"
+        onClick={() => navigate("/login")}
+      >
+        <LogOut className="w-4 h-4 mr-2" />
+        Déconnexion
+      </button>
       </div>
     </div>
   );
