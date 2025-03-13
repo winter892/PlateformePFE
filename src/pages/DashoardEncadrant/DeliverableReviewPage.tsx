@@ -111,7 +111,7 @@ const DeliverableReviewPage = () => {
   return (
     
     <DashboardLayout>
-      <button onClick={() =>} className="mb-8 flex items-center p-2 rounded-md transition  hover:bg-violet-100">
+      <button className="mb-8 flex items-center p-2 rounded-md transition  hover:bg-violet-100">
                         <ArrowLeft className="w-5 h-5 mr-2" /> Retour
                       </button>
       <div className="flex h-[calc(100vh-7rem)] overflow-hidden">
