@@ -16,7 +16,7 @@ export const EtudiantSidebar = () => {
 
   const bottomMenuItems = [
     { icon: User, label: "Profile", path: "/Etudiantprofile", color: "from-green-400 to-green-600" },
-    { icon: LogOut, label: "Déconnexion", path: "/logout", color: "from-red-400 to-red-600" },
+    { icon: LogOut, label: "Déconnexion", path: "/login", color: "from-red-400 to-red-600" },
   ];
 
   const sidebarVariants = {
@@ -98,10 +98,10 @@ export const EtudiantSidebar = () => {
                 <item.icon className={cn(
                   "w-5 h-5 mr-3",
                   location.pathname === item.path 
-                    ? item.label === "Déconnexion" ? "text-red-500" : "text-green-500"
+                    ? item.label === "Déconnexion" ? "text-red-500 " : "text-green-500"
                     : "text-gray-500"
                 )} />
-                <span className="font-medium">{item.label}</span>
+                <span className="font-medium hover:bg-red-50 rounded-lg transition-colors">{item.label}</span>
               </Link>
             </motion.div>
           ))}

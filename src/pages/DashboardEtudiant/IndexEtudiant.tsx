@@ -111,7 +111,7 @@ const IndexEtudiant = () => {
               width: '25%'
             }}></div>
             </div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex justify-between items-center text-sm">
               <div>
                 <p className="text-gray-500">Date de début</p>
                 <p className="font-medium">15 Oct 2023</p>
