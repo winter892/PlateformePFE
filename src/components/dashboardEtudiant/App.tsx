@@ -32,58 +32,46 @@ import Notifications from "../../pages/DashboardEtudiant/Notifications";
 
 const queryClient = new QueryClient();
 
-const App = () => {
-  const location = useLocation();
-  const isEtudiantPage = location.pathname.startsWith("/tasks") || location.pathname.startsWith("/profile") || location.pathname.startsWith("/notifications");
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          {/** Admin */}
+          <Route path="/IndexAdmin" element={<IndexAdmin />} />
+          <Route path="/comptes" element={<Comptes />} />
+          <Route path="/gestion-horaires" element={<GestionHoraires />} />
+          <Route path="/gestion-horaires/soutenances" element={<PlanningSoutenances />} />
+          <Route path="/gestion-horaires/dates-limites" element={<DatesLimites />} />
+          <Route path="/gestion-horaires/activation" element={<ActivationPlateforme />} />
+          <Route path="/statistiques" element={<Statistiques />} />
+          <Route path="/parametres" element={<Parametres />} />
+          
+          {/** Encadrant */}
+          <Route path="/IndexEncadrant" element={<IndexEncadrant />} />
+          <Route path="/groups" element={<GroupsPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/statistics" element={<StatisticsPage />} />
+          <Route path="/profile" element={<TeacherProfile />} />
+          <Route path="/groups/:groupId/tasks/:taskId/deliverables/:deliverableId" element={<DeliverableReviewPage />} />
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/** Pages Admin */}
-            <Route path="/IndexAdmin" element={<IndexAdmin />} />
-            <Route path="/comptes" element={<Comptes />} />
-            <Route path="/gestion-horaires" element={<GestionHoraires />} />
-            <Route path="/gestion-horaires/soutenances" element={<PlanningSoutenances />} />
-            <Route path="/gestion-horaires/dates-limites" element={<DatesLimites />} />
-            <Route path="/gestion-horaires/activation" element={<ActivationPlateforme />} />
-            <Route path="/statistiques" element={<Statistiques />} />
-            <Route path="/parametres" element={<Parametres />} />
+          {/** Etudiant (Avec Sidebar) */}
+          <Route path="/IndexEtudiant" element={<><EtudiantSidebar /><IndexEtudiant /></>} />
+          <Route path="/tasks" element={<><EtudiantSidebar /><Tasks /></>} />
+          <Route path="/profile" element={<><EtudiantSidebar /><Profile /></>} />
+          <Route path="/notifications" element={<><EtudiantSidebar /><Notifications /></>} />
 
-            {/** Pages Encadrant */}
-            <Route path="/IndexEncadrant" element={<IndexEncadrant />} />
-            <Route path="/groups" element={<GroupsPage />} />
-            <Route path="/notifications" element={<NotificationsPage />} />
-            <Route path="/statistics" element={<StatisticsPage />} />
-            <Route path="/profile" element={<TeacherProfile />} />
-            <Route path="/groups/:groupId/tasks/:taskId/deliverables/:deliverableId" element={<DeliverableReviewPage />} />
+          {/** Autres */}
+          <Route path="*" element={<NotFound />} />
+          <Route path="/" element={<Homepage />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
-            {/** Pages Etudiant - Conditionner l'application du div */}
-            <Route path="/" element={<Homepage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="*" element={<NotFound />} />
-            
-            {/* Pages spécifiques à l'étudiant */}
-            {isEtudiantPage && (
-              <div className="min-h-screen bg-gray-50">
-                <EtudiantSidebar />
-                <Routes>
-                  <Route path="/" element={<IndexEtudiant />} />
-                  <Route path="/tasks" element={<Tasks />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/notifications" element={<Notifications />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </div>
-            )}
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-};
 
-export default App;
+export default App;
