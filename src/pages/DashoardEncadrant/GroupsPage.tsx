@@ -4,8 +4,9 @@ import DashboardLayout from '@/components/Layout/DashboardLayout';
 import { groups, projects, tasks } from '@/lib/mock-data';
 import { Group, Project, Task } from '@/types';
 import GroupItem from '@/components/GroupItem';
-import { Plus, X, Printer, FileText, Users, CheckSquare, Search } from 'lucide-react';
+import { Plus, X, Printer, FileText, Users, CheckSquare,ArrowLeft, Search } from 'lucide-react';
 import { toast } from 'sonner';
+export   const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
 
 const GroupsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -286,14 +287,20 @@ const GroupsPage: React.FC = () => {
       {/* Tasks Modal */}
       {showTasksModal && selectedGroupId && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          
             <div className="p-6">
+            <button onClick={() => setShowTasksModal(false)} className="mb-8 flex items-center p-2 rounded-md transition  hover:bg-violet-100">
+                  <ArrowLeft className="w-5 h-5 mr-2" /> Retour
+                </button>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-violet-900">
                   Tâches - {groups.find(g => g.id === selectedGroupId)?.name}
                 </h2>
+                 
                 <button className="text-violet-500 hover:text-violet-700" onClick={() => setShowTasksModal(false)}>
                   <X size={20} />
                 </button>
+              
               </div>
               
               <div className="mb-4 relative">
@@ -340,6 +347,9 @@ const GroupsPage: React.FC = () => {
       {showTaskDetailModal && selectedTask && <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
+            <button onClick={() => {setShowTaskDetailModal(false); setShowTasksModal(true); }} className="mb-8 flex items-center p-2 rounded-md transition  hover:bg-violet-100">
+                  <ArrowLeft className="w-5 h-5 mr-2" /> Retour
+                </button>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-violet-900">{selectedTask.title}</h2>
                 <button className="text-violet-500 hover:text-violet-700" onClick={() => setShowTaskDetailModal(false)}>

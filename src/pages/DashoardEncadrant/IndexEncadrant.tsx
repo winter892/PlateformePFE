@@ -38,7 +38,7 @@ const IndexEncadrant = () => {
       </div>
       
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5 mb-8 section-animation">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-6 gap-5 mb-8 section-animation">
         <StatCard title="Total des projets" value={dashboardStats.totalProjects} icon={<FolderOpen size={24} />} trendValue={5} trendDirection="up" />
         <StatCard title="Projets en cours" value={dashboardStats.projectsInProgress} icon={<Clock size={24} />} />
         <StatCard title="Projets terminés" value={dashboardStats.projectsCompleted} icon={<CheckCircle size={24} />} trendValue={10} trendDirection="up" />

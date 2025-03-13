@@ -15,6 +15,7 @@ interface SidebarProps {
   onProfileClick?: () =>void
 }
 
+
 const Sidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
@@ -53,21 +54,29 @@ const Sidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
       </div>
       
       <div className="absolute bottom-0 w-full border-t border-violet-100 p-4">
-        <div className="flex items-center mb-4 cursor-pointer" onClick={onProfileClick}>
-          <div className="bg-violet-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
-            <User className="w-5 h-5 text-violet-700" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-violet-900">Dr. Jean Dupont</p>
-            <p className="text-xs text-violet-500">Encadrant</p>
-          </div>
+      {/* Bouton Profil */}
+      <button
+        onClick={() => navigate("/profile")}
+        className="flex items-center w-full text-left p-2 rounded-lg hover:bg-violet-100 transition duration-300"
+      >
+        <div className="bg-violet-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+          <User className="w-5 h-5 text-violet-700" />
         </div>
-        
-        <button className="flex items-center w-full py-2 px-3 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors" onClick={() => navigate('/login')}>
-          <LogOut className="w-4 h-4 mr-2" />
-          Déconnexion
-        </button>
-      </div>
+        <div>
+          <p className="text-sm font-medium text-violet-900">Dr. Jean Dupont</p>
+          <p className="text-xs text-violet-500">Encadrant</p>
+        </div>
+      </button>
+
+      {/* Bouton Déconnexion */}
+      <button
+        className="flex items-center w-full py-2 px-3 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+        onClick={() => navigate("/login")}
+      >
+        <LogOut className="w-4 h-4 mr-2" />
+        Déconnexion
+      </button>
+    </div>
     </div>
   );
 };

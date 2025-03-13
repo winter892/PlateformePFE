@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, Building, GraduationCap, Key, BookOpen } from 'lucide-react';
+import { User, Mail, Building,ArrowLeft, GraduationCap, Key, BookOpen } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const TeacherProfile = () => {
   const teacherInfo = {
@@ -27,9 +28,13 @@ const TeacherProfile = () => {
     hidden: { y: 20, opacity: 0 },
     show: { y: 0, opacity: 1 }
   };
-
+  const navigate = useNavigate();
   return (
+    
     <div className="p-6">
+      <button onClick={() => navigate('/IndexEncadrant')} className="mb-8 flex items-center p-2 rounded-md transition  hover:bg-violet-100">
+          <ArrowLeft className="w-5 h-5 mr-2" /> Retour
+        </button>
       <motion.div 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
