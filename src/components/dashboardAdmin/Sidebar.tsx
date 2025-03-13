@@ -46,7 +46,7 @@ const Sidebar = () => {
           <Link 
             key={item.path}
             to={item.path}
-            className={sidebar-link ${location.pathname === item.path ? 'active' : ''}}
+            className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
           >
             {item.icon}
             <span>{item.name}</span>
