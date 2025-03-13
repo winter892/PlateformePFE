@@ -11,8 +11,6 @@ import LoadingState from '@/components/DeliverableReview/LoadingState';
 import { useDeliverable } from '@/hooks/useDeliverable';
 import { useChat } from '@/hooks/useChat';
 import { ArrowLeft } from 'lucide-react';
-import {setShowTaskDetailModal,showTaskDetailModal} from './GroupsPage'
-
 
 const DeliverableReviewPage = () => {
   const navigate = useNavigate();
@@ -113,7 +111,7 @@ const DeliverableReviewPage = () => {
   return (
     
     <DashboardLayout>
-      <button onClick={() => setShowTaskDetailModal(true)} className="mb-8 flex items-center p-2 rounded-md transition  hover:bg-violet-100">
+      <button onClick={() =>} className="mb-8 flex items-center p-2 rounded-md transition  hover:bg-violet-100">
                         <ArrowLeft className="w-5 h-5 mr-2" /> Retour
                       </button>
       <div className="flex h-[calc(100vh-7rem)] overflow-hidden">

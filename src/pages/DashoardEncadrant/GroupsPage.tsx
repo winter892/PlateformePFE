@@ -6,7 +6,6 @@ import { Group, Project, Task } from '@/types';
 import GroupItem from '@/components/GroupItem';
 import { Plus, X, Printer, FileText, Users, CheckSquare,ArrowLeft, Search } from 'lucide-react';
 import { toast } from 'sonner';
-export   const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
 
 const GroupsPage: React.FC = () => {
   const navigate = useNavigate();
