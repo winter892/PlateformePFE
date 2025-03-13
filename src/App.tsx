@@ -59,10 +59,14 @@ const App = () => (
           <Route path="/profile" element={<TeacherProfile />} />
           <Route path="/groups/:groupId/tasks/:taskId/deliverables/:deliverableId" element={<DeliverableReviewPage />} />
           {/**Etudiant */}
+          <div className="min-h-screen bg-gray-50">
+            <Sidebar />
           <Route path="/IndexEtudiant" element={<IndexEtudiant />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/notifications" element={<Notifications />} />
+          </div>
+          
            
           {/**Autres */}
           <Route path="*" element={<NotFound />} />

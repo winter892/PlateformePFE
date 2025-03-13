@@ -13,10 +13,10 @@ import {
 import { toast } from '@/components/ui/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { Task, Deliverable, Comment } from '@/types/task';
-import { TaskFilter } from '@/components/dashboardEtudiant/TaskFilter';
-import { TaskList } from '@/components/dashboardEtudiant/TaskList';
-import { TaskForm } from '@/components/dashboardEtudiant/NewTaskForm';
-import { DeliverablesManager } from '@/components/dashboardEtudiant/DeliverablesManager';
+import { TaskFilter } from '@/components/tasks/TaskFilter';
+import { TaskList } from '@/components/tasks/TaskList';
+import { TaskForm } from '@/components/tasks/NewTaskForm';
+import { DeliverablesManager } from '@/components/tasks/DeliverablesManager';
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([

@@ -9,7 +9,7 @@ export const Sidebar = () => {
   const location = useLocation();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: "Tableau de bord", path: "/", color: "from-green-400 to-green-600" },
+    { icon: LayoutDashboard, label: "Tableau de bord", path: "/IndexEtudiant", color: "from-green-400 to-green-600" },
     { icon: CheckSquare, label: "Tâches", path: "/tasks", color: "from-green-400 to-green-600" },
     { icon: Bell, label: "Notifications", path: "/notifications", color: "from-green-400 to-green-600" },
   ];
