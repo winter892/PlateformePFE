@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 import React from 'react';
 import { motion } from 'framer-motion';
 import { User, Mail, Phone, Book, Calendar, Award, MapPin, School } from 'lucide-react';

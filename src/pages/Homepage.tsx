@@ -33,13 +33,22 @@ const Homepage = () => {
             className="group opacity-0 animate-fade-in-up glass-effect rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer overflow-hidden"
           >
             <div className="p-8">
+<<<<<<< HEAD
               <div className="bg-gradient-to-br from-blue-100 to-blue-200 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:animate-pulse-slow">
                 <Users className="w-10 h-10 text-blue-600 transform group-hover:scale-110 transition-transform duration-300" />
+=======
+              <div className="bg-gradient-to-br from-purple-100 to-purple-200 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:animate-pulse-slow">
+                <Users className="w-10 h-10 text-purple-600 transform group-hover:scale-110 transition-transform duration-300" />
+>>>>>>> master
               </div>
               <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Espace Encadrant</h2>
               <p className="text-gray-600 text-center">Accédez à vos outils d'encadrement et de suivi pédagogique</p>
             </div>
+<<<<<<< HEAD
             <div className="h-2 bg-gradient-to-r from-blue-400 to-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+=======
+            <div className="h-2 bg-gradient-to-r from-purple-400 to-purple-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+>>>>>>> master
           </div>
 
           {/* Espace Étudiant */}
@@ -63,13 +72,22 @@ const Homepage = () => {
             className="group opacity-0 animate-fade-in-up animation-delay-400 glass-effect rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 cursor-pointer overflow-hidden"
           >
             <div className="p-8">
+<<<<<<< HEAD
               <div className="bg-gradient-to-br from-purple-100 to-purple-200 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:animate-pulse-slow">
                 <Building2 className="w-10 h-10 text-purple-600 transform group-hover:scale-110 transition-transform duration-300" />
+=======
+              <div className="bg-gradient-to-br from-blue-100 to-blue-200 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:animate-pulse-slow">
+                <Building2 className="w-10 h-10 text-blue-600 transform group-hover:scale-110 transition-transform duration-300" />
+>>>>>>> master
               </div>
               <h2 className="text-2xl font-semibold text-gray-800 mb-4 text-center">Espace Administration</h2>
               <p className="text-gray-600 text-center">Pilotez et gérez les aspects administratifs de l'établissement</p>
             </div>
+<<<<<<< HEAD
             <div className="h-2 bg-gradient-to-r from-purple-400 to-purple-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+=======
+            <div className="h-2 bg-gradient-to-r from-blue-400 to-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+>>>>>>> master
           </div>
         </div>
       </div>

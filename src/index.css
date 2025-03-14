@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -196,5 +199,9 @@
 
 .glass-effect {
   backdrop-filter: blur(10px);
+<<<<<<< HEAD
   background: rgba(255, 255, 255, 0.7);
+=======
+  background: rgba(255, 255, 255, 0.7);
+>>>>>>> master
 }
