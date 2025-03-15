@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,17 +12,11 @@ import {
 import { toast } from '@/components/ui/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { Task, Deliverable, Comment } from '@/types/task';
-<<<<<<< HEAD
-import { TaskFilter } from '@/components/tasks/TaskFilter';
-import { TaskList } from '@/components/tasks/TaskList';
-import { TaskForm } from '@/components/tasks/NewTaskForm';
-import { DeliverablesManager } from '@/components/tasks/DeliverablesManager';
-=======
+
 import { TaskFilter } from '@/components/dashboardEtudiant/TaskFilter';
 import { TaskList } from '@/components/dashboardEtudiant/TaskList';
 import { TaskForm } from '@/components/dashboardEtudiant/NewTaskForm';
 import { DeliverablesManager } from '@/components/dashboardEtudiant/DeliverablesManager';
->>>>>>> master
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([
@@ -263,48 +253,17 @@ export default function Tasks() {
           onViewDeliverables={openDeliverablesDialog}
           onCreateTask={() => setIsNewTaskDialogOpen(true)}
         />
+        
+        <DeliverablesManager 
+          isOpen={isDeliverablesDialogOpen}
+          onClose={() => setIsDeliverablesDialogOpen(false)}
+          taskId={selectedTaskId}
+          deliverables={deliverables}
+          comments={comments}
+          onAddDeliverable={handleAddDeliverable}
+          onAddComment={handleAddComment}
+        />
       </div>
-
-      {/* Edit Task Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Modifier la tâche</DialogTitle>
-            <DialogDescription>Modifiez les détails de la tâche selon vos besoins.</DialogDescription>
-          </DialogHeader>
-          {editingTask && (
-            <TaskForm 
-              task={editingTask}
-              onChange={setEditingTask}
-              onCancel={() => {
-                setEditingTask(null);
-                setIsEditDialogOpen(false);
-              }}
-              onSubmit={handleEditTask}
-              isEditing={true}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Deliverables Dialog */}
-      <Dialog open={isDeliverablesDialogOpen} onOpenChange={setIsDeliverablesDialogOpen}>
-        <DialogContent className="sm:max-w-[800px] max-h-[80vh]">
-          <DialogHeader>
-            <DialogTitle>Livrables</DialogTitle>
-            <DialogDescription>Gérez les livrables associés à cette tâche.</DialogDescription>
-          </DialogHeader>
-          {selectedTaskId && (
-            <DeliverablesManager 
-              deliverables={deliverables.filter(d => d.taskId === selectedTaskId)}
-              comments={comments}
-              onAddComment={handleAddComment}
-              onAddDeliverable={handleAddDeliverable}
-              taskId={selectedTaskId}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

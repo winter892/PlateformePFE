@@ -1,12 +1,6 @@
-
 import React from "react";
-<<<<<<< HEAD
-import Layout from "../../../components/dashboard/Layout";
-import Header from "../../../components/dashboard/Header";
-=======
 import Layout from "../../../components/dashboardAdmin/Layout";
 import Header from "../../../components/dashboardAdmin/Header";
->>>>>>> master
 
 const Parametres = () => {
   return (

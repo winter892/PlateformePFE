@@ -58,7 +58,7 @@ const AdminSidebar = () => {
       <div className="absolute bottom-0 w-full border-t border-blue-500 p-4">
         <button
           className="flex items-center w-full py-2 px-3 text-white hover:bg-gradient-to-r from-blue-700 to-blue-500 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/IndexAdmin")}
         >
           <LogOut className="w-4 h-4 mr-2" />
           Déconnexion

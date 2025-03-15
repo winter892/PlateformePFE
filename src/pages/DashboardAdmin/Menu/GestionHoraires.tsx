@@ -1,14 +1,8 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Calendar, Clock, Power } from "lucide-react";
-<<<<<<< HEAD
-import Layout from "../../../components/dashboard/Layout";
-import Header from "../../../components/dashboard/Header";
-=======
 import Layout from "../../../components/dashboardAdmin/Layout";
 import Header from "../../../components/dashboardAdmin/Header";
->>>>>>> master
 
 const HoraireCard = ({ 
   title, 
