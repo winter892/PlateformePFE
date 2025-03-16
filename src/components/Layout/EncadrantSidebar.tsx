@@ -1,61 +1,74 @@
-import React from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import React from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
-  Clock, 
+  BellRing, 
+  BarChart2,
   LogOut,
-  BarChart3
-} from "lucide-react";
+  User
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const EncadrantSidebar = () => {
+interface SidebarProps {
+  onProfileClick?: () => void;
+}
+
+const EncadrentSidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
   const location = useLocation();
+  const isActive = (path: string) => location.pathname === path;
   const navigate = useNavigate();
-  
   const menuItems = [
-    {
-      path: "/IndexAdmin",
-      name: "Tableau de bord",
-      icon: <LayoutDashboard className="w-5 h-5" />
-    },
-    {
-      path: "/comptes",
-      name: "Comptes",
-      icon: <Users className="w-5 h-5" />
-    },
-    {
-      path: "/gestion-horaires",
-      name: "Gestion des horaires",
-      icon: <Clock className="w-5 h-5" />
-    },
-    {
-      path: "/statistiques",
-      name: "Statistiques",
-      icon: <BarChart3 className="w-5 h-5" />
-    }
+    { icon: LayoutDashboard, label: 'Tableau de bord', path: '/IndexEncadrant' },
+    { icon: Users, label: 'Groupes', path: '/groups' },
+    { icon: BellRing, label: 'Notifications', path: '/EncadrantNotifications' },
+    { icon: BarChart2, label: 'Statistiques', path: '/statistics' },
   ];
 
   return (
-    <div className="bg-gradient-to-b from-purple-900 to-purple-600 w-64 h-screen flex flex-col fixed left-0 top-0 text-white">
-      <div className="p-5 border-b border-purple-800">
-        <h1 className="text-white text-xl font-semibold">Gestion des Projets</h1>
+    <div className="w-64 h-full fixed bg-gradient-to-b from-purple-500 to-purple-800 text-white shadow-lg">
+      <div className="p-6">
+        <h1 className="text-2xl font-bold">Encadrement Academique</h1>
+        <p className="text-sm opacity-80">Plateforme d'encadrement</p>
       </div>
       
-      <div className="flex flex-col gap-1 py-5">
-        {menuItems.map((item) => (
-          <Link 
-            key={item.path}
-            to={item.path}
-            className={`flex items-center gap-3 py-2 px-4 text-white hover:bg-gradient-to-r from-purple-700 to-purple-500 rounded-lg transition-all duration-300 ${location.pathname === item.path ? 'bg-gradient-to-r from-purple-800 to-purple-600' : ''}`}
-          >
-            {item.icon}
-            <span>{item.name}</span>
-          </Link>
-        ))}
+      <div className="mt-6">
+        <ul>
+          {menuItems.map((item, index) => (
+            <li key={index}>
+              <Link
+                to={item.path}
+                className={cn(
+                  "flex items-center py-3 px-6 text-white hover:bg-purple-600 transition-colors",
+                  isActive(item.path) && "bg-purple-900 text-white font-medium border-r-4 border-white"
+                )}
+              >
+                <item.icon className="w-5 h-5 mr-3" />
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
-      <div className="absolute bottom-0 w-full border-t border-purple-500 p-4">
+      
+      <div className="absolute bottom-0 w-full border-t border-purple-400 p-4">
+        {/* Bouton Profil */}
         <button
-          className="flex items-center w-full py-2 px-3 text-white hover:bg-gradient-to-r from-purple-700 to-purple-500 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
+          onClick={() => navigate("/EncadrantProfile")}
+          className="flex items-center w-full text-left p-2 rounded-lg hover:bg-purple-600 transition duration-300"
+        >
+          <div className="bg-purple-400 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+            <User className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <p className="text-sm font-medium">Dr. Jean Dupont</p>
+            <p className="text-xs opacity-80">Encadrant</p>
+          </div>
+        </button>
+
+        {/* Bouton Déconnexion */}
+        <button
+          className="flex items-center w-full py-2 px-3 text-sm text-white bg-gradient-to-r from-purple-600 to-purple-900 hover:from-purple-700 hover:to-purple-950 rounded-lg transition-colors"
           onClick={() => navigate("/login")}
         >
           <LogOut className="w-4 h-4 mr-2" />
@@ -66,4 +79,4 @@ const EncadrantSidebar = () => {
   );
 };
 
-export default EncadrantSidebar;
+export default EncadrentSidebar;
