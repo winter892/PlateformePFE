@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useEffect,useState } from "react";
 import Layout from "../../../components/dashboardAdmin/Layout";
 import Header from "../../../components/dashboardAdmin/Header";
 import { Button } from "@/components/ui/button";
@@ -7,40 +7,53 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Users, User, FileArchive, RefreshCcw, ArrowLeft } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-
-// Données fictives pour les départements
-const departments = [
-  { id: "info", name: "Informatique" },
-  { id: "elec", name: "Électrique" },
-  { id: "meca", name: "Mécanique" },
-  { id: "civil", name: "Génie Civil" },
-  { id: "indus", name: "Génie Industriel" }
-];
-
-// Données fictives pour les encadrants
-const mockSupervisors = [
-  { id: 1, nom: "Alaoui", prenom: "Mohammed", cin: "AB123456", departement: "info", codePFE: "" },
-  { id: 2, nom: "Benani", prenom: "Sara", cin: "CD789012", departement: "info", codePFE: "" },
-  { id: 3, nom: "Chraibi", prenom: "Karim", cin: "EF345678", departement: "elec", codePFE: "" },
-  { id: 4, nom: "Daoudi", prenom: "Fatima", cin: "GH901234", departement: "elec", codePFE: "" },
-  { id: 5, nom: "El Fassi", prenom: "Ahmed", cin: "IJ567890", departement: "meca", codePFE: "" },
-];
-
-// Données fictives pour les étudiants
-const mockStudents = [
-  { id: 1, nom: "Zidane", prenom: "Yasmine", codeApogee: "19000123", departement: "info", codePFE: "" },
-  { id: 2, nom: "Yacoubi", prenom: "Mehdi", codeApogee: "19000456", departement: "info", codePFE: "" },
-  { id: 3, nom: "Wahbi", prenom: "Leila", codeApogee: "19000789", departement: "elec", codePFE: "" },
-  { id: 4, nom: "Toumi", prenom: "Hamza", codeApogee: "19000012", departement: "elec", codePFE: "" },
-  { id: 5, nom: "Saadi", prenom: "Salma", codeApogee: "19000345", departement: "meca", codePFE: "" },
-];
+import { error } from "console";
+import { getDepartements, getFilieres, getEncadrants,getEtudiants } from "@/services/userService";
 
 const Comptes = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
-  const [supervisors, setSupervisors] = useState(mockSupervisors);
-  const [students, setStudents] = useState(mockStudents);
+  const [departments, setDepartments] = useState<any[]>([]); // Liste des départements récupérés
+  const [supervisors, setSupervisors] = useState<any[]>([]); // Liste des encadrants récupérés
+  const [students, setStudents] = useState<any[]>([]); // Liste des étudiants récupérés
   const { toast } = useToast();
+
+  // Récupérer les départements lors du chargement initial
+  useEffect(() => {
+    const fetchDepartements = async () => {
+      const data = await getDepartements();
+      console.log("Departements récupérés:", data);
+      setDepartments(data);
+    };
+    fetchDepartements();
+  }, []);
+
+  // Récupérer les encadrants en fonction du département sélectionné
+  useEffect(() => {
+    if (selectedDepartment) {
+      const fetchEncadrants = async () => {
+        const data = await getEncadrants(selectedDepartment);
+        setSupervisors(data);
+      };
+      fetchEncadrants();
+    }
+  }, [selectedDepartment]);
+
+  // Récupérer les étudiants en fonction du département ou de la filière sélectionnée
+  useEffect(() => {
+    if (selectedDepartment) {
+      const fetchFilieres = async () => {
+        const data = await getFilieres(selectedDepartment);
+        // Ensuite, on peut utiliser l'ID de la filière pour récupérer les étudiants
+        if (data.length > 0) {
+          const filiereId = data[0].id; // Choisir la première filière par défaut
+          const studentsData = await getEtudiants(filiereId);
+          setStudents(studentsData);
+        }
+      };
+      fetchFilieres();
+    }
+  }, [selectedDepartment]);
 
   const handleRoleSelect = (role: string) => {
     setSelectedRole(role);
@@ -63,7 +76,7 @@ const Comptes = () => {
   const generateCodes = () => {
     if (selectedRole === "encadrant") {
       const updatedSupervisors = supervisors.map(supervisor => {
-        if (supervisor.departement === selectedDepartment && !supervisor.codePFE) {
+        if (!supervisor.codePFE) {
           return {
             ...supervisor,
             codePFE: `PFE-${supervisor.departement.toUpperCase()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`
@@ -74,7 +87,7 @@ const Comptes = () => {
       setSupervisors(updatedSupervisors);
     } else {
       const updatedStudents = students.map(student => {
-        if (student.departement === selectedDepartment && !student.codePFE) {
+        if (!student.codePFE) {
           return {
             ...student,
             codePFE: `PFE-${student.departement.toUpperCase()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`
@@ -84,7 +97,7 @@ const Comptes = () => {
       });
       setStudents(updatedStudents);
     }
-    
+
     toast({
       title: "Codes générés",
       description: "Les codes PFE ont été générés avec succès",
@@ -99,14 +112,6 @@ const Comptes = () => {
       duration: 3000,
     });
   };
-
-  // Filtrer les personnes par département sélectionné
-  const filteredSupervisors = supervisors.filter(
-    (supervisor) => supervisor.departement === selectedDepartment
-  );
-  const filteredStudents = students.filter(
-    (student) => student.departement === selectedDepartment
-  );
 
   return (
     <Layout>
@@ -173,7 +178,7 @@ const Comptes = () => {
                   onClick={() => handleDepartmentSelect(dept.id)}
                 >
                   <CardHeader className="py-4">
-                    <CardTitle className="text-base font-medium text-center">{dept.name}</CardTitle>
+                    <CardTitle className="text-base font-medium text-center">{dept.intitule}</CardTitle>
                   </CardHeader>
                 </Card>
               ))}
@@ -214,8 +219,8 @@ const Comptes = () => {
                 </TableHeader>
                 <TableBody>
                   {selectedRole === "encadrant" ? (
-                    filteredSupervisors.length > 0 ? (
-                      filteredSupervisors.map((supervisor) => (
+                    supervisors.length > 0 ? (
+                      supervisors.map((supervisor) => (
                         <TableRow key={supervisor.id}>
                           <TableCell>{supervisor.nom}</TableCell>
                           <TableCell>{supervisor.prenom}</TableCell>
@@ -231,8 +236,8 @@ const Comptes = () => {
                       </TableRow>
                     )
                   ) : (
-                    filteredStudents.length > 0 ? (
-                      filteredStudents.map((student) => (
+                    students.length > 0 ? (
+                      students.map((student) => (
                         <TableRow key={student.id}>
                           <TableCell>{student.nom}</TableCell>
                           <TableCell>{student.prenom}</TableCell>
