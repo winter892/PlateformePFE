@@ -1,15 +1,16 @@
 
 import React, { useState } from "react";
-import { Calendar as CalendarIcon, Plus, Trash2, Edit } from "lucide-react";
+import { Calendar as CalendarIcon, Plus, Trash2, Edit, ArrowLeft } from "lucide-react";
 import Layout from "../../../components/dashboardAdmin/Layout";
 import Header from "../../../components/dashboardAdmin/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // Type pour les données de soutenance
 interface Soutenance {
   id: string;
-  etudiant: string;
+  Groupe: string;
   projet: string;
   date: string;
   heure: string;
@@ -18,11 +19,13 @@ interface Soutenance {
 }
 
 const PlanningSoutenances = () => {
+  const location = useLocation();
+    const navigate = useNavigate();
   // Données simulées de soutenances
   const [soutenances, setSoutenances] = useState<Soutenance[]>([
     {
       id: "1",
-      etudiant: "Mohammed Alami",
+      Groupe: "Mohammed Alami",
       projet: "Système de recommandation",
       date: "2023-06-15",
       heure: "10:00",
@@ -31,7 +34,7 @@ const PlanningSoutenances = () => {
     },
     {
       id: "2",
-      etudiant: "Fatima Zohra",
+      Groupe: "Fatima Zohra",
       projet: "Application mobile de gestion",
       date: "2023-06-16",
       heure: "14:30",
@@ -43,7 +46,7 @@ const PlanningSoutenances = () => {
   // État pour le formulaire d'ajout
   const [showForm, setShowForm] = useState(false);
   const [newSoutenance, setNewSoutenance] = useState<Omit<Soutenance, 'id'>>({
-    etudiant: "",
+    Groupe: "",
     projet: "",
     date: "",
     heure: "",
@@ -56,7 +59,7 @@ const PlanningSoutenances = () => {
     const id = Math.random().toString(36).substr(2, 9);
     setSoutenances([...soutenances, { id, ...newSoutenance }]);
     setNewSoutenance({
-      etudiant: "",
+      Groupe: "",
       projet: "",
       date: "",
       heure: "",
@@ -73,6 +76,11 @@ const PlanningSoutenances = () => {
 
   return (
     <Layout>
+      
+      
+       <button onClick={() => navigate('/gestion-horaires')} className="mb-8 flex items-center p-2 rounded-md transition border bg-gray-200 hover:bg-blue-100">
+                      <ArrowLeft className="w-5 h-5 mr-2" /> Retour
+            </button>
       <Header title="Planning des soutenances" />
       
       <Card className="mb-6">
@@ -93,8 +101,8 @@ const PlanningSoutenances = () => {
                   <input 
                     type="text" 
                     className="w-full p-2 border rounded-md"
-                    value={newSoutenance.etudiant}
-                    onChange={(e) => setNewSoutenance({...newSoutenance, etudiant: e.target.value})}
+                    value={newSoutenance.Groupe}
+                    onChange={(e) => setNewSoutenance({...newSoutenance, Groupe: e.target.value})}
                   />
                 </div>
                 <div>
@@ -154,7 +162,7 @@ const PlanningSoutenances = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-indigo-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Étudiant</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Groupe</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Projet</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Heure</th>
@@ -166,7 +174,7 @@ const PlanningSoutenances = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {soutenances.map((soutenance) => (
                   <tr key={soutenance.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{soutenance.etudiant}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{soutenance.Groupe}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{soutenance.projet}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{soutenance.date}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{soutenance.heure}</td>

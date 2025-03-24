@@ -32,6 +32,7 @@ const HoraireCard = ({
 const GestionHoraires = () => {
   return (
     <Layout>
+      
       <Header title="Gestion des horaires" />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">

@@ -27,7 +27,7 @@ export const getFilieres = async (departementId) => {
 //pour les encadrants 
 export const getEncadrants = async (departementId) => {
   try {
-    const response = await axios.get(`${REST_API_BASE_URL}/Encadrants/${departementId}`);
+    const response = await axios.get(`http://localhost:8080/api/Encadrants/${departementId}`);
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des encadrants :", error);
@@ -37,7 +37,7 @@ export const getEncadrants = async (departementId) => {
 //pour les etudiants 
 export const getEtudiants = async (filiereId) => {
   try {
-    const response = await axios.get(`${REST_API_BASE_URL}/Etudiants/${filiereId}`);
+    const response = await axios.get(`http://localhost:8080/api/Etudiants/${filiereId}`);
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des etudiants :", error);

@@ -1,12 +1,15 @@
 
 import React, { useState } from "react";
-import { Power, Bell, RefreshCw } from "lucide-react";
+import { Power, Bell, RefreshCw, ArrowLeft } from "lucide-react";
 import Layout from "../../../components/dashboardAdmin/Layout";
 import Header from "../../../components/dashboardAdmin/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const ActivationPlateforme = () => {
+  const location = useLocation();
+      const navigate = useNavigate();
   // État pour l'activation de la plateforme
   const [isActive, setIsActive] = useState(true);
   // État pour le message de maintenance
@@ -23,6 +26,10 @@ const ActivationPlateforme = () => {
 
   return (
     <Layout>
+      
+       <button onClick={() => navigate('/gestion-horaires')} className="mb-8 flex items-center p-2 rounded-md transition border bg-gray-200 hover:bg-blue-100">
+                      <ArrowLeft className="w-5 h-5 mr-2" /> Retour
+            </button>
       <Header title="Activation/Désactivation de la plateforme" />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

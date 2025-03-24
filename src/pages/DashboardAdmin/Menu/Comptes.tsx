@@ -13,7 +13,11 @@ import { getDepartements, getFilieres, getEncadrants,getEtudiants } from "@/serv
 const Comptes = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
+  const [selectedFiliere, setSelectedFiliere] = useState<string | null>(null);
+
   const [departments, setDepartments] = useState<any[]>([]); // Liste des départements récupérés
+  const [filieres, setFilieres] = useState<any[]>([]); // Liste des filieres récupérés
+
   const [supervisors, setSupervisors] = useState<any[]>([]); // Liste des encadrants récupérés
   const [students, setStudents] = useState<any[]>([]); // Liste des étudiants récupérés
   const { toast } = useToast();
@@ -27,6 +31,17 @@ const Comptes = () => {
     };
     fetchDepartements();
   }, []);
+  // Charger les filières lorsque le département est sélectionné
+  useEffect(() => {
+    if (selectedDepartment) {
+      const fetchFilieres = async () => {
+        const data = await getFilieres(selectedDepartment);
+        setFilieres(data);
+      };
+      fetchFilieres();
+    }
+  }, [selectedDepartment]);
+
 
   // Récupérer les encadrants en fonction du département sélectionné
   useEffect(() => {
@@ -39,21 +54,18 @@ const Comptes = () => {
     }
   }, [selectedDepartment]);
 
-  // Récupérer les étudiants en fonction du département ou de la filière sélectionnée
+ 
+  // Charger les étudiants lorsque la filière est sélectionnée et le rôle est "étudiant"
   useEffect(() => {
-    if (selectedDepartment) {
-      const fetchFilieres = async () => {
-        const data = await getFilieres(selectedDepartment);
-        // Ensuite, on peut utiliser l'ID de la filière pour récupérer les étudiants
-        if (data.length > 0) {
-          const filiereId = data[0].id; // Choisir la première filière par défaut
-          const studentsData = await getEtudiants(filiereId);
-          setStudents(studentsData);
-        }
+    if (selectedFiliere && selectedRole === "etudiant") {
+      const fetchEtudiants = async () => {
+        const data = await getEtudiants(selectedFiliere);
+        setStudents(data);
       };
-      fetchFilieres();
+      fetchEtudiants();
     }
-  }, [selectedDepartment]);
+  }, [selectedFiliere, selectedRole]);
+
 
   const handleRoleSelect = (role: string) => {
     setSelectedRole(role);
@@ -64,6 +76,11 @@ const Comptes = () => {
     setSelectedDepartment(departmentId);
   };
 
+
+    // Gestion de la sélection d'une filière
+    const handleFiliereSelect = (filiereId) => {
+      setSelectedFiliere(filiereId);
+    };
   const handleBackToRoles = () => {
     setSelectedRole(null);
     setSelectedDepartment(null);
@@ -73,6 +90,9 @@ const Comptes = () => {
     setSelectedDepartment(null);
   };
 
+  const handleBackToFilieres = () => {
+    setSelectedFiliere(null);
+  };
   const generateCodes = () => {
     if (selectedRole === "encadrant") {
       const updatedSupervisors = supervisors.map(supervisor => {
@@ -167,8 +187,9 @@ const Comptes = () => {
               </Button>
             </div>
             <p className="text-gray-500 mb-6">
-              Veuillez sélectionner un département pour afficher la liste des {selectedRole === "encadrant" ? "encadrants" : "étudiants"}.
+            {selectedRole === "encadrant" ? "Veuillez sélectionner un département pour afficher la liste des Departement" : "Veuillez sélectionner un département pour afficher la liste des filieres"}
             </p>
+         
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {departments.map((dept) => (
@@ -185,17 +206,54 @@ const Comptes = () => {
             </div>
           </div>
         )}
-
-        {/* Étape 3: Affichage de la liste */}
-        {selectedRole && selectedDepartment && (
+            
+        {/*Etape 3 : afficher la liste des filieres pour les etudiants*/}
+        
+        {selectedRole === "etudiant" && selectedDepartment && !selectedFiliere && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold">
-                Liste des {selectedRole === "encadrant" ? "encadrants" : "étudiants"} - Département {departments.find(d => d.id === selectedDepartment)?.name}
+                Sélection du Filière des Etudiants
               </h2>
               <Button variant="outline" onClick={handleBackToDepartments}>
                 <ArrowLeft className="mr-2 h-4 w-4" /> Retour
               </Button>
+            </div>
+            <p className="text-gray-500 mb-6">
+            {selectedRole === "etudiant" ? "Veuillez sélectionner une filière pour afficher la liste des etudiants" : ""}
+            </p>
+         
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {filieres.map((fil) => (
+                <Card 
+                  key={fil.id}
+                  className="cursor-pointer transition-all hover:shadow-md border hover:border-blue-500"
+                  onClick={() => handleFiliereSelect(fil.id)}
+                >
+                  <CardHeader className="py-4">
+                    <CardTitle className="text-base font-medium text-center">{fil.intitule}</CardTitle>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Étape 4: Affichage de la liste des etudiants ou encadrants*/}
+        {selectedRole && selectedDepartment && (selectedRole === "encadrant" || selectedFiliere) &&(
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">
+                Liste des {selectedRole === "encadrant" ? "encadrants" : "étudiants"} {selectedRole === "encadrant" ? `- Département : ${departments.find(d => d.id === selectedDepartment)?.intitule || ''}`  : `- Filière :  ${filieres.find(d => d.id === selectedFiliere)?.intitule || ''}`}
+
+              </h2>
+              {selectedRole === "encadrant" ? <Button variant="outline" onClick={handleBackToDepartments}>
+                <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+              </Button> : <Button variant="outline" onClick={handleBackToFilieres}>
+                <ArrowLeft className="mr-2 h-4 w-4" /> Retour
+              </Button>}
+             
             </div>
             
             <div className="flex gap-4 my-4">
@@ -213,8 +271,8 @@ const Comptes = () => {
                   <TableRow>
                     <TableHead>Nom</TableHead>
                     <TableHead>Prénom</TableHead>
-                    <TableHead>{selectedRole === "encadrant" ? "CIN" : "Code Apogée"}</TableHead>
-                    <TableHead>Code PFE</TableHead>
+                    <TableHead>{selectedRole === "encadrant" ? "Email" : "Code Apogée"}</TableHead>
+                    <TableHead>Code D'authentification</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -224,7 +282,7 @@ const Comptes = () => {
                         <TableRow key={supervisor.id}>
                           <TableCell>{supervisor.nom}</TableCell>
                           <TableCell>{supervisor.prenom}</TableCell>
-                          <TableCell>{supervisor.cin}</TableCell>
+                          <TableCell>{supervisor.Email}</TableCell>
                           <TableCell>{supervisor.codePFE || "Non généré"}</TableCell>
                         </TableRow>
                       ))
