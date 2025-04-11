@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation,useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, 
   Users, 
@@ -36,34 +36,41 @@ const AdminSidebar = () => {
   ];
 
   return (
-    <div className="bg-dashboard-sidebar w-64 h-screen flex flex-col fixed left-0 top-0">
-      <div className="p-5 border-b border-indigo-800">
+    <div className="bg-gradient-to-b from-blue-900 to-blue-600 w-64 h-screen flex flex-col fixed left-0 top-0 text-white shadow-lg">
+      {/* Titre du sidebar */}
+      <div className="p-5 border-b border-blue-800">
         <h1 className="text-white text-xl font-semibold">Gestion des Projets</h1>
       </div>
       
-      <div className="flex flex-col gap-1 py-5">
+      {/* Liens du menu */}
+      <div className="flex flex-col gap-2 py-5 flex-1">
         {menuItems.map((item) => (
           <Link 
             key={item.path}
             to={item.path}
-            className={`sidebar-link ${location.pathname === item.path ? 'active' : ''}`}
+            className={`flex items-center gap-3 py-2 px-4 text-white hover:bg-gradient-to-r from-blue-700 to-blue-500 rounded-lg transition-all duration-300 
+              ${location.pathname === item.path ? 'bg-gradient-to-r from-blue-800 to-blue-600' : ''}`}
+            aria-label={item.name}
           >
             {item.icon}
             <span>{item.name}</span>
           </Link>
         ))}
       </div>
-      <div className="absolute bottom-0 w-full border-t border-violet-100 p-4">
-      <button
-        className="flex items-center w-full py-2 px-3 text-sm text-balck-600 hover:bg-red-50 rounded-lg transition-colors"
-        onClick={() => navigate("/login")}
-      >
-        <LogOut className="w-4 h-4 mr-2" />
-        Déconnexion
-      </button>
+      
+      {/* Bouton Déconnexion */}
+      <div className="p-4 border-t border-blue-500 mt-auto">
+        <button
+          className="flex items-center w-full py-2 px-4 text-white bg-gradient-to-r from-blue-900 to-blue-600 hover:from-blue-700 hover:to-blue-500 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
+          onClick={() => navigate("/")}
+          aria-label="Déconnexion"
+        >
+          <LogOut className="w-5 h-5 mr-2" />
+          Déconnexion
+        </button>
       </div>
     </div>
   );
 };
 
-export default AdminSidebar;
+export default AdminSidebar;

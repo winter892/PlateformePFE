@@ -44,3 +44,14 @@ export const getEtudiants = async (filiereId) => {
     return [];
   }
 };
+//pour les etudiants
+export const getGroupes=async(filiere_Id)=>{
+  try {
+    const response = await axios.get(`http://localhost:8080/api/Groupes/${filiere_Id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des groupes :", error);
+    return [];
+  }
+
+}

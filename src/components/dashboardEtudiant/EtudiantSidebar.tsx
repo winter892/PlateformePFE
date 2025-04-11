@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 
 export const EtudiantSidebar = () => {
   const location = useLocation();
+  
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Tableau de bord", path: "/IndexEtudiant", color: "from-green-400 to-green-600" },

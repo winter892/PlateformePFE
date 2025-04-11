@@ -22,7 +22,7 @@ const IndexEncadrant = () => {
   }, []);
 
   const handleTeacherClick = () => {
-    navigate('/profile');
+    navigate('/EncadrantProfile');
   };
 
   // Import tasks from mock-data
