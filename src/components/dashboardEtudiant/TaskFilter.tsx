@@ -43,7 +43,7 @@ export const TaskFilter = ({
           <Filter className="w-4 h-4 mr-2" />
           Tous
         </Button>
-        {['à faire', 'en cours', 'terminé'].map(status => (
+        {['En attente', 'En cours', 'Terminé'].map(status => (
           <Button
             key={status}
             variant="outline"

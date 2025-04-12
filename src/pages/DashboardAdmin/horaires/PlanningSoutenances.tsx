@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect,useState } from "react";
+import Select from 'react-select';
 import { Calendar as CalendarIcon, Plus, Trash2, Edit, ArrowLeft } from "lucide-react";
 import Layout from "../../../components/dashboardAdmin/Layout";
 import Header from "../../../components/dashboardAdmin/Header";
@@ -6,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui
 import { Button } from "../../../components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getDepartements, getFilieres, getEncadrants, getEtudiants,getGroupes } from "@/services/userService";
+import { getDepartements, getFilieres,getProjectName, getEncadrantName,getJurys,getGroupes } from "@/services/userService";
 
 // Type pour les données de soutenance
 interface Soutenance {
@@ -23,16 +24,26 @@ const PlanningSoutenances = () => {
   const [departments, setDepartments] = useState<any[]>([]); // Liste des départements récupérés
   const [filieres, setFilieres] = useState<any[]>([]); // Liste des filières récupérées
   const [groupes, setGroupes] = useState<any[]>([]); // Liste des groupes récupérées
-
+  const [juryOptions, setJuryOptions] = useState<any[]>([]);
   const [soutenances, setSoutenances] = useState<Soutenance[]>([]); // Liste des soutenances récupérées
+
   const [selectedDepartement, setSelectedDepartement] = useState<string | number>(""); // ID du département sélectionné
-  const [selectedFiliere, setSelectedFiliere] = useState<string>(""); // Département sélectionné
+  const [selectedFiliere, setSelectedFiliere] = useState<string>(""); // la filiere selectioné 
+  const [selectedGroupe, setSelectedGroupe] = useState<string>(""); //le groupe selectioné
+  const [selectedProjet, setSelectedProjet] = useState(""); // Intitulé du projet du groupe sélectionné
+  const [selectedEncadrant, setSelectedEncadrant] = useState(""); // Intitulé d'encadrant du groupe selectionné'
+  const [jury, setJury] = useState([]);
+
+
+
 
   // pour la navigation
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Récupérer les départements et soutenances lors du chargement initial
+ 
+  
+  // Récupérer les départements lors du chargement initiale
   useEffect(() => {
     const fetchDepartementsAndSoutenances = async () => {
       try {
@@ -57,7 +68,14 @@ const PlanningSoutenances = () => {
     if (departementId) {
       try {
         const filieresData = await getFilieres(departementId); // Charger les filières de ce département
-        setFilieres(filieresData);
+        if (filieresData.length === 0) {
+          // Si le département n'a pas de filières
+          setFilieres([]);
+          alert("Ce département n'a pas de filières disponibles.");
+          
+        } else {
+          setFilieres(filieresData);
+        }
       } catch (error) {
         console.error("Erreur lors de la récupération des filières :", error);
         setFilieres([]); // En cas d'erreur, on vide la liste
@@ -66,25 +84,85 @@ const PlanningSoutenances = () => {
       setFilieres([]); // Si aucun département n'est sélectionné, on vide la liste
     }
   };
-  //Récuperer les groupes d'une filiere
-   // Récupérer les filières en fonction du département sélectionné
+
+    //Récuperer les groupes d'une filiere
+   // Récupérer les groupes en fonction du filiere sélectionné
+
    const handlFiliereChange = async (e) => {
     const filiereId = e.target.value; // Récupérer l'ID du département sélectionné
     setSelectedFiliere(filiereId); // Mettre à jour l’état
 
     if (filiereId) {
       try {
-        const GroupeData = await getGroupes(filiereId); // Charger les filières de ce département
+        const GroupeData = await getGroupes(filiereId); // Charger les groupes de cette filiere
         setGroupes(GroupeData);
+        if (GroupeData.length === 0) {
+          // si la fiiere ne contion aucun groupe 
+          setGroupes([]);
+
+          alert("cette filiere ne contient aucun groupe (cela pour le test)");
+          
+        } else {
+          setGroupes(GroupeData);
+        }
       } catch (error) {
-        console.error("Erreur lors de la récupération des filières :", error);
+        console.error("Erreur lors de la récupération des groupes :", error);
         setGroupes([]); // En cas d'erreur, on vide la liste
       }
     } else {
-      setGroupes([]); // Si aucun département n'est sélectionné, on vide la liste
+      setGroupes([]); // Si aucun filiere n'a ete sélectionné, on vide la liste
     }
   }; 
+  const handleGroupeChange = async (e) => {
+    const groupeId = e.target.value;
+    setSelectedGroupe(groupeId);
+  
+    if (groupeId) {
+      try {
+        // Appels parallèles aux deux APIs
+        const [nameOfProject, nameofEncadrant] = await Promise.all([
+          getProjectName(groupeId),
+          getEncadrantName(groupeId)
+        ]);
+  
+        setSelectedProjet(nameOfProject);
+        setSelectedEncadrant(nameofEncadrant);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des infos du groupe :", error);
+        setSelectedProjet("");
+        setSelectedEncadrant("");
+      }
+    } else {
+      setSelectedProjet("");
+      setSelectedEncadrant("");
+    }
+  };
+  
+  //récupereé tout les jurys
+  
+  useEffect(() => {
+    const fetchJurys = async () => {
+      try {
+        const response = await getJurys();
+        console.log("Réponse des jurys:", response); // Ajoute ceci pour vérifier la réponse
 
+        const options = response.map(jury => ({
+          value: jury.id,
+          label: jury.nom_complet,
+        }));
+        setJuryOptions(options);
+      } catch (error) {
+        console.error("Erreur lors du chargement des jurys :", error);
+      }
+    };
+
+    fetchJurys();
+  }, []);
+  // Pour le jury
+const handleJuryChange = (selectedOptions) => {
+  const values = selectedOptions.map(option => option.value);
+  setJury(values);
+};
   // État pour le formulaire d'ajout
   const [showForm, setShowForm] = useState(false);
   const [newSoutenance, setNewSoutenance] = useState<Omit<Soutenance, 'id'>>({
@@ -184,8 +262,9 @@ const PlanningSoutenances = () => {
                   <select
                      className="w-full p-2 border rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
                      transition-all duration-200 ease-in-out max-h-40 overflow-y-auto" 
-                    value={newSoutenance.Groupe}
-                    onChange={(e) => setNewSoutenance({ ...newSoutenance, Groupe: e.target.value })}
+                     value={selectedGroupe}
+                     onChange={handleGroupeChange}
+               
                   >
                     <option value="">Sélectionner un groupe</option>
                     {groupes.map((grp) => (
@@ -199,11 +278,22 @@ const PlanningSoutenances = () => {
                   <label className="block text-sm font-medium mb-1">Projet</label>
                   <input
                     type="text"
-                    className="w-full p-2 border rounded-md"
-                    value={newSoutenance.projet}
-                    onChange={(e) => setNewSoutenance({ ...newSoutenance, projet: e.target.value })}
+                    className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
+                    value={selectedProjet}
+                    readOnly
                   />
                 </div>
+                    {/* encadrant */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Encadrant</label>
+                  <input
+                    type="text"
+                    className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
+                    value={selectedEncadrant}
+                    readOnly
+                  />
+                </div>
+                     {/*date*/}
                 <div>
                   <label className="block text-sm font-medium mb-1">Date</label>
                   <input 
@@ -213,6 +303,7 @@ const PlanningSoutenances = () => {
                     onChange={(e) => setNewSoutenance({...newSoutenance, date: e.target.value})}
                   />
                 </div>
+                      {/*heure*/}
                 <div>
                   <label className="block text-sm font-medium mb-1">Heure</label>
                   <input 
@@ -222,6 +313,7 @@ const PlanningSoutenances = () => {
                     onChange={(e) => setNewSoutenance({...newSoutenance, heure: e.target.value})}
                   />
                 </div>
+                       {/*salle*/}
                 <div>
                   <label className="block text-sm font-medium mb-1">Salle</label>
                   <input 
@@ -231,14 +323,15 @@ const PlanningSoutenances = () => {
                     onChange={(e) => setNewSoutenance({...newSoutenance, salle: e.target.value})}
                   />
                 </div>
+                       {/*Jury*/}
                 <div>
-                  <label className="block text-sm font-medium mb-1">Jury (séparés par des virgules)</label>
-                  <input 
-                    type="text" 
-                    className="w-full p-2 border rounded-md"
-                    value={newSoutenance.jury.join(", ")}
-                    onChange={(e) => setNewSoutenance({...newSoutenance, jury: e.target.value.split(", ")})}
-                  />
+                    <label className="block text-sm font-medium mb-1">Jury</label>
+                    <Select
+                      isMulti
+                      options={juryOptions}
+                      value={juryOptions.filter(option => jury.includes(option.value))}
+                      onChange={handleJuryChange}
+                    />
                 </div>
 
               </div>
@@ -255,6 +348,8 @@ const PlanningSoutenances = () => {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Groupe</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Projet</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Filiere</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Encadrant</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Heure</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Salle</th>
@@ -273,11 +368,9 @@ const PlanningSoutenances = () => {
                     <td className="px-6 py-4 whitespace-nowrap">{soutenance.date}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{soutenance.heure}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{soutenance.salle}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{soutenance.jury.join(", ")}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{soutenance.jury}</td>
                     <td className="px-6 py-4 whitespace-nowrap flex gap-2">
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                      
                       <Button variant="ghost" size="sm" onClick={() => handleDeleteSoutenance(soutenance.id)}>
                         <Trash2 className="h-4 w-4 text-red-500" />
                       </Button>

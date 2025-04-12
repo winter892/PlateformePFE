@@ -50,7 +50,7 @@ export const TaskForm = ({
             value={task.status}
             onChange={(e) => onChange({...task, status: e.target.value as Task['status']})}
           >
-            <option value="à faire">À faire</option>
+            <option value="à faire">En attente</option>
             <option value="en cours">En cours</option>
             <option value="terminé">Terminé</option>
           </select>

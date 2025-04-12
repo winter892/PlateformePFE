@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useEffect,useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,33 +16,41 @@ import { v4 as uuidv4 } from 'uuid';
 import { Task, Deliverable, Comment } from '@/types/task';
 import { TaskFilter } from '@/components/dashboardEtudiant/TaskFilter';
 import { TaskList } from '@/components/dashboardEtudiant/TaskList';
+import {TaskItem} from '@/components/dashboardEtudiant/TaskItem';
 import { TaskForm } from '@/components/dashboardEtudiant/NewTaskForm';
 import { DeliverablesManager } from '@/components/dashboardEtudiant/DeliverablesManager';
+import {getTaches} from "../../services/EtudiantsService";
 
 export default function Tasks() {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: '1',
-      title: 'Analyser les besoins du projet',
-      description: 'Réaliser une analyse détaillée des besoins fonctionnels du projet.',
-      status: 'terminé',
-      dueDate: '2023-10-15',
-    },
-    {
-      id: '2',
-      title: 'Concevoir l\'architecture',
-      description: 'Définir l\'architecture technique de l\'application.',
-      status: 'en cours',
-      dueDate: '2023-10-22',
-    },
-    {
-      id: '3',
-      title: 'Développer le prototype',
-      description: 'Créer un prototype fonctionnel pour validation.',
-      status: 'à faire',
-      dueDate: '2023-11-05',
-    },
-  ]);
+ 
+    const [tasks, setTasks] = useState<Task[]>([]); // Liste des taches récupérés
+    const [selectedTache, setSelectedTache] = useState<string | number>(""); // ID de le tache sélectionné
+
+    useEffect(() => {
+        const fetcheTaches = async () => {
+          try {
+            const TachesData = await getTaches();
+    
+            console.log("Taches récupérés:", TachesData);
+        const formattedTasks = TachesData.map((t: any) => ({
+            id: t.id.toString(),
+            title: t.titre,
+            description: t.description,
+            status: t.statut,
+            dueDate: t.dateLimite?.split('T')[0], // pour éviter les formats bizarres
+          }));
+      
+      setTasks(formattedTasks);
+          } catch (error) {
+            console.error("Erreur lors de la récupération des données:", error);
+          }
+        };
+    
+        fetcheTaches();
+      }, []);
+      
+    
+  
   
   const [deliverables, setDeliverables] = useState<Deliverable[]>([
     {
@@ -255,7 +264,7 @@ export default function Tasks() {
         />
       </div>
 
-      {/* Edit Task Dialog */}
+     {/*Edit Task Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
@@ -276,6 +285,7 @@ export default function Tasks() {
           )}
         </DialogContent>
       </Dialog>
+      
 
       {/* Deliverables Dialog */}
       <Dialog open={isDeliverablesDialogOpen} onOpenChange={setIsDeliverablesDialogOpen}>

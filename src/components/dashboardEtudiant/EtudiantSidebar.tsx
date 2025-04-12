@@ -45,8 +45,8 @@ export const EtudiantSidebar = () => {
     >
       <div className="h-full px-3 py-4 flex flex-col">
         <div className="flex items-center mb-8 pl-2">
-          <div className="bg-green-500 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold mr-2">S</div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-green-500 to-green-700 bg-clip-text text-transparent">StudyTrack</span>
+          <div className="bg-green-500 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold mr-2">E</div>
+          <span className="text-2xl font-bold bg-gradient-to-r from-green-500 to-green-700 bg-clip-text text-transparent">Espace Etudiant</span>
         </div>
         
         <nav className="space-y-2 flex-1">
