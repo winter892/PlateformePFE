@@ -5,9 +5,9 @@ import Layout from "../../../components/dashboardAdmin/Layout";
 import Header from "../../../components/dashboardAdmin/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { toast, useToast } from "@/hooks/use-toast";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getDepartements, getFilieres,getProjectName, getEncadrantName,getJurys,getGroupes } from "@/services/userService";
+import { getDepartements, getFilieres,getProjectName, getEncadrantName,getJurys,getGroupesByFiliere,addSoutenance} from "@/services/userService";
 
 // Type pour les données de soutenance
 interface Soutenance {
@@ -94,7 +94,7 @@ const PlanningSoutenances = () => {
 
     if (filiereId) {
       try {
-        const GroupeData = await getGroupes(filiereId); // Charger les groupes de cette filiere
+        const GroupeData = await getGroupesByFiliere(filiereId); // Charger les groupes de cette filiere
         setGroupes(GroupeData);
         if (GroupeData.length === 0) {
           // si la fiiere ne contion aucun groupe 
@@ -163,6 +163,7 @@ const handleJuryChange = (selectedOptions) => {
   const values = selectedOptions.map(option => option.value);
   setJury(values);
 };
+
   // État pour le formulaire d'ajout
   const [showForm, setShowForm] = useState(false);
   const [newSoutenance, setNewSoutenance] = useState<Omit<Soutenance, 'id'>>({
@@ -174,27 +175,39 @@ const handleJuryChange = (selectedOptions) => {
     jury: []
   });
 
-  // Fonction pour ajouter une nouvelle soutenance
-  const handleAddSoutenance = async () => {
-    const id = Math.random().toString(36).substr(2, 9); // Générer un ID aléatoire pour la soutenance
-    try {
-     // await getSoutenances(); // Vous pouvez appeler une fonction d'ajout de soutenance ici, ou envoyer à votre API
-      setSoutenances([...soutenances, { id, ...newSoutenance }]);
-      setNewSoutenance({
-        Groupe: "",
-        projet: "",
-        date: "",
-        heure: "",
-        salle: "",
-        jury: []
-      });
-      setShowForm(false);
-    } catch (error) {
-      console.error("Erreur lors de l'ajout de la soutenance:", error);
-    }
-  };
+//les informations recupérer du le forulaire
+const handleAddSoutenance = async () => {
+  try {
+    const dataToSend = {
+      groupeId: selectedGroupe,
+      date: newSoutenance.date,
+      heure: newSoutenance.heure,
+      salle: newSoutenance.salle,
+      juryIds: jury,
+    };
 
-  // Fonction pour supprimer une soutenance
+    await addSoutenance(dataToSend);
+    toast({ title: "Soutenance ajoutée avec succès !" });
+    setShowForm(false);
+
+    // Reset form
+    setNewSoutenance({
+      Groupe: "",
+      projet: "",
+      date: "",
+      heure: "",
+      salle: "",
+      jury: [],
+    });
+    setJury([]);
+  } catch (error) {
+    console.error("Erreur lors de l'ajout de la soutenance:", error);
+    toast({ variant: "destructive", title: "Erreur lors de l'ajout de la soutenance." });
+  }
+};
+
+
+  // Fonction pour supprimear une soutenance
   const handleDeleteSoutenance = async (id:string) => {
     try {
      // await getSoutenances(); // Vous pouvez appeler une fonction de suppression de soutenance ici

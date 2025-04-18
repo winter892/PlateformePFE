@@ -53,7 +53,7 @@ export const DeliverablesManager = ({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 overflow-y-auto max-h-[60vh]">
+    <div className="grid grid-cols-1 md:grid-cols-1 gap-4 overflow-y-auto max-h-[60vh]">
       <div className="border rounded-lg p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-medium">Livrables disponibles</h3>
@@ -146,65 +146,7 @@ export const DeliverablesManager = ({
           )}
         </div>
       </div>
-      <div className="border rounded-lg p-4">
-        <h3 className="font-medium mb-4">Aperçu et discussion</h3>
-        {activeDeliverable ? (
-          <>
-            <div className="h-40 flex items-center justify-center bg-gray-100 rounded-lg mb-4">
-              <div className="text-center">
-                <FileText className="mx-auto h-10 w-10 text-gray-400 mb-2" />
-                <p className="text-gray-500">{activeDeliverable.name}</p>
-              </div>
-            </div>
-            <h3 className="font-medium mt-4 mb-2">Discussion</h3>
-            <div className="border rounded-lg p-3 h-40 overflow-y-auto bg-gray-50">
-              <div className="space-y-3">
-                {getCommentsForDeliverable(activeDeliverable.id).map((comment) => (
-                  <div key={comment.id} className={`flex gap-2 ${comment.author === 'E' ? 'justify-end' : ''}`}>
-                    {comment.author !== 'E' && (
-                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 flex-shrink-0">
-                        {comment.author}
-                      </div>
-                    )}
-                    <div className={`p-2 rounded-lg shadow-sm max-w-[80%] ${comment.author === 'E' ? 'bg-green-100' : 'bg-white'}`}>
-                      <p className="text-sm">{comment.text}</p>
-                      <span className="text-xs text-gray-500">{comment.timestamp}</span>
-                    </div>
-                    {comment.author === 'E' && (
-                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 flex-shrink-0">
-                        {comment.author}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="flex mt-2">
-              <Input 
-                placeholder="Écrire un message..." 
-                className="rounded-r-none" 
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAddComment();
-                  }
-                }}
-              />
-              <Button 
-                className="rounded-l-none bg-green-600 hover:bg-green-700"
-                onClick={handleAddComment}
-              >
-                Envoyer
-              </Button>
-            </div>
-          </>
-        ) : (
-          <div className="h-64 flex items-center justify-center bg-gray-100 rounded-lg">
-            <p className="text-gray-500">Sélectionnez un livrable pour voir les détails</p>
-          </div>
-        )}
-      </div>
+      
     </div>
   );
 };

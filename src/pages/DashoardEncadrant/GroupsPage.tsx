@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect  } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import { groups, projects, tasks } from '@/lib/mock-data';
@@ -6,6 +6,8 @@ import { Group, Project, Task } from '@/types';
 import GroupItem from '@/components/GroupItem';
 import { Plus, X, Printer, FileText, Users, CheckSquare,ArrowLeft, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import {getGroupes } from "@/services/userService";
+
 
 const GroupsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,30 +23,33 @@ const GroupsPage: React.FC = () => {
   const [showStudentSelectionModal, setShowStudentSelectionModal] = useState(false);
   const [taskSearchTerm, setTaskSearchTerm] = useState('');
   const [deliverableSearchTerm, setDeliverableSearchTerm] = useState('');
+  const [groupes, setGroupes] = useState<any[]>([]); // Liste des groupes récupérées
+  
 
   // Mock list of all students with APOGE codes
   const allStudents = [
-    { name: "Jean Dupont", code: "20150123" },
-    { name: "Marie Martin", code: "20150124" },
-    { name: "Lucas Bernard", code: "20150125" },
-    { name: "Sophie Dubois", code: "20150126" },
-    { name: "Thomas Leroy", code: "20150127" },
-    { name: "Emma Petit", code: "20150128" },
-    { name: "Hugo Moreau", code: "20150129" },
-    { name: "Chloé Lefebvre", code: "20150130" },
-    { name: "Nathan Roux", code: "20150131" },
-    { name: "Léa Fournier", code: "20150132" },
-    { name: "Jules Girard", code: "20150133" },
-    { name: "Manon Lambert", code: "20150134" },
-    { name: "Camille Bonnet", code: "20150135" },
-    { name: "Louis Mercier", code: "20150136" },
-    { name: "Inès Durand", code: "20150137" },
-    { name: "Mathis Rousseau", code: "20150138" },
-    { name: "Zoé Lemoine", code: "20150139" },
-    { name: "Ethan Moreau", code: "20150140" },
-    { name: "Alice Dubois", code: "20150141" },
-    { name: "Gabriel Leroy", code: "20150142" }
-  ];
+    { name: "Ahmed Benjelloun", code: "20150123" },
+    { name: "Fatima Zahra El Amrani", code: "20150124" },
+    { name: "Youssef Boussouf", code: "20150125" },
+    { name: "Khadija El Gharbi", code: "20150126" },
+    { name: "Mohamed El Kabbaj", code: "20150127" },
+    { name: "Sara Houssaini", code: "20150128" },
+    { name: "Abdellah Ouarzazi", code: "20150129" },
+    { name: "Meryem Ait Ali", code: "20150130" },
+    { name: "Rachid Amrani", code: "20150131" },
+    { name: "Nadia Bouzid", code: "20150132" },
+    { name: "Imane El Idrissi", code: "20150133" },
+    { name: "Salma Fassi", code: "20150134" },
+    { name: "Omar Ghrib", code: "20150135" },
+    { name: "Zineb Boujida", code: "20150136" },
+    { name: "Mouad Ziani", code: "20150137" },
+    { name: "Laila Souiri", code: "20150138" },
+    { name: "Tarik Berrada", code: "20150139" },
+    { name: "Sanae Lahlou", code: "20150140" },
+    { name: "Nabil El Fassi", code: "20150141" },
+    { name: "Mounir Rachidi", code: "20150142" }
+];
+
 
   const getProjectForGroup = (groupId: number): Project => {
     return projects.find(p => p.groupId === groupId) || projects[0];
@@ -104,6 +109,22 @@ const GroupsPage: React.FC = () => {
       task.description.toLowerCase().includes(taskSearchTerm.toLowerCase())
     );
   };
+  //recuperer les groupes
+  useEffect(() => {
+      const fetchGroupes = async () => {
+        try {
+          const groupeData = await getGroupes();
+  
+          console.log("groupes récupérés:", groupeData);
+  
+          setGroupes(groupeData);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des données:", error);
+        }
+      };
+  
+      fetchGroupes();
+    }, []);
 
   return <DashboardLayout>
       <div className="flex justify-between items-center mb-6">
@@ -123,7 +144,7 @@ const GroupsPage: React.FC = () => {
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {groups.map(group => <GroupItem key={group.id} group={group} project={getProjectForGroup(group.id)} tasks={getTasksForProject(getProjectForGroup(group.id).id)} onClick={handleGroupClick} onTasksClick={handleTasksClick} />)}
+        {groupes.map(group => <GroupItem key={group.id} group={group} project={getProjectForGroup(group.id)} tasks={getTasksForProject(getProjectForGroup(group.id).id)} onClick={handleGroupClick} onTasksClick={handleTasksClick} />)}
       </div>
       
       {/* Create Group Modal */}

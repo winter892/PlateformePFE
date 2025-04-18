@@ -44,10 +44,21 @@ export const getEtudiants = async (filiereId) => {
     return [];
   }
 };
-//pour les etudiants
-export const getGroupes=async(filiere_Id)=>{
+//pour les groupes par filieres
+export const getGroupesByFiliere=async(filiere_Id)=>{
   try {
     const response = await axios.get(`http://localhost:8080/api/Groupes/${filiere_Id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des groupes :", error);
+    return [];
+  }
+
+}
+//pour les groupes 
+export const getGroupes=async()=>{
+  try {
+    const response = await axios.get(`http://localhost:8080/api/groupe`);
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des groupes :", error);
@@ -87,4 +98,19 @@ export const getJurys = async () => {
     console.error("Erreur lors de la récupération de la liste des jurys :", error);
     return [];
   }
+};
+//recuperer les etudiants d'un groupe 
+export const getEtudiantsByGroupe = async (GroupeId) => {
+  try {
+    const response = await axios.get(`http://localhost:8080/api/Etudiants/${GroupeId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des etudiants :", error);
+    return [];
+  }
+};
+//inserer les novelle soutenance 
+
+export const addSoutenance = async (soutenanceData) => {
+  return await axios.post("/api/soutenances", soutenanceData);
 };

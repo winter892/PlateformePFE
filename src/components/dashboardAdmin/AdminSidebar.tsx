@@ -39,7 +39,7 @@ const AdminSidebar = () => {
     <div className="bg-gradient-to-b from-blue-900 to-blue-600 w-64 h-screen flex flex-col fixed left-0 top-0 text-white shadow-lg">
       {/* Titre du sidebar */}
       <div className="p-5 border-b border-blue-800">
-        <h1 className="text-white text-xl font-semibold">Gestion des Projets</h1>
+        <h1 className="text-white text-xl font-semibold">Tableau de Bord Administratif</h1>
       </div>
       
       {/* Liens du menu */}

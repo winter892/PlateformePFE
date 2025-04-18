@@ -6,11 +6,11 @@ import { useNavigate } from 'react-router-dom';
 
 const TeacherProfile = () => {
   const teacherInfo = {
-    name: "Dr. Mohammed Ahmed",
+    name: "M.OUTANOUT",
     password: "••••••••",
     post: "Professeur",
     department: "Génie Informatique",
-    email: "m.ahmed@faculty.edu",
+    email: "m.outanout@usms.ac.ma",
     field: "Intelligence Artificielle"
   };
 

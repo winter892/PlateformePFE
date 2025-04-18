@@ -17,7 +17,7 @@ export const EtudiantSidebar = () => {
 
   const bottomMenuItems = [
     { icon: User, label: "Profile", path: "/Etudiantprofile", color: "from-green-400 to-green-600" },
-    { icon: LogOut, label: "Déconnexion", path: "/login", color: "from-red-400 to-red-600" },
+    { icon: LogOut, label: "Déconnexion", path: "/", color: "from-red-400 to-red-600" },
   ];
 
   const sidebarVariants = {

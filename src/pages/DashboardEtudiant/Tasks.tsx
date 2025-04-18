@@ -18,8 +18,9 @@ import { TaskFilter } from '@/components/dashboardEtudiant/TaskFilter';
 import { TaskList } from '@/components/dashboardEtudiant/TaskList';
 import {TaskItem} from '@/components/dashboardEtudiant/TaskItem';
 import { TaskForm } from '@/components/dashboardEtudiant/NewTaskForm';
-import { DeliverablesManager } from '@/components/dashboardEtudiant/DeliverablesManager';
+//import { DeliverablesManager } from '@/components/dashboardEtudiant/DeliverablesManager';
 import {getTaches} from "../../services/EtudiantsService";
+import { DeliverablesManager } from "@/components/dashboardEtudiant/DeliverablesManager";
 
 export default function Tasks() {
  
@@ -32,13 +33,14 @@ export default function Tasks() {
             const TachesData = await getTaches();
     
             console.log("Taches récupérés:", TachesData);
-        const formattedTasks = TachesData.map((t: any) => ({
-            id: t.id.toString(),
-            title: t.titre,
-            description: t.description,
-            status: t.statut,
-            dueDate: t.dateLimite?.split('T')[0], // pour éviter les formats bizarres
-          }));
+            const formattedTasks = TachesData.map((t: any) => ({
+              id: t.id.toString(),
+              title: t.titre,
+              description: t.description,
+              status: t.statut,
+              dueDate: t.dateLimite ? new Date(t.dateLimite).toLocaleDateString('fr-FR') : ''
+            }));
+            
       
       setTasks(formattedTasks);
           } catch (error) {
@@ -264,27 +266,7 @@ export default function Tasks() {
         />
       </div>
 
-     {/*Edit Task Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Modifier la tâche</DialogTitle>
-            <DialogDescription>Modifiez les détails de la tâche selon vos besoins.</DialogDescription>
-          </DialogHeader>
-          {editingTask && (
-            <TaskForm 
-              task={editingTask}
-              onChange={setEditingTask}
-              onCancel={() => {
-                setEditingTask(null);
-                setIsEditDialogOpen(false);
-              }}
-              onSubmit={handleEditTask}
-              isEditing={true}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+     
       
 
       {/* Deliverables Dialog */}

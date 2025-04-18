@@ -1,37 +1,56 @@
-
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../../components/dashboardAdmin/Layout";
 import Header from "../../../components/dashboardAdmin/Header";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, User, FileArchive, RefreshCcw, ArrowLeft } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Users,
+  User,
+  FileArchive,
+  RefreshCcw,
+  ArrowLeft,
+} from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { error } from "console";
-import { getDepartements, getFilieres, getEncadrants,getEtudiants } from "@/services/userService";
+import {
+  getDepartements,
+  getFilieres,
+  getEncadrants,
+  getEtudiants,
+} from "@/services/userService";
 
 const Comptes = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [selectedDepartment, setSelectedDepartment] = useState<string | null>(null);
   const [selectedFiliere, setSelectedFiliere] = useState<string | null>(null);
 
-  const [departments, setDepartments] = useState<any[]>([]); // Liste des départements récupérés
-  const [filieres, setFilieres] = useState<any[]>([]); // Liste des filieres récupérés
-
-  const [supervisors, setSupervisors] = useState<any[]>([]); // Liste des encadrants récupérés
-  const [students, setStudents] = useState<any[]>([]); // Liste des étudiants récupérés
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [filieres, setFilieres] = useState<any[]>([]);
+  const [supervisors, setSupervisors] = useState<any[]>([]);
+  const [students, setStudents] = useState<any[]>([]);
   const { toast } = useToast();
 
-  // Récupérer les départements lors du chargement initial
   useEffect(() => {
     const fetchDepartements = async () => {
       const data = await getDepartements();
-      console.log("Departements récupérés:", data);
       setDepartments(data);
     };
     fetchDepartements();
   }, []);
-  // Charger les filières lorsque le département est sélectionné
+
   useEffect(() => {
     if (selectedDepartment) {
       const fetchFilieres = async () => {
@@ -42,8 +61,6 @@ const Comptes = () => {
     }
   }, [selectedDepartment]);
 
-
-  // Récupérer les encadrants en fonction du département sélectionné
   useEffect(() => {
     if (selectedDepartment) {
       const fetchEncadrants = async () => {
@@ -54,8 +71,6 @@ const Comptes = () => {
     }
   }, [selectedDepartment]);
 
- 
-  // Charger les étudiants lorsque la filière est sélectionnée et le rôle est "étudiant"
   useEffect(() => {
     if (selectedFiliere && selectedRole === "etudiant") {
       const fetchEtudiants = async () => {
@@ -66,7 +81,6 @@ const Comptes = () => {
     }
   }, [selectedFiliere, selectedRole]);
 
-
   const handleRoleSelect = (role: string) => {
     setSelectedRole(role);
     setSelectedDepartment(null);
@@ -76,11 +90,10 @@ const Comptes = () => {
     setSelectedDepartment(departmentId);
   };
 
+  const handleFiliereSelect = (filiereId: string) => {
+    setSelectedFiliere(filiereId);
+  };
 
-    // Gestion de la sélection d'une filière
-    const handleFiliereSelect = (filiereId) => {
-      setSelectedFiliere(filiereId);
-    };
   const handleBackToRoles = () => {
     setSelectedRole(null);
     setSelectedDepartment(null);
@@ -93,24 +106,29 @@ const Comptes = () => {
   const handleBackToFilieres = () => {
     setSelectedFiliere(null);
   };
+
   const generateCodes = () => {
     if (selectedRole === "encadrant") {
-      const updatedSupervisors = supervisors.map(supervisor => {
+      const updatedSupervisors = supervisors.map((supervisor) => {
         if (!supervisor.codePFE) {
           return {
             ...supervisor,
-            codePFE: `PFE-${supervisor.departement.toUpperCase()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`
+            codePFE: `PFE-${supervisor.departement.toUpperCase()}-${Math.floor(Math.random() * 10000)
+              .toString()
+              .padStart(4, "0")}`,
           };
         }
         return supervisor;
       });
       setSupervisors(updatedSupervisors);
     } else {
-      const updatedStudents = students.map(student => {
+      const updatedStudents = students.map((student) => {
         if (!student.codePFE) {
           return {
             ...student,
-            codePFE: `PFE-${student.departement.toUpperCase()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`
+            codePFE: `PFE-${student.departement.toUpperCase()}-${Math.floor(Math.random() * 10000)
+              .toString()
+              .padStart(4, "0")}`,
           };
         }
         return student;
@@ -137,12 +155,13 @@ const Comptes = () => {
     <Layout>
       <Header title="Comptes" />
       <div className="bg-white rounded-lg shadow-sm p-6 animate-fade-in">
-        {/* Étape 1: Sélection du rôle */}
         {!selectedRole && (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-center mb-6">Choisissez un type de compte à gérer</h2>
+            <h2 className="text-xl font-semibold text-center mb-6">
+              Choisissez un type de compte à gérer
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card 
+              <Card
                 className="cursor-pointer transition-all hover:shadow-md border-2 hover:border-blue-500"
                 onClick={() => handleRoleSelect("encadrant")}
               >
@@ -156,8 +175,8 @@ const Comptes = () => {
                   </CardDescription>
                 </CardContent>
               </Card>
-              
-              <Card 
+
+              <Card
                 className="cursor-pointer transition-all hover:shadow-md border-2 hover:border-blue-500"
                 onClick={() => handleRoleSelect("etudiant")}
               >
@@ -175,7 +194,6 @@ const Comptes = () => {
           </div>
         )}
 
-        {/* Étape 2: Sélection du département */}
         {selectedRole && !selectedDepartment && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -187,52 +205,50 @@ const Comptes = () => {
               </Button>
             </div>
             <p className="text-gray-500 mb-6">
-            {selectedRole === "encadrant" ? "Veuillez sélectionner un département pour afficher la liste des Departement" : "Veuillez sélectionner un département pour afficher la liste des filieres"}
+              {selectedRole === "encadrant"
+                ? "Veuillez sélectionner un département pour afficher la liste des encadrants"
+                : "Veuillez sélectionner un département pour afficher la liste des filières"}
             </p>
-         
-            
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {departments.map((dept) => (
-                <Card 
+                <Card
                   key={dept.id}
                   className="cursor-pointer transition-all hover:shadow-md border hover:border-blue-500"
                   onClick={() => handleDepartmentSelect(dept.id)}
                 >
                   <CardHeader className="py-4">
-                    <CardTitle className="text-base font-medium text-center">{dept.intitule}</CardTitle>
+                    <CardTitle className="text-base font-medium text-center">
+                      {dept.intitule}
+                    </CardTitle>
                   </CardHeader>
                 </Card>
               ))}
             </div>
           </div>
         )}
-            
-        {/*Etape 3 : afficher la liste des filieres pour les etudiants*/}
-        
+
         {selectedRole === "etudiant" && selectedDepartment && !selectedFiliere && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">
-                Sélection du Filière des Etudiants
-              </h2>
+              <h2 className="text-xl font-semibold">Sélection du Filière des Étudiants</h2>
               <Button variant="outline" onClick={handleBackToDepartments}>
                 <ArrowLeft className="mr-2 h-4 w-4" /> Retour
               </Button>
             </div>
             <p className="text-gray-500 mb-6">
-            {selectedRole === "etudiant" ? "Veuillez sélectionner une filière pour afficher la liste des etudiants" : ""}
+              Veuillez sélectionner une filière pour afficher la liste des étudiants
             </p>
-         
-            
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {filieres.map((fil) => (
-                <Card 
+                <Card
                   key={fil.id}
                   className="cursor-pointer transition-all hover:shadow-md border hover:border-blue-500"
                   onClick={() => handleFiliereSelect(fil.id)}
                 >
                   <CardHeader className="py-4">
-                    <CardTitle className="text-base font-medium text-center">{fil.intitule}</CardTitle>
+                    <CardTitle className="text-base font-medium text-center">
+                      {fil.intitule}
+                    </CardTitle>
                   </CardHeader>
                 </Card>
               ))}
@@ -240,22 +256,20 @@ const Comptes = () => {
           </div>
         )}
 
-        {/* Étape 4: Affichage de la liste des etudiants ou encadrants*/}
-        {selectedRole && selectedDepartment && (selectedRole === "encadrant" || selectedFiliere) &&(
+        {selectedRole && selectedDepartment && (selectedRole === "encadrant" || selectedFiliere) && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold">
-                Liste des {selectedRole === "encadrant" ? "encadrants" : "étudiants"} {selectedRole === "encadrant" ? `- Département : ${departments.find(d => d.id === selectedDepartment)?.intitule || ''}`  : `- Filière :  ${filieres.find(d => d.id === selectedFiliere)?.intitule || ''}`}
-
+                Liste des{selectedRole === "encadrant" ? "encadrants" : "étudiants"}{" "}
+                {selectedRole === "encadrant"
+                  ?` - Département : ${departments.find((d) => d.id === selectedDepartment)?.intitule || ""}`
+                  : -` Filière : ${filieres.find((f) => f.id === selectedFiliere)?.intitule || ""}`}
               </h2>
-              {selectedRole === "encadrant" ? <Button variant="outline" onClick={handleBackToDepartments}>
+              <Button variant="outline" onClick={selectedRole === "encadrant" ? handleBackToDepartments : handleBackToFilieres}>
                 <ArrowLeft className="mr-2 h-4 w-4" /> Retour
-              </Button> : <Button variant="outline" onClick={handleBackToFilieres}>
-                <ArrowLeft className="mr-2 h-4 w-4" /> Retour
-              </Button>}
-             
+              </Button>
             </div>
-            
+
             <div className="flex gap-4 my-4">
               <Button onClick={generateCodes} className="bg-green-600 hover:bg-green-700">
                 <RefreshCcw className="mr-2 h-4 w-4" /> Générer les codes
@@ -264,7 +278,7 @@ const Comptes = () => {
                 <FileArchive className="mr-2 h-4 w-4" /> Archiver la liste
               </Button>
             </div>
-            
+
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
@@ -276,41 +290,39 @@ const Comptes = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {selectedRole === "encadrant" ? (
-                    supervisors.length > 0 ? (
-                      supervisors.map((supervisor) => (
-                        <TableRow key={supervisor.id}>
-                          <TableCell>{supervisor.nom}</TableCell>
-                          <TableCell>{supervisor.prenom}</TableCell>
-                          <TableCell>{supervisor.Email}</TableCell>
-                          <TableCell>{supervisor.codePFE || "Non généré"}</TableCell>
+                  {selectedRole === "encadrant"
+                    ? supervisors.length > 0
+                      ? supervisors.map((supervisor) => (
+                          <TableRow key={supervisor.id}>
+                            <TableCell>{supervisor.nom}</TableCell>
+                            <TableCell>{supervisor.prenom}</TableCell>
+                            <TableCell>{supervisor.adresseEmail}</TableCell>
+                            <TableCell>{supervisor.codePFE || "Non généré"}</TableCell>
+                          </TableRow>
+                        ))
+                      : (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center py-4 text-gray-500">
+                            Aucun encadrant trouvé dans ce département
+                          </TableCell>
                         </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={4} className="text-center py-4 text-gray-500">
-                          Aucun encadrant trouvé dans ce département
-                        </TableCell>
-                      </TableRow>
-                    )
-                  ) : (
-                    students.length > 0 ? (
-                      students.map((student) => (
-                        <TableRow key={student.id}>
-                          <TableCell>{student.nom}</TableCell>
-                          <TableCell>{student.prenom}</TableCell>
-                          <TableCell>{student.codeApogee}</TableCell>
-                          <TableCell>{student.codePFE || "Non généré"}</TableCell>
+                      )
+                    : students.length > 0
+                      ? students.map((student) => (
+                          <TableRow key={student.id}>
+                            <TableCell>{student.nom}</TableCell>
+                            <TableCell>{student.prenom}</TableCell>
+                            <TableCell>{student.codeApogee}</TableCell>
+                            <TableCell>{student.codePFE || "Non généré"}</TableCell>
+                          </TableRow>
+                        ))
+                      : (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center py-4 text-gray-500">
+                            Aucun étudiant trouvé dans cette filière
+                          </TableCell>
                         </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={4} className="text-center py-4 text-gray-500">
-                          Aucun étudiant trouvé dans ce département
-                        </TableCell>
-                      </TableRow>
-                    )
-                  )}
+                      )}
                 </TableBody>
               </Table>
             </div>
@@ -321,4 +333,4 @@ const Comptes = () => {
   );
 };
 
-export default Comptes;
+export default Comptes;
