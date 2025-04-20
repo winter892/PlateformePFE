@@ -14,10 +14,10 @@ import {
 import { toast } from '@/components/ui/use-toast';
 import { v4 as uuidv4 } from 'uuid';
 import { Task, Deliverable, Comment } from '@/types/task';
-import { TaskFilter } from '@/components/dashboardEtudiant/TaskFilter';
-import { TaskList } from '@/components/dashboardEtudiant/TaskList';
-import {TaskItem} from '@/components/dashboardEtudiant/TaskItem';
-import { TaskForm } from '@/components/dashboardEtudiant/NewTaskForm';
+import { TaskFilter } from '@/components/tasks/TaskFilter';
+import { TaskList } from '@/components/tasks/TaskList';
+import {TaskItem} from '@/components/tasks/TaskItem';
+import { TaskForm } from '@/components/tasks/NewTaskForm';
 //import { DeliverablesManager } from '@/components/dashboardEtudiant/DeliverablesManager';
 import {getTaches} from "../../services/EtudiantsService";
 import { DeliverablesManager } from "@/components/dashboardEtudiant/DeliverablesManager";
