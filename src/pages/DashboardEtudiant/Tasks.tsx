@@ -19,8 +19,9 @@ import { TaskList } from '@/components/tasks/TaskList';
 import {TaskItem} from '@/components/tasks/TaskItem';
 import { TaskForm } from '@/components/tasks/NewTaskForm';
 //import { DeliverablesManager } from '@/components/dashboardEtudiant/DeliverablesManager';
-import {getTaches} from "../../services/EtudiantsService";
+import {getTaches,deleteTache} from "../../services/EtudiantsService";
 import { DeliverablesManager } from "@/components/dashboardEtudiant/DeliverablesManager";
+import { time } from "console";
 
 export default function Tasks() {
  
@@ -115,44 +116,82 @@ export default function Tasks() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleCreateTask = () => {
-    const task: Task = {
-      id: uuidv4(),
-      ...newTask,
-    };
-    
-    setTasks([...tasks, task]);
-    setNewTask({
-      title: '',
-      description: '',
-      status: 'à faire',
-      dueDate: new Date().toISOString().split('T')[0],
-    });
-    setIsNewTaskDialogOpen(false);
-    toast({
-      title: "Tâche créée",
-      description: "La tâche a été créée avec succès.",
-    });
-  };
+const refreshTasks = async () => {
 
-  const handleDeleteTask = (id: string) => {
-    setTasks(tasks.filter(task => task.id !== id));
-    toast({
-      title: "Tâche supprimée",
-      description: "La tâche a été supprimée avec succès.",
-    });
+        try {
+          const TachesData = await getTaches();
+          console.log("Tâches récupérées:", TachesData);
+    
+          const formattedTasks = TachesData.map((t: any) => ({
+            id: t.id.toString(),
+            title: t.titre,
+            description: t.description,
+            status: t.statut,
+            dueDate: t.dateLimite
+              ? new Date(t.dateLimite).toLocaleDateString('fr-FR')
+              : '',
+          }));
+    
+          setTasks(formattedTasks);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des tâches :", error);
+        }
+      };
+
+//crée un nouveau tache 
+  const handleCreateTask = () => {
+        const task: Task = {
+          id: uuidv4(),
+          ...newTask,
+        };
+        setTasks([...tasks, task]);
+        setNewTask({
+          title: '',
+          description: '',
+          status: 'à faire',
+          dueDate: new Date().toISOString().split('T')[0],
+        });
+
+        setIsNewTaskDialogOpen(false);
+        toast({
+          title: "Tâche créée",
+          description: "La tâche a été créée avec succès.",
+        });
   };
+//supprimer une tache 
+
+  const handleDeleteTask = async (id: string) => {
+        try {
+          await deleteTache(id);
+          await refreshTasks();  
+      
+          toast({
+            title: "Tâche supprimée",
+            description: "La tâche a été supprimée avec succès.",
+          });
+        } catch (error) {
+          console.error("Erreur de suppression :", error);
+          toast({
+            title: "Erreur",
+            description: "La suppression de la tâche a échoué.",
+            variant: "destructive",
+          });
+        }
+  };
+  
+  
+//modifier une tache 
 
   const handleEditTask = () => {
-    if (editingTask) {
-      setTasks(tasks.map(task => task.id === editingTask.id ? editingTask : task));
-      setEditingTask(null);
-      setIsEditDialogOpen(false);
-      toast({
-        title: "Tâche modifiée",
-        description: "La tâche a été modifiée avec succès.",
-      });
-    }
+        if (editingTask) {
+          setTasks(tasks.map(task => task.id === editingTask.id ? editingTask : task));
+          setEditingTask(null);
+          setIsEditDialogOpen(false);
+          toast({
+            title: "Tâche modifiée",
+            description: "La tâche a été modifiée avec succès.",
+          });
+        }
   };
 
   const openEditDialog = (task: Task) => {
@@ -234,6 +273,7 @@ export default function Tasks() {
             selectedStatus={selectedStatus}
             onStatusChange={setSelectedStatus}
           />
+          
 
           <Dialog open={isNewTaskDialogOpen} onOpenChange={setIsNewTaskDialogOpen}>
             <DialogTrigger asChild>

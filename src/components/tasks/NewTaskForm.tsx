@@ -76,7 +76,7 @@ export const TaskForm = ({
         <Label>Date d'échéance</Label>
         <Input 
           type="date" 
-          value={task.dueDate || ''} // sécurité
+          value={task.dueDate.toString() || ''} // sécurité
           onChange={(e) => onChange({...task, dueDate: e.target.value})}
         />
       </div>

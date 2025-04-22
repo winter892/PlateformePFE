@@ -41,3 +41,18 @@ export const AddTache = async (task: TaskPayload) => {
     throw error;
   }
 };
+ 
+// Supprimer une tâche
+
+export const deleteTache = async (id: string | number) => {
+  try {
+    const response = await axios.delete(`http://localhost:8080/api/DeletTache/${id}`);
+    console.log('Tâche supprimée avec succès.');
+    return response.data; // même si en général un DELETE ne retourne rien (204)
+  } catch (error) {
+    console.error('Erreur lors de la suppression de la tâche :', error);
+    throw error; // permet au composant React de gérer l'erreur aussi
+  }
+};
+
+
