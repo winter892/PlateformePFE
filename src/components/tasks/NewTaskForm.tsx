@@ -1,3 +1,4 @@
+"use client"; // très important dans les composants client du App Router
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,14 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Task } from '@/types/task';
+
 import { AddTache } from '@/services/EtudiantsService';
+import { toast } from "@/components/ui/use-toast";
+
+import { useNavigate } from "react-router-dom";
+
+
+
 
 interface NewTaskFormProps {
   task: Omit<Task, 'id'>;
@@ -26,6 +34,8 @@ export const TaskForm = ({
   isEditing = false 
 }: NewTaskFormProps) => {
 
+  const router = useNavigate(); // pour naviguer
+
   const handleSubmit = async () => {
     try {
       await AddTache({
@@ -36,11 +46,23 @@ export const TaskForm = ({
         projet_id: 1
       });
   
-      alert('Tâche créée !');
+      toast({
+        title: "Tâche créée !",
+        description: "Votre tâche a bien été ajoutée.",
+      });
+  
+      // Petite pause avant de rediriger
+      setTimeout(() => {
+        router("/tasks");
+            }, 2);
     } catch (error) {
-      alert('Erreur lors de la création.');
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la création.",
+        variant: "destructive"
+      });
     }
-  }; 
+  };
   return (
     <div className="space-y-4 py-4">
       <div className="space-y-2">

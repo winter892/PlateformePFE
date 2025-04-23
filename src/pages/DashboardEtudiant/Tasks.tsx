@@ -157,6 +157,7 @@ const refreshTasks = async () => {
           title: "Tâche créée",
           description: "La tâche a été créée avec succès.",
         });
+        
   };
 //supprimer une tache 
 
@@ -168,6 +169,7 @@ const refreshTasks = async () => {
           toast({
             title: "Tâche supprimée",
             description: "La tâche a été supprimée avec succès.",
+             className: " text-green-800 border-green-300"
           });
         } catch (error) {
           console.error("Erreur de suppression :", error);
