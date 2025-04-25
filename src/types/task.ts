@@ -7,12 +7,17 @@ export interface Task {
   dueDate: String;
 }
 
-export interface Deliverable {
+export interface LivrableResponse {
   id: string;
-  taskId: string;
-  name: string;
-  fileUrl: string;
-  submittedAt: string;
+  nom_Fichier: string;
+  descreption: string;
+  date_Soumission: string; // <-- tu la reçois ici
+  tache_id: string;
+}
+export interface LivrableCreate {
+  nom_Fichier: string;
+  descreption: string;
+  tache_id: string;
 }
 
 export interface Comment {

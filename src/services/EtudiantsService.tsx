@@ -55,4 +55,40 @@ export const deleteTache = async (id: string | number) => {
   }
 };
 
+//la liste des livrable d'une tache
+export const getLivrableByTacheid = async (TacheId) => {
+  try {
+    const response = await axios.get(`http://localhost:8080/api/Livrables/${TacheId}`);
+    console.log("Réponse de l'API:", response);  // Afficher la réponse entière
+    return Array.isArray(response.data) ? response.data : [];  // Vérifier que la réponse est bien un tableau
+  } catch (error) {
+    console.error("Erreur lors de la récupération des livrables :", error);
+    return [];
+  }
+};
+
+
+//ajouter une livrable
+interface Livrable {
+  nom_Fichier: string;
+  descreption: string;
+  tache_id: string;
+}
+
+export const AjouterUneLivrable = async (Liv: Livrable) => {
+  try {
+    const response = await axios.post(`http://localhost:8080/api/AddLivrable`, {
+      nom_Fichier: Liv.nom_Fichier,
+      description: Liv.descreption,
+      tache : {
+        id: Number(Liv.tache_id)    }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Erreur lors de l ajout de livrable:', error);
+    throw error;
+  }
+};
+
 

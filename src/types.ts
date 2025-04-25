@@ -1,7 +1,7 @@
 
 export interface Project {
   id: number;
-  title: string;
+  titre: string;
   description: string;
   progress: number;
   status: 'in_progress' | 'completed';
@@ -29,9 +29,10 @@ export interface Comment {
 
 export interface Group {
   id: number;
-  name: string;
+  intitule: string;
+  description:string;
   members: string[];
-  projectId: number;
+  projet_id: number;
   progress?: number; // Added for GroupPanel compatibility
   project?: string; // Added for GroupPanel compatibility
 }
@@ -86,4 +87,28 @@ export interface DeliverableComment {
   timestamp: string;
   type: 'text' | 'annotation' | 'system';
   annotationId?: string;
+}
+
+export interface Encadrant{
+        type : "encadrant",
+        id: 1,
+        nom: string,
+        prenom: string,
+        codePfe: string,
+        adresseEmail: string,
+        specialite: string,
+        departement_id : number
+
+}
+export interface Etudiant{
+  type : "etudiant",
+  id: 1,
+  nom: string,
+  prenom: string,
+  codePfe: string,
+  codeApogee: number,
+  groupe_id: number,
+  filiere_id : number,
+
+
 }

@@ -262,7 +262,7 @@ const GroupsPage: React.FC = () => {
               <div className="mb-6">
                 <div className="mb-4">
                   <h3 className="text-sm font-medium text-violet-700 mb-1">Groupe</h3>
-                  <p className="text-violet-900">{selectedGroup.name}</p>
+                  <p className="text-violet-900">{selectedGroup.intitule}</p>
                 </div>
                 
                 <div className="mb-4">
@@ -276,7 +276,7 @@ const GroupsPage: React.FC = () => {
                 
                 <div className="mb-4">
                   <h3 className="text-sm font-medium text-violet-700 mb-1">Projet</h3>
-                  <p className="text-violet-900">{getProjectForGroup(selectedGroup.id).title}</p>
+                  <p className="text-violet-900">{getProjectForGroup(selectedGroup.id).titre}</p>
                 </div>
                 
                 <div className="mb-4">
@@ -314,7 +314,7 @@ const GroupsPage: React.FC = () => {
                 </button>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-violet-900">
-                  Tâches - {groups.find(g => g.id === selectedGroupId)?.name}
+                  Tâches - {groups.find(g => g.id === selectedGroupId)?.intitule}
                 </h2>
                  
                 <button className="text-violet-500 hover:text-violet-700" onClick={() => setShowTasksModal(false)}>

@@ -18,27 +18,9 @@ const GroupItem: React.FC<GroupItemProps> = ({
   onClick,
   onTasksClick
 }) => {
-  const [groupes, setGroupes] = useState<Group[]>([]); // Liste des groupes récupérés
   const [loading, setLoading] = useState<boolean>(false); // État de chargement
   const [error, setError] = useState<string | null>(null); // État d'erreur
 
-  useEffect(() => {
-    const fetchGroupes = async () => {
-      setLoading(true);
-      try {
-        const groupeData = await getGroupes(); // Appel à l'API pour récupérer les groupes
-        setGroupes(groupeData); // Met à jour l'état avec les groupes récupérés
-        setError(null); // Réinitialisation de l'erreur en cas de succès
-      } catch (error) {
-        console.error("Erreur lors de la récupération des données:", error);
-        setError("Erreur lors de la récupération des groupes.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGroupes(); // Appel de la fonction pour récupérer les groupes
-  }, []); // L'effet se déclenche seulement au montage du composant
 
   const groupTasks = tasks.filter(task => task.projectId === project.id);
 
@@ -55,7 +37,7 @@ const GroupItem: React.FC<GroupItemProps> = ({
               <div className="p-2 rounded-full bg-violet-100 mr-3">
                 <Users size={18} className="text-violet-700" />
               </div>
-              <h3 className="font-medium text-violet-900">{group.intitulé}</h3> {/* Affichage du nom du groupe */}
+              <h3 className="font-medium text-violet-900">{group.intitule}</h3> {/* Affichage du nom du groupe */}
             </div>
             
             <span
@@ -69,7 +51,7 @@ const GroupItem: React.FC<GroupItemProps> = ({
           
           <div className="flex items-center text-sm text-violet-600 mb-3">
             <FileText size={16} className="mr-2" />
-            <span>{project.title}</span>
+            <span>{project.titre}</span>
           </div>
           
           <div className="mb-4">

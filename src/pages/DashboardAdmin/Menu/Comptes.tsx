@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../../components/dashboardAdmin/Layout";
 import Header from "../../../components/dashboardAdmin/Header";
 import { Button } from "@/components/ui/button";
+import {Encadrant,Etudiant} from '@/types';
 import {
   Card,
   CardContent,
@@ -39,8 +40,8 @@ const Comptes = () => {
 
   const [departments, setDepartments] = useState<any[]>([]);
   const [filieres, setFilieres] = useState<any[]>([]);
-  const [supervisors, setSupervisors] = useState<any[]>([]);
-  const [students, setStudents] = useState<any[]>([]);
+  const [supervisors, setSupervisors] = useState<Encadrant[]>([]);
+  const [students, setStudents] = useState<Etudiant[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -107,7 +108,125 @@ const Comptes = () => {
     setSelectedFiliere(null);
   };
 
-  const generateCodes = () => {
+
+  const generateUniquePFECode = (prefix: string, existingCodes: string[]) => {
+    let code;
+    let tries = 0;
+    do {
+      const randomPart = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
+      code = `${prefix}-${randomPart}`;
+      tries++;
+    } while (existingCodes.includes(code) && tries < 10000);
+    return code;
+  };
+
+
+  const generateCodes = async () => {
+
+    let updatedData = [];
+  
+    // Pour les encadrants
+    if (selectedRole === "encadrant") {
+      const existingCodes = supervisors.map((sup) => sup.codePfe).filter(Boolean);
+      
+      updatedData = supervisors.map((supervisor) => {
+        if (!supervisor.codePfe) {
+          const prefix = `PFE-${supervisor.nom.toUpperCase()}`;
+          return {
+            type: "encadrant",
+            id: supervisor.id,
+            codePfe: generateUniquePFECode(prefix, existingCodes),
+            nom:supervisor.nom,
+            prenom:supervisor.prenom,
+            adresseEmail:supervisor.adresseEmail
+          
+          };
+        }
+        return {
+          type: "encadrant",
+          id: supervisor.id,
+          codePfe: supervisor.codePfe,
+          nom:supervisor.nom,
+          prenom:supervisor.prenom,
+          adresseEmail:supervisor.adresseEmail
+        };
+      });
+    }
+  
+    // Pour les étudiants
+    else if (selectedRole === "etudiant") {
+      const existingCodes = students.map((stu) => stu.codePfe).filter(Boolean);
+      
+      updatedData = students.map((student) => {
+        if (!student.codePfe) {
+          const prefix = `PFE-${student.nom.toUpperCase()}`;
+          return {
+            type: "etudiant",
+            id: student.id,
+            codePfe: generateUniquePFECode(prefix, existingCodes),
+            codeApogee:student.codeApogee,
+          };
+        }
+        return {
+          type: "etudiant",
+          id: student.id,
+          codePfe: student.codePfe,
+          codeApogee:student.codeApogee,
+
+        };
+      });
+    }
+  
+    // Envoi des données mises à jour à l'API
+    try {
+      const response = await fetch("http://localhost:8080/api/utilisateur/update-codes", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),  // Envoi des données correctement formatées
+      });
+  
+      if (response.ok) {
+        if (selectedRole === "encadrant") {
+          setSupervisors(updatedData); // Met à jour les encadrants dans le state
+          toast({
+            title: "Codes générés",
+            description: "Les codes PFE des encadrants ont été générés et sauvegardés.",
+            className: "text-blue-800 border-blue-300",
+            duration: 3000,
+          });
+        } else if (selectedRole === "etudiant") {
+          setStudents(updatedData); // Met à jour les étudiants dans le state
+          toast({
+            title: "Codes générés",
+            description: "Les codes PFE des étudiants ont été générés et sauvegardés.",
+            className: "text-blue-800 border-blue-300",
+            duration: 3000,
+          });
+        }
+      } else {
+        toast({
+          title: "Erreur",
+          description: "Erreur lors de la mise à jour des codes.",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour des codes : ", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de contacter le serveur.",
+        duration: 3000,
+      });
+    }
+  };
+  
+  
+
+
+  
+  /*const generateCodes = () => {
     if (selectedRole === "encadrant") {
       const updatedSupervisors = supervisors.map((supervisor) => {
         if (!supervisor.codePFE) {
@@ -141,7 +260,7 @@ const Comptes = () => {
       description: "Les codes PFE ont été générés avec succès",
       duration: 3000,
     });
-  };
+  };*/
 
   const archiveList = () => {
     toast({
@@ -297,7 +416,7 @@ const Comptes = () => {
                             <TableCell>{supervisor.nom}</TableCell>
                             <TableCell>{supervisor.prenom}</TableCell>
                             <TableCell>{supervisor.adresseEmail}</TableCell>
-                            <TableCell>{supervisor.codePFE || "Non généré"}</TableCell>
+                            <TableCell>{supervisor.codePfe || "Non généré"}</TableCell>
                           </TableRow>
                         ))
                       : (
@@ -313,7 +432,7 @@ const Comptes = () => {
                             <TableCell>{student.nom}</TableCell>
                             <TableCell>{student.prenom}</TableCell>
                             <TableCell>{student.codeApogee}</TableCell>
-                            <TableCell>{student.codePFE || "Non généré"}</TableCell>
+                            <TableCell>{student.codePfe || "Non généré"}</TableCell>
                           </TableRow>
                         ))
                       : (

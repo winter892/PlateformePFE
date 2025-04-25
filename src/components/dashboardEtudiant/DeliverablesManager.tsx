@@ -1,12 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Eye, FileText, Plus, Upload } from 'lucide-react';
+import { useRef } from "react";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Deliverable, Comment } from '@/types/task';
+import {LivrableResponse,LivrableCreate, Comment } from '@/types/task';
+import {AjouterUneLivrable,getLivrableByTacheid} from '@/services/EtudiantsService';
 
 interface DeliverablesManagerProps {
-  deliverables: Deliverable[];
+  deliverables: LivrableResponse[];
   comments: Comment[];
   onAddComment: (deliverableId: string, text: string) => void;
   onAddDeliverable: (name: string, taskId: string, description: string) => void;
@@ -14,36 +16,73 @@ interface DeliverablesManagerProps {
 }
 
 export const DeliverablesManager = ({
-  deliverables,
+  deliverables: initialDeliverables, 
   comments,
   onAddComment,
   onAddDeliverable,
   taskId
 }: DeliverablesManagerProps) => {
-  const [activeDeliverable, setActiveDeliverable] = useState<Deliverable | null>(
-    deliverables.length > 0 ? deliverables[0] : null
+
+  const [deliverables, setDeliverables] = useState<LivrableResponse[]>(initialDeliverables);
+  const [activeDeliverable, setActiveDeliverable] = useState<LivrableResponse | null>(
+    initialDeliverables.length > 0 ? initialDeliverables[0] : null
   );
   const [newComment, setNewComment] = useState('');
   const [isNewDeliverableFormVisible, setIsNewDeliverableFormVisible] = useState(false);
   const [newDeliverable, setNewDeliverable] = useState({
     name: '',
-    description: ''
+    description: '',
+    taskId:''
   });
 
   const getCommentsForDeliverable = (deliverableId: string) => {
     return comments.filter(comment => comment.deliverableId === deliverableId);
   };
 
-  const handleAddDeliverable = () => {
-    if (newDeliverable.name) {
-      onAddDeliverable(newDeliverable.name, taskId, newDeliverable.description);
-      setNewDeliverable({
-        name: '',
-        description: ''
-      });
+  useEffect(() => {
+    const fetchDeliverables = async () => {
+      try {
+        const data = await getLivrableByTacheid(taskId);
+        setDeliverables(data);
+        if (data.length > 0) setActiveDeliverable(data[0]);
+      } catch (error) {
+        console.error("Impossible de récupérer les livrables :", error);
+      }
+    };
+
+    fetchDeliverables();
+  }, [taskId]); // se relance si l'id de tâche change
+
+  const handleAddDeliverable = async (name: string, taskId: string, description: string) => {
+    try {
+      const livrable: LivrableCreate = {
+        nom_Fichier: name,
+        descreption: description,
+        tache_id: taskId
+      };
+  
+      const result = await AjouterUneLivrable(livrable);
+  
+      console.log('Livrable ajouté avec succès :', result);
+  
+      // Met à jour localement la liste ou relance un fetch :
+      setDeliverables(prev => [...prev, result]); // si tu veux ajouter sans refetch
       setIsNewDeliverableFormVisible(false);
+      setNewDeliverable({ name: '', description: '', taskId: '' });
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du livrable :", error);
     }
   };
+  
+
+  //Upload un fichier 
+
+  const fileInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    fileInputRef.current.click(); // Simule un clic sur l'input
+  };
+  
 
   const handleAddComment = () => {
     if (newComment && activeDeliverable) {
@@ -61,6 +100,7 @@ export const DeliverablesManager = ({
             size="sm" 
             className="bg-green-600 hover:bg-green-700"
             onClick={() => setIsNewDeliverableFormVisible(true)}
+            
           >
             <Plus className="w-4 h-4 mr-2" /> 
             Nouveau livrable
@@ -71,7 +111,7 @@ export const DeliverablesManager = ({
             <h4 className="font-medium mb-2">Nouveau livrable</h4>
             <div className="space-y-3">
               <Input 
-                placeholder="Nom du fichier avec extension" 
+                placeholder="Nom du fichier " 
                 value={newDeliverable.name}
                 onChange={(e) => setNewDeliverable({...newDeliverable, name: e.target.value})}
               />
@@ -85,10 +125,24 @@ export const DeliverablesManager = ({
                 <div className="text-sm text-gray-500 mb-2">
                   Glissez votre fichier ici ou
                 </div>
-                <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                  Parcourir les fichiers
-                </Button>
-                <input type="file" className="hidden" />
+                  <Button
+                    size="sm"
+                    className="bg-green-600 hover:bg-green-700"
+                    onClick={handleButtonClick}
+                  >
+                    Parcourir les fichiers
+
+                  </Button>
+                <input
+                      type="file"
+                      multiple //plusieurs fichier
+                      ref={fileInputRef}
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        console.log("Fichiers sélectionnés :", files);
+                      }}
+                 />
               </div>
               <div className="flex justify-end gap-2 mt-2">
                 <Button 
@@ -101,7 +155,7 @@ export const DeliverablesManager = ({
                 <Button 
                   size="sm" 
                   className="bg-green-600 hover:bg-green-700"
-                  onClick={handleAddDeliverable}
+                  onClick={() => handleAddDeliverable(newDeliverable.name, taskId, newDeliverable.description )}
                   disabled={!newDeliverable.name}
                 >
                   Ajouter
@@ -123,8 +177,8 @@ export const DeliverablesManager = ({
                     <FileText className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">{deliverable.name}</p>
-                    <p className="text-xs text-gray-500">Soumis le {new Date(deliverable.submittedAt).toLocaleDateString()}</p>
+                    <p className="text-sm font-medium">{deliverable.nom_Fichier}</p>
+                    <p className="text-xs text-gray-500">  Soumis le {new Date(deliverable.date_Soumission).toLocaleDateString()}</p>
                   </div>
                 </div>
                 <Button variant="ghost" size="sm" className="text-gray-500 hover:text-green-600 hover:bg-green-50">
@@ -135,13 +189,7 @@ export const DeliverablesManager = ({
           ) : (
             <div className="text-center py-8">
               <p className="text-gray-500">Aucun livrable trouvé pour cette tâche</p>
-              <Button 
-                className="mt-4 bg-green-600 hover:bg-green-700"
-                onClick={() => setIsNewDeliverableFormVisible(true)}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Ajouter un livrable
-              </Button>
+             
             </div>
           )}
         </div>
