@@ -1,5 +1,7 @@
 
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect  } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { Eye, FileText, Plus, Upload } from 'lucide-react';
 import { useRef } from "react";
 import { Button } from '@/components/ui/button';
@@ -32,8 +34,19 @@ export const DeliverablesManager = ({
   const [newDeliverable, setNewDeliverable] = useState({
     name: '',
     description: '',
-    taskId:''
+    taskId:'',
+    fichier:''
   });
+    const navigate = useNavigate();
+  
+  const navigateToDeliverable = (groupId: number, taskId: number, deliverableId: number) => {
+    navigate(`/groups/${groupId}/tasks/${taskId}`);
+    setIsNewDeliverableFormVisible(false);
+  };
+  const formData = new FormData();
+formData.append('nom', newDeliverable.name);
+formData.append('description', newDeliverable.description);
+formData.append('fichier', newDeliverable.fichier); // `fichier` est de type File
 
   const getCommentsForDeliverable = (deliverableId: string) => {
     return comments.filter(comment => comment.deliverableId === deliverableId);
@@ -68,7 +81,7 @@ export const DeliverablesManager = ({
       // Met à jour localement la liste ou relance un fetch :
       setDeliverables(prev => [...prev, result]); // si tu veux ajouter sans refetch
       setIsNewDeliverableFormVisible(false);
-      setNewDeliverable({ name: '', description: '', taskId: '' });
+      setNewDeliverable({ name: '', description: '', taskId: '' , fichier:'' });
     } catch (error) {
       console.error("Erreur lors de l'ajout du livrable :", error);
     }
@@ -178,10 +191,10 @@ export const DeliverablesManager = ({
                   </div>
                   <div>
                     <p className="text-sm font-medium">{deliverable.nom_Fichier}</p>
-                    <p className="text-xs text-gray-500">  Soumis le {new Date(deliverable.date_Soumission).toLocaleDateString()}</p>
+                    <p className="text-xs text-gray-500">  Soumis le {new Date("03-04-2025").toLocaleDateString()}</p>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm" className="text-gray-500 hover:text-green-600 hover:bg-green-50">
+                <Button variant="ghost" size="sm" className="text-gray-500 hover:text-green-600 hover:bg-green-50" onClick={() => navigateToDeliverable( 1, 107, 1)}>
                   <Eye className="w-4 h-4" />
                 </Button>
               </div>

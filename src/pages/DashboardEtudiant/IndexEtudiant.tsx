@@ -73,8 +73,9 @@ const IndexEtudiant = () => {
         duration: 0.5,
         delay: 0.2
       }}>
-          Bienvenue sur StudyTrack, votre assistant de suivi de projets académiques
-        </motion.p>
+          Bienvenue Ahmed, votre assistant de suivi de projets académiques.
+
+</motion.p>
         
         <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" variants={container} initial="hidden" animate="show">
           {stats.map((stat, index) => <motion.div key={index} className="rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden" variants={item}>
@@ -114,11 +115,11 @@ const IndexEtudiant = () => {
             <div className="flex justify-between items-center text-sm">
               <div>
                 <p className="text-gray-500">Date de début</p>
-                <p className="font-medium">15 Oct 2023</p>
+                <p className="font-medium">01 Février 2025</p>
               </div>
               <div>
                 <p className="text-gray-500">Date de fin</p>
-                <p className="font-medium">30 Nov 2023</p>
+                <p className="font-medium">01 Avril 2025</p>
               </div>
             </div>
           </div>

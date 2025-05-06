@@ -20,7 +20,7 @@ const GroupsPanel = () => {
     <div className="dashboard-card h-full">
       <div className="divide-y divide-violet-100 max-h-[400px] overflow-y-auto">
         {groups.map(group => {
-          const project = projects.find(p => p.id === group.projectId);
+          const project = projects.find(p => p.id === group.projet_id);
           return project ? (
             <div key={group.id} className="p-4">
               <GroupItem 

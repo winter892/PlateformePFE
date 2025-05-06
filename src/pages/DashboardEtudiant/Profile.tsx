@@ -6,16 +6,16 @@ import { Button } from '@/components/ui/button';
 
 const Profile = () => {
   const studentInfo = {
-    name: "Ahmed Mohammed",
-    email: "ahmed.mohammed@etudiant.edu",
+    name: "Ahmed Brinoui",
+    email: "ahmed.Brinoui@usms.ac.ma",
     phone: "+212 612 345 678",
     studentId: "ET19540012",
-    birthDate: "15/05/1998",
-    address: "123 Avenue Mohammed V, Rabat",
+    birthDate: "15/05/2004",
+    address: "123 Avenue Mohammed V, Beni Mellal",
     department: "Informatique",
-    level: "Master 2",
-    specialization: "Génie Logiciel",
-    enrollmentDate: "Septembre 2022",
+    level: "2 éme Année ",
+    specialization: "Génie Informatique ",
+    enrollmentDate: "Septembre 2025",
   };
 
   const container = {

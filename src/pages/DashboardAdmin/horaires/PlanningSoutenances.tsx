@@ -28,7 +28,9 @@ const PlanningSoutenances = () => {
   const [soutenances, setSoutenances] = useState<Soutenance[]>([]); // Liste des soutenances récupérées
 
   const [selectedDepartement, setSelectedDepartement] = useState<string | number>(""); // ID du département sélectionné
-  const [selectedFiliere, setSelectedFiliere] = useState<string>(""); // la filiere selectioné 
+  const [selectedFiliere, setSelectedFiliere] = useState<string>(""); // la filiere selectioné
+  const [selectedBloc, setSelectedBloc] = useState<string>(""); // bloc selectioné
+
   const [selectedGroupe, setSelectedGroupe] = useState<string>(""); //le groupe selectioné
   const [selectedProjet, setSelectedProjet] = useState(""); // Intitulé du projet du groupe sélectionné
   const [selectedEncadrant, setSelectedEncadrant] = useState(""); // Intitulé d'encadrant du groupe selectionné'
@@ -163,6 +165,30 @@ const handleJuryChange = (selectedOptions) => {
   const values = selectedOptions.map(option => option.value);
   setJury(values);
 };
+//les blocs
+const handleBlocChange = async (e) => {
+  const BlocId = e.target.value; // Récupérer l'ID du département sélectionné
+  setSelectedDepartement(BlocId); // Mettre à jour l’état
+
+  if (BlocId) {
+    try {
+      const salleData = await getFilieres(BlocId); // Charger les filières de ce département
+      if (salleData.length === 0) {
+        // Si le département n'a pas de filières
+        setFilieres([]);
+        alert("Ce département n'a pas de filières disponibles.");
+        
+      } else {
+        setFilieres(salleData);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des filières :", error);
+      setFilieres([]); // En cas d'erreur, on vide la liste
+    }
+  } else {
+    setFilieres([]); // Si aucun département n'est sélectionné, on vide la liste
+  }
+};
 
   // État pour le formulaire d'ajout
   const [showForm, setShowForm] = useState(false);
@@ -238,114 +264,125 @@ const handleAddSoutenance = async () => {
               <h3 className="font-semibold mb-4">Nouvelle soutenance</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Départements */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">Département</label>
-                  <select
-                    className="w-full p-2 border rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                    transition-all duration-200 ease-in-out max-h-40 overflow-y-auto" 
-                    value={selectedDepartement}
-                    onChange={handleDepartementChange}
-                  >
-                    <option value="">Sélectionner un département</option>
-                    {departments.map((dep) => (
-                      <option key={dep.id} value={dep.id}>{dep.intitule}</option>
-                    ))}
-                  </select>
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Département</label>
+                      <select
+                        className="w-full p-2 border rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                        transition-all duration-200 ease-in-out max-h-40 overflow-y-auto" 
+                        value={selectedDepartement}
+                        onChange={handleDepartementChange}
+                      >
+                        <option value="">Sélectionner un département</option>
+                        {departments.map((dep) => (
+                          <option key={dep.id} value={dep.id}>{dep.intitule}</option>
+                        ))}
+                      </select>
+                    </div>
 
                 {/* Filière */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">Filière</label>
-                  <select
-                     className="w-full p-2 border rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                     transition-all duration-200 ease-in-out max-h-40 overflow-y-auto" 
-                    value={selectedFiliere}
-                    onChange={handlFiliereChange}
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Filière</label>
+                      <select
+                        className="w-full p-2 border rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                        transition-all duration-200 ease-in-out max-h-40 overflow-y-auto" 
+                        value={selectedFiliere}
+                        onChange={handlFiliereChange}
 
-                  >
-                    <option value="">Sélectionner une filière</option>
-                    {filieres.map((filiere) => (
-                      <option key={filiere.id} value={filiere.id}>{filiere.intitule}</option>
-                    ))}
-                  </select>
-                </div>
+                      >
+                        <option value="">Sélectionner une filière</option>
+                        {filieres.map((filiere) => (
+                          <option key={filiere.id} value={filiere.id}>{filiere.intitule}</option>
+                        ))}
+                      </select>
+                    </div>
                 {/* groupes */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">Groupe</label>
-                  <select
-                     className="w-full p-2 border rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                     transition-all duration-200 ease-in-out max-h-40 overflow-y-auto" 
-                     value={selectedGroupe}
-                     onChange={handleGroupeChange}
-               
-                  >
-                    <option value="">Sélectionner un groupe</option>
-                    {groupes.map((grp) => (
-                      <option key={grp.id} value={grp.id}>{grp.intitulé}</option>
-                    ))}
-                  </select>
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Groupe</label>
+                      <select
+                        className="w-full p-2 border rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                        transition-all duration-200 ease-in-out max-h-40 overflow-y-auto" 
+                        value={selectedGroupe}
+                        onChange={handleGroupeChange}
+                  
+                      >
+                        <option value="">Sélectionner un groupe</option>
+                        {groupes.map((grp) => (
+                          <option key={grp.id} value={grp.id}>{grp.intitule}</option>
+                        ))}
+                      </select>
+                    </div>
                 
                 {/* Projet */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">Projet</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
-                    value={selectedProjet}
-                    readOnly
-                  />
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Projet</label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
+                        value={selectedProjet}
+                        readOnly
+                      />
+                    </div>
                     {/* encadrant */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">Encadrant</label>
-                  <input
-                    type="text"
-                    className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
-                    value={selectedEncadrant}
-                    readOnly
-                  />
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Encadrant</label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
+                        value={selectedEncadrant}
+                        readOnly
+                      />
+                    </div>
                      {/*date*/}
-                <div>
-                  <label className="block text-sm font-medium mb-1">Date</label>
-                  <input 
-                    type="date" 
-                    className="w-full p-2 border rounded-md"
-                    value={newSoutenance.date}
-                    onChange={(e) => setNewSoutenance({...newSoutenance, date: e.target.value})}
-                  />
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Date</label>
+                      <input 
+                        type="date" 
+                        className="w-full p-2 border rounded-md"
+                        value={newSoutenance.date}
+                        onChange={(e) => setNewSoutenance({...newSoutenance, date: e.target.value})}
+                      />
+                    </div>
                       {/*heure*/}
-                <div>
-                  <label className="block text-sm font-medium mb-1">Heure</label>
-                  <input 
-                    type="time" 
-                    className="w-full p-2 border rounded-md"
-                    value={newSoutenance.heure}
-                    onChange={(e) => setNewSoutenance({...newSoutenance, heure: e.target.value})}
-                  />
-                </div>
-                       {/*salle*/}
-                <div>
-                  <label className="block text-sm font-medium mb-1">Salle</label>
-                  <input 
-                    type="text" 
-                    className="w-full p-2 border rounded-md"
-                    value={newSoutenance.salle}
-                    onChange={(e) => setNewSoutenance({...newSoutenance, salle: e.target.value})}
-                  />
-                </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Heure</label>
+                      <input 
+                        type="time" 
+                        className="w-full p-2 border rounded-md"
+                        value={newSoutenance.heure}
+                        onChange={(e) => setNewSoutenance({...newSoutenance, heure: e.target.value})}
+                      />
+                    </div>
+                    {/* bloc */}
+                
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Bloc</label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
+                        value={"E"}
+                        
+                      />
+                    </div>
+                    {/* salle */}
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Salle</label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
+                        value={"E4"}
+                        
+                      />
+                    </div>
                        {/*Jury*/}
-                <div>
-                    <label className="block text-sm font-medium mb-1">Jury</label>
-                    <Select
-                      isMulti
-                      options={juryOptions}
-                      value={juryOptions.filter(option => jury.includes(option.value))}
-                      onChange={handleJuryChange}
-                    />
-                </div>
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Jury</label>
+                        <Select
+                          isMulti
+                          options={juryOptions}
+                          value={juryOptions.filter(option => jury.includes(option.value))}
+                          onChange={handleJuryChange}
+                        />
+                    </div>
 
               </div>
               <div className="mt-4 flex justify-end gap-2">
@@ -375,8 +412,8 @@ const handleAddSoutenance = async () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {soutenances.map((soutenance) => (
-                  <tr key={soutenance.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{soutenance.Groupe}</td>
+                  <tr >
+                    <td className="px-6 py-4 whitespace-nowrap"> Groupe A</td>
                     <td className="px-6 py-4 whitespace-nowrap">{soutenance.projet}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{soutenance.date}</td>
                     <td className="px-6 py-4 whitespace-nowrap">{soutenance.heure}</td>

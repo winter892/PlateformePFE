@@ -19,8 +19,8 @@ const Homepage = () => {
       </div>
 
       <div className="relative container mx-auto px-4 py-12 flex-grow">
-        <h1 className="text-5xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 mb-4 animate-fade-in-up">
-          Portail Universitaire
+        <h1 className="text-5xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-600 mb-6 animate-fade-in-up">
+        Plateforme PFE | EST Béni Mellal
         </h1>
         <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto animate-fade-in-up animation-delay-200">
           Bienvenue sur votre espace numérique. Sélectionnez votre profil pour accéder à votre espace personnalisé.

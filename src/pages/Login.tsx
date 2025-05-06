@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Lock, icons, Loader2, User, GraduationCap, ClipboardList, Mail } from 'lucide-react';
-
 const Login = () => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -132,6 +131,30 @@ const Login = () => {
                   Mot de passe oublié ?
                 </button>
               </div>
+              <div className="mt-2 text-center">
+  <button
+    onClick={() => {
+      switch (userType) {
+        case 'etudiant':
+          navigate('/StudentForm');
+          break;
+        case 'encadrant':
+          navigate('/SupervisorForm');
+          break;
+        case 'admin':
+          navigate('/AdminForm');     
+          break;     
+        default:
+          navigate('/');
+          break;
+      }
+    }}
+    className="text-sm text-green-600 hover:text-green-800 transition-colors hover:underline"
+  >
+    Vous n'avez pas de compte ? Créez-en un
+  </button>
+</div>
+
             </form>
           ) : (
             <form onSubmit={handleForgotPassword} className="space-y-6">
