@@ -203,34 +203,35 @@ const SupervisorForm: React.FC = () => {
         </div>
         
         <div>
-          <div className="flex justify-between items-center">
+          
             <label htmlFor="password" className="form-label">Mot de passe</label>
-            <PasswordGenerator 
-              onGenerate={handlePasswordGenerate}
-              buttonColor="bg-purple-500 hover:bg-purple-600" 
-            />
-          </div>
-          <div className="relative">
-            <Input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              value={formData.password}
-              onChange={handleChange}
-              className="form-input focus:ring-purple-500 pr-10"
-              placeholder="••••••••"
-              required
-            />
-            <button 
-              type="button"
-              onClick={togglePasswordVisibility}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-              aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-            >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-            </button>
-          </div>
-          <PasswordStrength password={formData.password} />
+            <div className="flex space-x-2">
+                  <div className="relative flex-grow">
+                      <Input
+                        id="password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="form-input focus:ring-purple-500 pr-10"
+                        placeholder="••••••••"
+                        required
+                      />
+                      <button 
+                        type="button"
+                        onClick={togglePasswordVisibility}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                        aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                      >
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                  </div>
+                  <PasswordGenerator 
+                        onGenerate={handlePasswordGenerate}
+                        buttonColor="bg-purple-500 hover:bg-purple-600" 
+                  />
+            </div>
+            <PasswordStrength password={formData.password} />
         </div>
         
         <button
