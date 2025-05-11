@@ -32,7 +32,7 @@ const IndexEncadrant = () => {
     <DashboardLayout onProfileClick={handleTeacherClick}>
       <div className="mb-8 section-animation">
         <h1 className="text-2xl font-semibold text-violet-900 mb-1">
-          Bienvenue !! <span className="cursor-pointer hover:text-violet-700 underline" onClick={handleTeacherClick}>M.OUTANOUT</span>
+          Bienvenue !! <span className="cursor-pointer hover:text-violet-700 underline" onClick={handleTeacherClick}>M.OUTANOUTE</span>
         </h1>
         <p className="text-violet-500">Voici un aperçu des projets académiques</p>
       </div>

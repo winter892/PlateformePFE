@@ -66,7 +66,7 @@ const EncadrentSidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
             <User className="w-5 h-5 text-white" />
           </div>
           <div>
-            <p className="text-sm font-medium">M.OUTANOUT</p>
+            <p className="text-sm font-medium">M.OUTANOUTE</p>
             <p className="text-xs opacity-80">Encadrant</p>
           </div>
         </button>

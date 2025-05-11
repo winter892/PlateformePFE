@@ -1,11 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, Eye, EyeOff } from 'lucide-react';
 import PasswordStrength from '../PasswordStrength';
 import PasswordGenerator from '../PasswordGenerator';
 import { departments } from '@/data/departmentData';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
+import { getDepartements,getFilieres } from '@/services/userService';
 
 const SupervisorForm: React.FC = () => {
   const { toast } = useToast();
@@ -14,45 +16,94 @@ const SupervisorForm: React.FC = () => {
     firstName: '',
     email: '',
     departmentId: '',
-    programId: '',
+    FiliereId: '',
     specialty: '',
     password: ''
   });
   const [programs, setPrograms] = useState<{ id: string; name: string }[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [departments, setDepartments] = useState<any[]>([]); // Liste des départements récupérés
+  const [selectedDepartement, setSelectedDepartement] = useState<string | number>(""); // ID du département sélectionné
+  const [filieres, setFilieres] = useState<any[]>([]); // Liste des filières récupérées
+  const navigate = useNavigate();
+  
+  
 
-  useEffect(() => {
-    if (formData.departmentId) {
-      const selectedDepartment = departments.find(d => d.id === formData.departmentId);
-      setPrograms(selectedDepartment?.programs || []);
-      setFormData(prev => ({ ...prev, programId: '' }));
+  // Récupérer les départements lors du chargement initiale
+   useEffect(() => {
+     const fetchDepartementsAndSoutenances = async () => {
+       try {
+         const departementsData = await getDepartements();
+ 
+         console.log("Départements récupérés:", departementsData);
+ 
+         setDepartments(departementsData);
+       } catch (error) {
+         console.error("Erreur lors de la récupération des données:", error);
+       }
+     };
+ 
+     fetchDepartementsAndSoutenances();
+   }, []);
+
+  //lors du changement de département il fuat changer la liste des filieres
+  
+  const handleDepartementChange = async (e) => {
+    const selectedDeptId = e.target.value;
+    setFormData(prev => ({ ...prev, departmentId: selectedDeptId, FiliereId: '' }));
+  
+    if (selectedDeptId) {
+      try {
+        const filieresData = await getFilieres(selectedDeptId);
+        if (filieresData.length === 0) {
+          setFilieres([]);
+          alert("Ce département n'a pas de filières disponibles.");
+        } else {
+          setFilieres(filieresData);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des filières :", error);
+        setFilieres([]);
+      }
     } else {
-      setPrograms([]);
+      setFilieres([]);
     }
-  }, [formData.departmentId]);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
   };
+  
+    
+ 
+  const handleInputChange= (event) =>{
+
+    const {name, value} = event.target;
+    setFormData({
+      ...formData,
+      [name]:value,
+    })
+  }
+
 
   const handlePasswordGenerate = (password: string) => {
     setFormData(prev => ({ ...prev, password }));
+  
+    toast({
+      title: "Mot de passe généré",
+      description: "Pensez à copier ce mot de passe quelque part avant de valider.",
+      duration: 5000,
+      variant: "default", // ou "warning" si supporté
+    });
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  /*const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Simple validation
     if (!formData.lastName || !formData.firstName || !formData.email || 
-        !formData.departmentId || !formData.programId || 
+        !formData.departmentId || !formData.FiliereId || 
         !formData.specialty || !formData.password) {
       toast({
         title: "Erreur",
@@ -87,13 +138,89 @@ const SupervisorForm: React.FC = () => {
         firstName: '',
         email: '',
         departmentId: '',
-        programId: '',
+        FiliereId: '',
         specialty: '',
         password: ''
       });
     }, 1500);
+  };*/
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    // Valide les champs ici si nécessaire...
+  
+    // Préparation des données au bon format
+    const mappedData = {
+      nom: formData.lastName,
+      prenom: formData.firstName,
+      adresseEmail: formData.email,
+      password: formData.password,
+      specialite: formData.specialty,
+      filiereId: parseInt(formData.FiliereId), // s'assurer que c'est un nombre
+      role: "encadrant"
+    };
+    const handleSpaceClick = (userType: string) => {
+      navigate('/login', { state: { userType } });
+    };
+  
+    try {
+      const response = await fetch("http://localhost:8080/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(mappedData)
+      });
+    
+      const data = await response.json(); // Lire la réponse JSON
+    
+      // Vérifie le contenu de la réponse, pas juste le status HTTP
+      if (data.statusCode === 500 && data.error?.includes("email")) {
+        toast({
+          title: "Email déjà utilisé",
+          description: "Un compte avec cette adresse e-mail existe déjà.",
+          variant: "destructive"
+        });
+        return;
+      }
+    
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP ${response.status}`);
+      }
+    
+      toast({
+        title: "Compte créé avec succès",
+        description: `Le compte de ${formData.firstName} ${formData.lastName} a été enregistré avec succès.`,
+        duration: 3000, // facultatif, contrôle le temps d'affichage
+       
+      });
+      // Rediriger après 3 secondes
+setTimeout(() => {
+  handleSpaceClick('encadrant')}, 3000);
+      
+    
+      // Réinitialiser le formulaire
+      setFormData({
+        lastName: '',
+        firstName: '',
+        email: '',
+        departmentId: '',
+        FiliereId: '',
+        specialty: '',
+        password: ''
+      });
+    
+    } catch (error) {
+      console.log("Erreur lors de la création :", error.message);
+      toast({
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de la création du compte.",
+        variant: "destructive"
+      });
+    }
+    
   };
-
+  
   return (
     <div className="form-container animate-slide-in">
       <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 rounded-full supervisor-gradient text-white">
@@ -110,7 +237,7 @@ const SupervisorForm: React.FC = () => {
             name="lastName"
             type="text"
             value={formData.lastName}
-            onChange={handleChange}
+            onChange={handleInputChange}
             className="form-input focus:ring-purple-500"
             placeholder="Martin"
             required
@@ -124,7 +251,7 @@ const SupervisorForm: React.FC = () => {
             name="firstName"
             type="text"
             value={formData.firstName}
-            onChange={handleChange}
+            onChange={handleInputChange}
             className="form-input focus:ring-purple-500"
             placeholder="Sophie"
             required
@@ -138,7 +265,7 @@ const SupervisorForm: React.FC = () => {
             name="email"
             type="email"
             value={formData.email}
-            onChange={handleChange}
+            onChange={handleInputChange}
             className="form-input focus:ring-purple-500"
             placeholder="sophie.martin@univ.fr"
             required
@@ -151,40 +278,36 @@ const SupervisorForm: React.FC = () => {
             id="departmentId"
             name="departmentId"
             value={formData.departmentId}
-            onChange={handleChange}
+            onChange={handleDepartementChange}
             className="form-select focus:ring-purple-500"
             required
           >
-            <option value="">Sélectionner un département</option>
+            <option value=""  className="text-gray-400 italic">Sélectionner un département</option>
             {departments.map(department => (
               <option key={department.id} value={department.id}>
-                {department.name}
+                {department.intitule}
               </option>
             ))}
           </select>
         </div>
         
         <div>
-          <label htmlFor="programId" className="form-label">Filière</label>
+          <label htmlFor="FiliereId" className="form-label">Filière</label>
           <select
-            id="programId"
-            name="programId"
-            value={formData.programId}
-            onChange={handleChange}
+            id="FiliereId"
+            name="FiliereId"
+            value={formData.FiliereId}
+            onChange={handleInputChange}
             className="form-select focus:ring-purple-500"
             disabled={!formData.departmentId}
-            required
+          
           >
-            <option value="">
-              {formData.departmentId 
-                ? "Sélectionner une filière" 
-                : "Veuillez d'abord sélectionner un département"}
-            </option>
-            {programs.map(program => (
-              <option key={program.id} value={program.id}>
-                {program.name}
-              </option>
-            ))}
+             <option value="" className="text-gray-400 italic">Sélectionner une filiere</option>
+            {filieres.map((filiere) => (
+                          <option key={filiere.id} value={filiere.id}>
+                            {filiere.intitule}
+                           </option>
+                        ))}
           </select>
         </div>
         
@@ -195,7 +318,7 @@ const SupervisorForm: React.FC = () => {
             name="specialty"
             type="text"
             value={formData.specialty}
-            onChange={handleChange}
+            onChange={handleInputChange}
             className="form-input focus:ring-purple-500"
             placeholder="Intelligence Artificielle, Big Data, Réseaux, etc."
             required
@@ -212,7 +335,7 @@ const SupervisorForm: React.FC = () => {
                         name="password"
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
-                        onChange={handleChange}
+                        onChange={handleInputChange}
                         className="form-input focus:ring-purple-500 pr-10"
                         placeholder="••••••••"
                         required
@@ -230,10 +353,13 @@ const SupervisorForm: React.FC = () => {
                         onGenerate={handlePasswordGenerate}
                         buttonColor="bg-purple-500 hover:bg-purple-600" 
                   />
+                  
             </div>
             <PasswordStrength password={formData.password} />
         </div>
-        
+        <div className="text-sm text-yellow-600 mt-1">
+                      ⚠️ N'oubliez pas de copier votre mot de passe avant de soumettre le formulaire.
+                    </div>
         <button
           type="submit"
           disabled={isSubmitting}
