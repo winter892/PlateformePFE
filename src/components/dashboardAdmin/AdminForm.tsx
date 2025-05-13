@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ClipboardList, Eye, EyeOff } from 'lucide-react';
 import PasswordStrength from '../PasswordStrength';
@@ -24,154 +23,195 @@ const AdminForm = () => {
 
   const handlePasswordGenerate = (password: string) => {
     setFormData(prev => ({ ...prev, password }));
+    toast({
+      title: "Mot de passe généré",
+      description: "Copiez ce mot de passe avant de soumettre !",
+      duration: 5000,
+    });
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
+  const validateForm = () => {
+    // Validation email USMS
+    const emailRegex = /^[a-zA-Z]+\.[a-zA-Z]+@usms\.ac\.ma$/;
+    if (!emailRegex.test(formData.email)) {
+      toast({
+        title: "Email invalide",
+        description: "Format requis : prenom.nom@usms.ma",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    // Validation nom/prénom
+    const nameRegex = /^[a-zA-ZÀ-ÿ -]{2,}$/;
+    if (!nameRegex.test(formData.lastName) || !nameRegex.test(formData.firstName)) {
+      toast({
+        title: "Nom invalide",
+        description: "Doit contenir uniquement des lettres (min 2 caractères)",
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simple validation
-    if (!formData.lastName || !formData.firstName || !formData.email || !formData.password) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs",
-        variant: "destructive"
-      });
-      return;
-    }
-    if (!formData.email.includes('@')) {
-      toast({
-        title: "Erreur",
-        description: "L'adresse e-mail est invalide",
-        variant: "destructive"
-      });
-      return;
-    }
-    
+    if (!validateForm()) return;
+
     setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast({
-        title: "Compte créé avec succès",
-        description: `Le compte administrateur pour ${formData.firstName} ${formData.lastName} a été créé.`,
+
+    try {
+      const adminData = {
+        nom: formData.lastName,
+        prenom: formData.firstName,
+        adresseEmail: formData.email,
+        password: formData.password,
+        role: "admin" // Rôle spécifique pour l'admin
+      };
+
+      const response = await fetch("http://localhost:8080/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(adminData),
       });
-      
-      // Reset form
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Erreur lors de l'enregistrement");
+      }
+
+      toast({
+        title: "Administrateur créé 🎉",
+        description: `${formData.firstName} ${formData.lastName} a été enregistré avec succès`,
+      });
+
+      // Réinitialisation du formulaire
       setFormData({
         lastName: '',
         firstName: '',
         email: '',
         password: ''
       });
-    }, 1500);
+
+    } catch (error) {
+      console.error("Erreur:", error);
+      toast({
+        title: "Erreur d'enregistrement",
+        description: error.message.includes("existe déjà") 
+          ? "Cet email est déjà utilisé" 
+          : "Une erreur est survenue avec le serveur",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
   return (
-    <div className="min-h-screen bg-gray-20 flex items-center justify-center px-4">
-      <div className="w-full max-w-2xl form-container animate-slide-in bg-white p-8 rounded-lg shadow-md">
-        <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 rounded-full admin-gradient text-white">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
+        <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white">
           <ClipboardList size={32} />
         </div>
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Créer un Compte Administrateur</h2>
-  
+
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
+          Nouveau Administrateur
+        </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="lastName" className="form-label">Nom</label>
-          <Input
-            id="lastName"
-            name="lastName"
-            type="text"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="form-input focus:ring-blue-500"
-            placeholder="Votre Prenom"
-            required
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="firstName" className="form-label">Prénom</label>
-          <Input
-            id="firstName"
-            name="firstName"
-            type="text"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="form-input focus:ring-blue-500"
-            placeholder="Votre Nom"
-            required
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="email" className="form-label">Adresse e-mail</label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="form-input focus:ring-blue-500"
-            placeholder="Nom.Prenom@gmail.com"
-            required
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="password" className="form-label">Mot de passe</label>
-          <div className="flex space-x-2">
-            <div className="relative flex-grow">
+          <div className="grid gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Nom</label>
               <Input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                value={formData.password}
+                name="lastName"
+                value={formData.lastName}
                 onChange={handleChange}
-                className="form-input focus:ring-blue-500 pr-10 w-full"
-                placeholder="••••••••"
+                placeholder="Dupont"
+                minLength={2}
                 required
               />
-              <button 
-                type="button"
-                onClick={togglePasswordVisibility}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
             </div>
-            <PasswordGenerator 
-              onGenerate={handlePasswordGenerate}
-              buttonColor="bg-blue-500 hover:bg-blue-600"
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Prénom</label>
+              <Input
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="Marie"
+                minLength={2}
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Email institutionnel</label>
+            <Input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="prenom.nom@usms.ma"
+              pattern="[a-zA-Z]+\.[a-zA-Z]+@usms\.ma"
+              title="Format: prenom.nom@usms.ma"
+              required
             />
           </div>
-          <PasswordStrength password={formData.password} />
-        </div>
-        
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full py-2 px-4 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-md hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-all disabled:opacity-70"
-        >
-          {isSubmitting ? (
-            <>
-              <span className="loader mr-2"></span>
-              Création en cours...
-            </>
-          ) : (
-            "Créer le compte"
-          )}
-        </button>
-      </form>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Mot de passe</label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  minLength={8}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              <PasswordGenerator 
+                onGenerate={handlePasswordGenerate}
+                buttonClass="bg-blue-500 hover:bg-blue-600 text-white"
+              />
+            </div>
+            <PasswordStrength password={formData.password} />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? (
+              <span className="flex items-center justify-center">
+                <span className="animate-spin mr-2">🌀</span>
+                Création...
+              </span>
+            ) : "Créer l'administrateur"}
+          </button>
+        </form>
       </div>
     </div>
   );
-  
-
 };
 
 export default AdminForm;

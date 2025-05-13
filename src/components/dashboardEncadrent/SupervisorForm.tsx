@@ -267,7 +267,7 @@ setTimeout(() => {
             value={formData.email}
             onChange={handleInputChange}
             className="form-input focus:ring-purple-500"
-            placeholder="sophie.martin@univ.fr"
+            placeholder="sophie.martin@usms.ma"
             required
           />
         </div>

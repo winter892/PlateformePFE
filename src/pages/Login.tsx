@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Lock, icons, Loader2, User, GraduationCap, ClipboardList, Mail } from 'lucide-react';
+import { ArrowLeft, Lock, Loader2, User, GraduationCap, ClipboardList, Mail } from 'lucide-react';
+
 const Login = () => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -53,7 +54,7 @@ const Login = () => {
       case 'encadrant':
         return { icon: <User className="w-8 h-8 text-white" />, color: 'bg-gradient-to-r from-purple-500 to-purple-700' };
       case 'etudiant':
-        return { icon: <GraduationCap className="w-8 h-8 text-white" />, color: 'bg-gradient-to-r from-green-400 to-green-600' }; // Dégradé vert clair à foncé
+        return { icon: <GraduationCap className="w-8 h-8 text-white" />, color: 'bg-gradient-to-r from-green-400 to-green-600' };
       case 'admin':
         return { icon: <ClipboardList className="w-8 h-8 text-white" />, color: 'bg-gradient-to-r from-blue-500 to-blue-700' };
       default:
@@ -64,7 +65,7 @@ const Login = () => {
   const { icon, color } = getUserDetails();
 
   const getIdentifierLabel = () => {
-    return userType === 'etudiant' ? 'Code Apogée' : 'Adresse Email';
+    return userType === 'etudiant' ? 'Email universitaire' : 'Adresse Email';
   };
 
   return (
@@ -93,12 +94,12 @@ const Login = () => {
                   {getIdentifierLabel()}
                 </label>
                 <input
-                  type={userType === 'etudiant' ? 'text' : 'email'}
+                  type="email"
                   id="identifier"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder={userType === 'etudiant' ? 'Entrez votre Code Apogée' : 'votre@email.com'}
+                  placeholder={userType === 'etudiant' ? 'prenom.nom@usms.ac.ma' : 'prenom.nom@usms.ma'}
                   required
                 />
               </div>
@@ -132,29 +133,28 @@ const Login = () => {
                 </button>
               </div>
               <div className="mt-2 text-center">
-  <button
-    onClick={() => {
-      switch (userType) {
-        case 'etudiant':
-          navigate('/StudentForm');
-          break;
-        case 'encadrant':
-          navigate('/SupervisorForm');
-          break;
-        case 'admin':
-          navigate('/AdminForm');     
-          break;     
-        default:
-          navigate('/');
-          break;
-      }
-    }}
-    className="text-sm text-green-600 hover:text-green-800 transition-colors hover:underline"
-  >
-    Vous n'avez pas de compte ? Créez-en un
-  </button>
-</div>
-
+                <button
+                  onClick={() => {
+                    switch (userType) {
+                      case 'etudiant':
+                        navigate('/StudentForm');
+                        break;
+                      case 'encadrant':
+                        navigate('/SupervisorForm');
+                        break;
+                      case 'admin':
+                        navigate('/AdminForm');
+                        break;
+                      default:
+                        navigate('/');
+                        break;
+                    }
+                  }}
+                  className="text-sm text-green-600 hover:text-green-800 transition-colors hover:underline"
+                >
+                  Vous n'avez pas de compte ? Créez-en un
+                </button>
+              </div>
             </form>
           ) : (
             <form onSubmit={handleForgotPassword} className="space-y-6">
@@ -163,14 +163,29 @@ const Login = () => {
                   {getIdentifierLabel()}
                 </label>
                 <input
-                  type={userType === 'etudiant' ? 'text' : 'email'}
+                  type="email"
                   id="resetIdentifier"
                   value={resetIdentifier}
                   onChange={(e) => setResetIdentifier(e.target.value)}
                   className="w-full p-3 border rounded-lg"
+                  placeholder={userType === 'etudiant' ? 'prenom.nom@usms.ac.ma' : 'prenom.nom@usms.ma'}
                   required
                 />
               </div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`w-full py-3 text-white rounded-lg ${color} hover:${color.replace('bg-', 'hover:bg-')}-700 disabled:opacity-50`}
+              >
+                {isLoading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Réinitialiser le mot de passe'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(false)}
+                className="w-full text-center text-sm text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                Retour à la connexion
+              </button>
             </form>
           )}
         </div>
@@ -179,4 +194,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Login;
