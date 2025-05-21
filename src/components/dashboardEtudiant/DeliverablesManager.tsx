@@ -2,18 +2,18 @@
 import React, { useState,useEffect  } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Eye, FileText, Plus, Upload } from 'lucide-react';
+import { Eye, FileText, Plus, Upload ,Trash2} from 'lucide-react';
 import { useRef } from "react";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {LivrableResponse,LivrableCreate, Comment } from '@/types/task';
+import {LivrableResponse,LivrableCreate, Comment, Fichier } from '@/types/task';
 import {AjouterUneLivrable,getLivrableByTacheid} from '@/services/EtudiantsService';
 
 interface DeliverablesManagerProps {
   deliverables: LivrableResponse[];
   comments: Comment[];
   onAddComment: (deliverableId: string, text: string) => void;
-  onAddDeliverable: (name: string, taskId: string, description: string) => void;
+  onAddDeliverable: (name: string, taskId: string, description: string,fichier:Fichier) => void;
   taskId: string;
 }
 
@@ -29,6 +29,7 @@ export const DeliverablesManager = ({
   const [activeDeliverable, setActiveDeliverable] = useState<LivrableResponse | null>(
     initialDeliverables.length > 0 ? initialDeliverables[0] : null
   );
+  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [newComment, setNewComment] = useState('');
   const [isNewDeliverableFormVisible, setIsNewDeliverableFormVisible] = useState(false);
   const [newDeliverable, setNewDeliverable] = useState({
@@ -43,11 +44,8 @@ export const DeliverablesManager = ({
     navigate(`/groups/${groupId}/tasks/${taskId}`);
     setIsNewDeliverableFormVisible(false);
   };
-  const formData = new FormData();
-formData.append('nom', newDeliverable.name);
-formData.append('description', newDeliverable.description);
-formData.append('fichier', newDeliverable.fichier); // `fichier` est de type File
-
+   
+    
   const getCommentsForDeliverable = (deliverableId: string) => {
     return comments.filter(comment => comment.deliverableId === deliverableId);
   };
@@ -67,25 +65,37 @@ formData.append('fichier', newDeliverable.fichier); // `fichier` est de type Fil
   }, [taskId]); // se relance si l'id de tâche change
 
   const handleAddDeliverable = async (name: string, taskId: string, description: string) => {
-    try {
-      const livrable: LivrableCreate = {
-        nom_Fichier: name,
-        descreption: description,
-        tache_id: taskId
-      };
+    if (!selectedFiles || selectedFiles.length === 0) {
+      console.error("Aucun fichier sélectionné !");
+      return;
+    }
   
-      const result = await AjouterUneLivrable(livrable);
+    const formData = new FormData();
+    formData.append("nom_fichier", name);
+    formData.append("descreption", description || "");
+    formData.append("tache_id", taskId);
+    if (!selectedFiles || selectedFiles.length === 0) {
+      console.error("Aucun fichier sélectionné !");
+      return;
+    }
+    if (selectedFiles && selectedFiles.length > 0) {
+      formData.append("fichier", selectedFiles[0]);
+      
+    }
+    try {
+      const response = await AjouterUneLivrable(formData);
+      const result = response.data;
   
       console.log('Livrable ajouté avec succès :', result);
-  
-      // Met à jour localement la liste ou relance un fetch :
-      setDeliverables(prev => [...prev, result]); // si tu veux ajouter sans refetch
+      setDeliverables(prev => [...prev, result]);
       setIsNewDeliverableFormVisible(false);
-      setNewDeliverable({ name: '', description: '', taskId: '' , fichier:'' });
+      setNewDeliverable({ name: '', description: '', taskId: '', fichier: '' });
+      setSelectedFiles(null); // correction ici aussi
     } catch (error) {
       console.error("Erreur lors de l'ajout du livrable :", error);
     }
   };
+  
   
 
   //Upload un fichier 
@@ -120,62 +130,65 @@ formData.append('fichier', newDeliverable.fichier); // `fichier` est de type Fil
           </Button>
         </div>
         {isNewDeliverableFormVisible ? (
-          <div className="border rounded-lg p-3 mb-4">
-            <h4 className="font-medium mb-2">Nouveau livrable</h4>
-            <div className="space-y-3">
-              <Input 
-                placeholder="Nom du fichier " 
-                value={newDeliverable.name}
-                onChange={(e) => setNewDeliverable({...newDeliverable, name: e.target.value})}
-              />
-              <Input 
-                placeholder="Description (optionnelle)" 
-                value={newDeliverable.description}
-                onChange={(e) => setNewDeliverable({...newDeliverable, description: e.target.value})}
-              />
-              <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
-                <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                <div className="text-sm text-gray-500 mb-2">
-                  Glissez votre fichier ici ou
-                </div>
-                  <Button
-                    size="sm"
-                    className="bg-green-600 hover:bg-green-700"
-                    onClick={handleButtonClick}
-                  >
-                    Parcourir les fichiers
-
-                  </Button>
-                <input
-                      type="file"
-                      multiple //plusieurs fichier
-                      ref={fileInputRef}
-                      className="hidden"
-                      onChange={(e) => {
-                        const files = e.target.files;
-                        console.log("Fichiers sélectionnés :", files);
-                      }}
-                 />
-              </div>
-              <div className="flex justify-end gap-2 mt-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setIsNewDeliverableFormVisible(false)}
-                >
-                  Annuler
-                </Button>
-                <Button 
-                  size="sm" 
-                  className="bg-green-600 hover:bg-green-700"
-                  onClick={() => handleAddDeliverable(newDeliverable.name, taskId, newDeliverable.description )}
-                  disabled={!newDeliverable.name}
-                >
-                  Ajouter
-                </Button>
-              </div>
-            </div>
-          </div>
+         <div className="border rounded-lg p-3 mb-4">
+         <h4 className="font-medium mb-2">Nouveau livrable</h4>
+         <div className="space-y-3">
+           <Input 
+             placeholder="Nom du fichier" 
+             value={newDeliverable.name}
+             onChange={(e) => setNewDeliverable({ ...newDeliverable, name: e.target.value })}
+             required
+           />
+           <Input 
+             placeholder="Description (optionnelle)" 
+             value={newDeliverable.description}
+             onChange={(e) => setNewDeliverable({ ...newDeliverable, description: e.target.value })}
+           />
+           <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
+             <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+             <div className="text-sm text-gray-500 mb-2">
+               Glissez votre fichier ici ou
+             </div>
+             <Button
+               size="sm"
+               className="bg-green-600 hover:bg-green-700"
+               onClick={handleButtonClick}
+             >
+               Parcourir les fichiers
+             </Button>
+             <input
+               type="file"
+               multiple
+               ref={fileInputRef}
+               className="hidden"
+               onChange={(e) => {
+                const files = e.target.files;
+                setSelectedFiles(files); // <-- Mise à jour du state
+                console.log("Fichiers sélectionnés :", files);
+               }}
+               required
+             />
+           </div>
+           <div className="flex justify-end gap-2 mt-2">
+             <Button 
+               variant="outline" 
+               size="sm"
+               onClick={() => setIsNewDeliverableFormVisible(false)}
+             >
+               Annuler
+             </Button>
+             <Button 
+               size="sm" 
+               className="bg-green-600 hover:bg-green-700"
+               onClick={() => handleAddDeliverable(newDeliverable.name, taskId, newDeliverable.description )}
+               disabled={!newDeliverable.name || !selectedFiles}
+             >
+               Ajouter
+             </Button>
+           </div>
+         </div>
+       </div>
+       
         ) : null}
         <div className="space-y-3">
           {deliverables.length > 0 ? (
@@ -190,14 +203,32 @@ formData.append('fichier', newDeliverable.fichier); // `fichier` est de type Fil
                     <FileText className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">{deliverable.nom_Fichier}</p>
-                    <p className="text-xs text-gray-500">  Soumis le {new Date("03-04-2025").toLocaleDateString()}</p>
+                    <p className="text-sm font-medium">{deliverable.nom_fichier}</p>
+                    <p className="text-xs text-gray-500">   Soumis le {new Date(deliverable.fichier.dateCreation).toLocaleString('fr-FR', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}</p>
                   </div>
                 </div>
+                <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" className="text-gray-500 hover:text-green-600 hover:bg-green-50" onClick={() => navigateToDeliverable( 1, 107, 1)}>
                   <Eye className="w-4 h-4" />
                 </Button>
+                <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={(e) => {
+                      
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+               </Button>
               </div>
+            </div>
             ))
           ) : (
             <div className="text-center py-8">

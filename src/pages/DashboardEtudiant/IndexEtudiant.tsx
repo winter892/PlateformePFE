@@ -171,7 +171,7 @@ useEffect(() => {
                       {stats.map((stat, index) => (
                 <motion.div
                   key={index}
-                  className="rounded-xl border-5 border-green-200 bg-green-100 shadow-lg hover:shadow-lg transition-all duration-300 overflow-hidden"
+                  className="rounded-xl border-5 border-green-500 bg-white  shadow-lg hover:shadow-lg transition-all duration-300 overflow-hidden"
                   variants={item}
                 >
                   <div className="p-6">

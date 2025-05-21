@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/use-toast";
 import { v4 as uuidv4 } from "uuid";
-import { Task, LivrableCreate,LivrableResponse, Comment } from "@/types/task";
+import { Task, LivrableCreate,LivrableResponse, Comment, Fichier } from "@/types/task";
 import { TaskFilter } from "@/components/tasks/TaskFilter";
 import { TaskList } from "@/components/tasks/TaskList";
 import { TaskForm } from "@/components/tasks/NewTaskForm";
@@ -178,13 +178,13 @@ export default function Tasks() {
     setIsDeliverablesDialogOpen(true);
   };
 
-  const handleAddDeliverable = (name: string, taskId: string, description: string) => {
+  const handleAddDeliverable = (name: string, taskId: string, description: string, fichier:Fichier) => {
     const deliverable: LivrableResponse = {
       id: uuidv4(),
       tache_id: taskId,
-      nom_Fichier: name,
+      nom_fichier: name,
       descreption: description,
-      date_Soumission: new Date().toISOString().split("T")[0],
+      fichier:fichier
     };
 
     const newAutoComment: Comment = {

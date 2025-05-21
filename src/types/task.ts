@@ -10,15 +10,25 @@ export interface Task {
 
 export interface LivrableResponse {
   id: string;
-  nom_Fichier: string;
+  nom_fichier: string;
   descreption: string;
-  date_Soumission: string; // <-- tu la reçois ici
   tache_id: string;
+  fichier: Fichier;
+
+}
+export interface Fichier {
+  id: number;
+  chemin: string;
+  dateCreation: string;
+  nom: string;
+  taille: number;
+  type: string;
 }
 export interface LivrableCreate {
   nom_Fichier: string;
   descreption: string;
   tache_id: string;
+
 }
 
 export interface Comment {
