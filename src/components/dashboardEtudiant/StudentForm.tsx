@@ -131,9 +131,18 @@ const StudentForm: React.FC = () => {
       if (!response.ok) {
         throw new Error(data.error || "Erreur lors de l'inscription");
       }
+       // Vérifie le contenu de la réponse, pas juste le status HTTP
+       if (data.statusCode === 500 && data.error?.includes("email")) {
+        toast({
+          title: "Email déjà utilisé",
+          description: "Un compte avec cette adresse e-mail existe déjà.",
+          variant: "destructive"
+        });
+        return;
+      }
 
       toast({
-        title: "Inscription réussie 🎉",
+        title: "Inscription réussie 🎓",
         description: `Bienvenue ${formData.firstName} ${formData.lastName} !`
       });
 
@@ -182,7 +191,7 @@ const StudentForm: React.FC = () => {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                placeholder="Dupont"
+                placeholder="Naji"
                 required
               />
             </div>
@@ -193,7 +202,7 @@ const StudentForm: React.FC = () => {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                placeholder="Marie"
+                placeholder="Ahmmed"
                 required
               />
             </div>
@@ -291,7 +300,7 @@ const StudentForm: React.FC = () => {
               </div>
               <PasswordGenerator 
                 onGenerate={handlePasswordGenerate}
-                buttonClass="bg-green-500 hover:bg-green-600"
+                buttonColor="bg-green-500 hover:bg-green-600"
               />
             </div>
             <PasswordStrength password={formData.password} />

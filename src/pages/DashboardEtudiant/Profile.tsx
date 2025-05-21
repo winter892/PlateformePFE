@@ -3,9 +3,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { User, Mail, Phone, Book, Calendar, Award, MapPin, School } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {getUserById} from '@/services/userService';
+import { useEffect,useState } from 'react';
 
 const Profile = () => {
-  const studentInfo = {
+  const studentInfoo = {
     name: "Ahmed Brinoui",
     email: "ahmed.Brinoui@usms.ac.ma",
     phone: "+212 612 345 678",
@@ -17,6 +19,27 @@ const Profile = () => {
     specialization: "Génie Informatique ",
     enrollmentDate: "Septembre 2025",
   };
+  const [studentInfo, setStudentInfo] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const id = localStorage.getItem('id');
+      if (id) {
+        try {
+          const data = await getUserById(id);
+          setStudentInfo(data);
+        } catch (error) {
+          console.error("Erreur lors du chargement du profil :", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (!studentInfo) {
+    return <div className="ml-64 p-6">Chargement...</div>;
+  }
 
   const container = {
     hidden: { opacity: 0 },
@@ -74,7 +97,7 @@ const Profile = () => {
                     <User className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
                     <div>
                       <p className="text-sm text-gray-500">Nom complet</p>
-                      <p className="font-medium">{studentInfo.name}</p>
+                      <p className="font-medium">{studentInfo.nom} {studentInfo.prenom}</p>
                     </div>
                   </div>
                   
@@ -82,34 +105,11 @@ const Profile = () => {
                     <Mail className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
                     <div>
                       <p className="text-sm text-gray-500">Email</p>
-                      <p className="font-medium">{studentInfo.email}</p>
+                      <p className="font-medium">{studentInfo.adresseEmail}</p>
                     </div>
                   </div>
-                  
-                  <div className="flex items-start">
-                    <Phone className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
-                    <div>
-                      <p className="text-sm text-gray-500">Téléphone</p>
-                      <p className="font-medium">{studentInfo.phone}</p>
-                    </div>
                   </div>
-                  
-                  <div className="flex items-start">
-                    <Calendar className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
-                    <div>
-                      <p className="text-sm text-gray-500">Date de naissance</p>
-                      <p className="font-medium">{studentInfo.birthDate}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <MapPin className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
-                    <div>
-                      <p className="text-sm text-gray-500">Adresse</p>
-                      <p className="font-medium">{studentInfo.address}</p>
-                    </div>
-                  </div>
-                </div>
+                
               </motion.div>
               
               <motion.div variants={item} className="space-y-6">
@@ -120,7 +120,7 @@ const Profile = () => {
                     <Book className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
                     <div>
                       <p className="text-sm text-gray-500">Numéro d'étudiant</p>
-                      <p className="font-medium">{studentInfo.studentId}</p>
+                      <p className="font-medium">{studentInfo.code_APOGEE}</p>
                     </div>
                   </div>
                   
@@ -128,7 +128,7 @@ const Profile = () => {
                     <School className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
                     <div>
                       <p className="text-sm text-gray-500">Département</p>
-                      <p className="font-medium">{studentInfo.department}</p>
+                      <p className="font-medium">{studentInfo.filiere.departement.intitule}</p>
                     </div>
                   </div>
                   
@@ -136,7 +136,7 @@ const Profile = () => {
                     <Award className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
                     <div>
                       <p className="text-sm text-gray-500">Niveau d'études</p>
-                      <p className="font-medium">{studentInfo.level}</p>
+                      <p className="font-medium">2 éme Année </p>
                     </div>
                   </div>
                   
@@ -144,26 +144,16 @@ const Profile = () => {
                     <Book className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
                     <div>
                       <p className="text-sm text-gray-500">Spécialisation</p>
-                      <p className="font-medium">{studentInfo.specialization}</p>
+                      <p className="font-medium">{studentInfo.filiere.intitule}</p>
                     </div>
                   </div>
                   
-                  <div className="flex items-start">
-                    <Calendar className="w-5 h-5 text-green-600 mt-0.5 mr-3" />
-                    <div>
-                      <p className="text-sm text-gray-500">Date d'inscription</p>
-                      <p className="font-medium">{studentInfo.enrollmentDate}</p>
-                    </div>
-                  </div>
+                  
                 </div>
               </motion.div>
             </div>
             
-            <div className="mt-8 border-t border-gray-200 pt-6 flex justify-end">
-              <Button className="bg-green-600 hover:bg-green-700 text-white">
-                Modifier le profil
-              </Button>
-            </div>
+            
           </div>
         </motion.div>
       </motion.div>

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Lock, Loader2, User, GraduationCap, ClipboardList, Mail } from 'lucide-react';
-
+import { ArrowLeft, Lock, icons, Loader2, User, GraduationCap, ClipboardList, Mail } from 'lucide-react';
 const Login = () => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -16,27 +15,58 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsLoading(false);
-    console.log('Login attempt:', { identifier, password, userType });
-
-    let destination;
-    switch (userType) {
-      case 'encadrant':
-        destination = '/IndexEncadrant';
-        break;
-      case 'etudiant':
-        destination = '/IndexEtudiant';
-        break;
-      case 'admin':
-        destination = '/IndexAdmin';
-        break;
-      default:
-        destination = '/';
-        break;
+  
+    try {
+      const response = await fetch('http://localhost:8080/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          adresseEmail: identifier,
+          password: password
+        })
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        console.log('Login réussi:', data);
+  
+        // Stockage du token
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.role);
+        localStorage.setItem('id', data.id);
+  
+        // Redirection selon le rôle
+        let destination;
+        switch (data.role) {
+          case 'ENCADRANT':
+            destination = '/IndexEncadrant';
+            break;
+          case 'ETUDIANT':
+            destination = '/IndexEtudiant';
+            break;
+          case 'ADMIN':
+            destination = '/IndexAdmin';
+            break;
+          default:
+            alert( data.message ||'Échec de l\'authentification');
+            destination = '/';
+            break;
+        }
+  
+        navigate(destination);
+      } else {
+        alert(data.message || 'Échec de l\'authentification');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Erreur de connexion:', error);
+      alert('Erreur de connexion au serveur.');
+    } finally {
+      setIsLoading(false);
     }
-    navigate(destination);
   };
+  
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
@@ -54,7 +84,7 @@ const Login = () => {
       case 'encadrant':
         return { icon: <User className="w-8 h-8 text-white" />, color: 'bg-gradient-to-r from-purple-500 to-purple-700' };
       case 'etudiant':
-        return { icon: <GraduationCap className="w-8 h-8 text-white" />, color: 'bg-gradient-to-r from-green-400 to-green-600' };
+        return { icon: <GraduationCap className="w-8 h-8 text-white" />, color: 'bg-gradient-to-r from-green-400 to-green-600' }; // Dégradé vert clair à foncé
       case 'admin':
         return { icon: <ClipboardList className="w-8 h-8 text-white" />, color: 'bg-gradient-to-r from-blue-500 to-blue-700' };
       default:
@@ -64,10 +94,7 @@ const Login = () => {
 
   const { icon, color } = getUserDetails();
 
-  const getIdentifierLabel = () => {
-    return userType === 'etudiant' ? 'Email universitaire' : 'Adresse Email';
-  };
-
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="max-w-md w-full relative">
@@ -91,15 +118,15 @@ const Login = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="identifier" className="block text-sm font-medium text-gray-700 mb-2">
-                  {getIdentifierLabel()}
+                Adresse Email
                 </label>
                 <input
-                  type="email"
+                  type='email'
                   id="identifier"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder={userType === 'etudiant' ? 'prenom.nom@usms.ac.ma' : 'prenom.nom@usms.ma'}
+                  placeholder= 'Prenom.nom@usms.ac.ma'
                   required
                 />
               </div>
@@ -133,59 +160,45 @@ const Login = () => {
                 </button>
               </div>
               <div className="mt-2 text-center">
-                <button
-                  onClick={() => {
-                    switch (userType) {
-                      case 'etudiant':
-                        navigate('/StudentForm');
-                        break;
-                      case 'encadrant':
-                        navigate('/SupervisorForm');
-                        break;
-                      case 'admin':
-                        navigate('/AdminForm');
-                        break;
-                      default:
-                        navigate('/');
-                        break;
-                    }
-                  }}
-                  className="text-sm text-green-600 hover:text-green-800 transition-colors hover:underline"
-                >
-                  Vous n'avez pas de compte ? Créez-en un
-                </button>
-              </div>
+                  <button
+                    onClick={() => {
+                      switch (userType) {
+                        case 'etudiant':
+                          navigate('/StudentForm');
+                          break;
+                        case 'encadrant':
+                          navigate('/SupervisorForm');
+                          break;
+                        case 'admin':
+                          navigate('/AdminForm');     
+                          break;     
+                        default:
+                          navigate('/');
+                          break;
+                      }
+                    }}
+                    className="text-sm text-green-600 hover:text-green-800 transition-colors hover:underline"
+                  >
+                    Vous n'avez pas de compte ? Créez-en un
+                  </button>
+                </div>
+
             </form>
           ) : (
             <form onSubmit={handleForgotPassword} className="space-y-6">
               <div>
                 <label htmlFor="resetIdentifier" className="block text-sm font-medium text-gray-700 mb-2">
-                  {getIdentifierLabel()}
+                Adresse Email
                 </label>
                 <input
-                  type="email"
+                  type='email'
                   id="resetIdentifier"
                   value={resetIdentifier}
                   onChange={(e) => setResetIdentifier(e.target.value)}
                   className="w-full p-3 border rounded-lg"
-                  placeholder={userType === 'etudiant' ? 'prenom.nom@usms.ac.ma' : 'prenom.nom@usms.ma'}
                   required
                 />
               </div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`w-full py-3 text-white rounded-lg ${color} hover:${color.replace('bg-', 'hover:bg-')}-700 disabled:opacity-50`}
-              >
-                {isLoading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Réinitialiser le mot de passe'}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowForgotPassword(false)}
-                className="w-full text-center text-sm text-gray-600 hover:text-gray-800 transition-colors"
-              >
-                Retour à la connexion
-              </button>
             </form>
           )}
         </div>
@@ -194,4 +207,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Login;

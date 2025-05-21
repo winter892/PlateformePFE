@@ -5,6 +5,7 @@ export interface Task {
   description?: string;
   status: 'à faire' | 'en cours' | 'terminé';
   dueDate: String;
+  
 }
 
 export interface LivrableResponse {

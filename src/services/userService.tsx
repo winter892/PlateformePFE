@@ -1,6 +1,19 @@
 import axios from "axios";
 
-
+export const getUserById = async (UserId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`http://localhost:8080/api/UserById/${UserId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données de l'utilisateur avec l'id", UserId, ":", error);
+    return null;
+  }
+};
 
 //recuperer les departement du via ComptesController qui est dans le backEnd
 export const getDepartements = async () => {

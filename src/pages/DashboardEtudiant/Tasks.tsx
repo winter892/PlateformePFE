@@ -19,6 +19,8 @@ import {
   getTaches,
   deleteTache,
   getLivrableByTacheid,
+  AddTache,
+  getProjetIdByUser
 } from "../../services/EtudiantsService";
 import { DeliverablesManager } from "@/components/dashboardEtudiant/DeliverablesManager";
 
@@ -43,7 +45,8 @@ export default function Tasks() {
   useEffect(() => {
     const fetchTaches = async () => {
       try {
-        const TachesData = await getTaches();
+        const id = localStorage.getItem('id');
+        const TachesData = await getTaches(Number(id));
         const formattedTasks = TachesData.map((t: any) => ({
           id: t.id.toString(),
           title: t.titre,
@@ -77,7 +80,8 @@ export default function Tasks() {
 
   const refreshTasks = async () => {
     try {
-      const TachesData = await getTaches();
+      const id = localStorage.getItem('id');
+      const TachesData = await getTaches(Number(id));
       const formattedTasks = TachesData.map((t: any) => ({
         id: t.id.toString(),
         title: t.titre,
@@ -93,21 +97,45 @@ export default function Tasks() {
     }
   };
 
-  const handleCreateTask = () => {
-    const task: Task = {
-      id: uuidv4(),
-      ...newTask,
-    };
-    setTasks([...tasks, task]);
-    setNewTask({
-      title: "",
-      description: "",
-      status: "à faire",
-      dueDate: new Date().toISOString().split("T")[0],
-    });
-    setIsNewTaskDialogOpen(false);
-    toast({ title: "Tâche créée", description: "La tâche a été créée avec succès." });
+
+  const handleCreateTask = async () => {
+    try {
+      const Etudiantid = localStorage.getItem('id');
+      const projetId = await getProjetIdByUser(Etudiantid);
+  
+      await AddTache({
+        titre: newTask.title,
+        description: newTask.description,
+        statut: newTask.status,
+        dateLimite: newTask.dueDate,
+        projet_id: projetId,
+      });
+  
+      toast({
+        title: "Tâche créée !",
+        description: "Votre tâche a bien été ajoutée.",
+        className: "border bg-green-50 border-green-500 text-green-800",
+      });
+  
+      setIsNewTaskDialogOpen(false); // Fermer la modale
+      await refreshTasks(); // Rafraîchir la liste
+      setNewTask({
+        title: "",
+        description: "",
+        status: "à faire",
+        dueDate: new Date().toISOString().split("T")[0],
+      });
+    } catch (error) {
+      console.error("Erreur lors de la création de la tâche :", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la création.",
+        variant: "destructive"
+      });
+    }
   };
+  
+  
 
   const handleDeleteTask = async (id: string) => {
     try {
@@ -116,7 +144,7 @@ export default function Tasks() {
       toast({
         title: "Tâche supprimée",
         description: "La tâche a été supprimée avec succès.",
-        className: "text-green-800 border-green-300",
+        className: "text-red-800 border-red-300",
       });
     } catch (error) {
       console.error("Erreur de suppression :", error);

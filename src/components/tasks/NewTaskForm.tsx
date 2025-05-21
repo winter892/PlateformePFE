@@ -1,4 +1,4 @@
-"use client"; // très important dans les composants client du App Router
+"use client";
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
@@ -9,14 +9,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Task } from '@/types/task';
-
-import { AddTache } from '@/services/EtudiantsService';
-import { toast } from "@/components/ui/use-toast";
-
-import { useNavigate } from "react-router-dom";
-
-
-
 
 interface NewTaskFormProps {
   task: Omit<Task, 'id'>;
@@ -30,39 +22,9 @@ export const TaskForm = ({
   task, 
   onCancel, 
   onChange, 
- 
+  onSubmit,
   isEditing = false 
 }: NewTaskFormProps) => {
-
-  const router = useNavigate(); // pour naviguer
-
-  const handleSubmit = async () => {
-    try {
-      await AddTache({
-        titre: task.title,
-        description: task.description,
-        statut: task.status,
-        dateLimite: task.dueDate || new Date().toISOString().split("T")[0],
-        projet_id: 1
-      });
-  
-      toast({
-        title: "Tâche créée !",
-        description: "Votre tâche a bien été ajoutée.",
-      });
-  
-      // Petite pause avant de rediriger
-      setTimeout(() => {
-        router("/tasks");
-            }, 2);
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la création.",
-        variant: "destructive"
-      });
-    }
-  };
   return (
     <div className="space-y-4 py-4">
       <div className="space-y-2">
@@ -95,14 +57,13 @@ export const TaskForm = ({
           </select>
         </div>
         <div className="space-y-2">
-        <Label>Date d'échéance</Label>
-        <Input 
-          type="date" 
-          value={task.dueDate.toString() || ''} // sécurité
-          onChange={(e) => onChange({...task, dueDate: e.target.value})}
-        />
-      </div>
-
+          <Label>Date d'échéance</Label>
+          <Input 
+            type="date" 
+            value={task.dueDate.toString() || ''} 
+            onChange={(e) => onChange({...task, dueDate: e.target.value})}
+          />
+        </div>
       </div>
       <DialogFooter>
         <Button 
@@ -113,7 +74,7 @@ export const TaskForm = ({
         </Button>
         <Button 
           className="bg-green-600 hover:bg-green-700"
-          onClick={handleSubmit}
+          onClick={onSubmit}
           disabled={!task.title}
         >
           {isEditing ? 'Enregistrer' : 'Créer'}

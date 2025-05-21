@@ -98,52 +98,7 @@ const SupervisorForm: React.FC = () => {
     setShowPassword(!showPassword);
   };
 
-  /*const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Simple validation
-    if (!formData.lastName || !formData.firstName || !formData.email || 
-        !formData.departmentId || !formData.FiliereId || 
-        !formData.specialty || !formData.password) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    if (!formData.email.includes('@')) {
-      toast({
-        title: "Erreur",
-        description: "L'adresse e-mail institutionnelle est invalide",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast({
-        title: "Compte créé avec succès",
-        description: `Le compte encadrant pour ${formData.firstName} ${formData.lastName} a été créé.`,
-      });
-      
-      // Reset form
-      setFormData({
-        lastName: '',
-        firstName: '',
-        email: '',
-        departmentId: '',
-        FiliereId: '',
-        specialty: '',
-        password: ''
-      });
-    }, 1500);
-  };*/
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
   

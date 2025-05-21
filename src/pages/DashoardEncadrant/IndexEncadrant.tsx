@@ -27,7 +27,9 @@ const IndexEncadrant = () => {
 
   // Import tasks from mock-data
   const { tasks } = dashboardStats;
-
+  const id = localStorage.getItem('id');
+  // Exemple d'utilisation
+  console.log("ID utilisateur connecté :", id);
   return (
     <DashboardLayout onProfileClick={handleTeacherClick}>
       <div className="mb-8 section-animation">

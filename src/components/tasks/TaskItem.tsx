@@ -35,8 +35,8 @@ export const TaskItem = ({ task, onDelete, onEdit, onViewDeliverables }: TaskIte
         <div className="flex items-center gap-4">
           <h3 className="font-medium">{task.title}</h3>
           <Badge className={getStatusColor(task.status)}>{task.status}</Badge>
-          <span className="text-sm text-gray-500"> {new Date(task.dueDate.toString()).toLocaleDateString()}
-          </span> 
+          <span className="text-sm text-gray-500"> {task.dueDate}</span>
+
         </div>
         <div className="flex items-center gap-2">
           <Button 

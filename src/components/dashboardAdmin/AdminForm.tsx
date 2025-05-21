@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ClipboardList, Eye, EyeOff } from 'lucide-react';
 import PasswordStrength from '../PasswordStrength';
 import PasswordGenerator from '../PasswordGenerator';
@@ -15,6 +16,8 @@ const AdminForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -38,7 +41,7 @@ const AdminForm = () => {
     if (!emailRegex.test(formData.email)) {
       toast({
         title: "Email invalide",
-        description: "Format requis : prenom.nom@usms.ma",
+        description: "Format requis : prenom.nom@usms.ac.ma",
         variant: "destructive"
       });
       return false;
@@ -92,6 +95,12 @@ const AdminForm = () => {
         title: "Administrateur créé 🎉",
         description: `${formData.firstName} ${formData.lastName} a été enregistré avec succès`,
       });
+
+      setTimeout(() => {
+        handleSpaceClick('admin')}, 3000);
+      const handleSpaceClick = (userType: string) => {
+        navigate('/login', { state: { userType } });
+      };
 
       // Réinitialisation du formulaire
       setFormData({
@@ -161,7 +170,7 @@ const AdminForm = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="prenom.nom@usms.ma"
-              pattern="[a-zA-Z]+\.[a-zA-Z]+@usms\.ma"
+              pattern="[a-zA-Z]+\.[a-zA-Z]+@usms\.ac\.ma"
               title="Format: prenom.nom@usms.ma"
               required
             />
@@ -190,7 +199,7 @@ const AdminForm = () => {
               </div>
               <PasswordGenerator 
                 onGenerate={handlePasswordGenerate}
-                buttonClass="bg-blue-500 hover:bg-blue-600 text-white"
+                buttonColor="bg-blue-500 hover:bg-blue-600 text-white"
               />
             </div>
             <PasswordStrength password={formData.password} />
