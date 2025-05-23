@@ -20,7 +20,8 @@ import {
   deleteTache,
   getLivrableByTacheid,
   AddTache,
-  getProjetIdByUser
+  getProjetIdByUser,
+  deletLivrableAndFile
 } from "../../services/EtudiantsService";
 import { DeliverablesManager } from "@/components/dashboardEtudiant/DeliverablesManager";
 
@@ -150,12 +151,42 @@ export default function Tasks() {
       console.error("Erreur de suppression :", error);
       toast({
         title: "Erreur",
-        description: "La suppression de la tâche a échoué.",
+        description: "La suppression de la tâche a échoué.Car il y a des livrables associés.",
+        className: "text-red-800 border-red-300",
+        
+      });
+    }
+  };
+  useEffect(() => {
+    const fetchDeliverables = async () => {
+      if (isDeliverablesDialogOpen && selectedTaskId) {
+        const data = await getLivrableByTacheid(selectedTaskId);
+        setDeliverables(data);
+      }
+    };
+    fetchDeliverables();
+  }, [isDeliverablesDialogOpen, selectedTaskId]);
+  
+  
+  const handleDeleteLivrable = async (id: string) => {
+    try {
+      await deletLivrableAndFile(id);
+      setDeliverables((prev) => prev.filter(livrable => livrable.id !== id));
+
+      toast({
+        title: "Livrable supprimée",
+        description: "Le livrable a été supprimée avec succès.",
+        className: "text-red-800 border-red-300",
+      });
+    } catch (error) {
+      console.error("Erreur de suppression :", error);
+      toast({
+        title: "Erreur",
+        description: "La suppression de livrable a échoué.",
         variant: "destructive",
       });
     }
   };
-
   const handleEditTask = () => {
     if (editingTask) {
       setTasks(tasks.map((task) => (task.id === editingTask.id ? editingTask : task)));
@@ -285,6 +316,7 @@ export default function Tasks() {
               comments={comments}
               onAddComment={handleAddComment}
               onAddDeliverable={handleAddDeliverable}
+              onDeleteDeliverable={handleDeleteLivrable}
               taskId={selectedTaskId}
             />
           )}

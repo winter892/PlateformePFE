@@ -93,6 +93,23 @@ export const getLivrableByTacheid = async (TacheId) => {
     return [];
   }
 };
+// Supprimer une livrable et son fichier asosier
+
+export const deletLivrableAndFile = async (id: string | number) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.delete(`http://localhost:8080/api/DeleteLivrable/${id}`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log('livrable et le fichier sont supprimée avec succès.');
+    return response.data; // même si en général un DELETE ne retourne rien (204)
+  } catch (error) {
+    console.error('Erreur lors de la suppression:', error);
+    throw error; // permet au composant React de gérer l'erreur aussi
+  }
+};
 
 
 //ajouter une livrable

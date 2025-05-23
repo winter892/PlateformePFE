@@ -15,6 +15,7 @@ interface DeliverablesManagerProps {
   onAddComment: (deliverableId: string, text: string) => void;
   onAddDeliverable: (name: string, taskId: string, description: string,fichier:Fichier) => void;
   taskId: string;
+  onDeleteDeliverable: (id: string) => void;
 }
 
 export const DeliverablesManager = ({
@@ -22,11 +23,16 @@ export const DeliverablesManager = ({
   comments,
   onAddComment,
   onAddDeliverable,
+  onDeleteDeliverable,
   taskId
 }: DeliverablesManagerProps) => {
 
-  const [deliverables, setDeliverables] = useState<LivrableResponse[]>(initialDeliverables);
-  const [activeDeliverable, setActiveDeliverable] = useState<LivrableResponse | null>(
+  const [deliverables, setDeliverables] = useState<LivrableResponse[]>([]);
+
+  useEffect(() => {
+    setDeliverables(initialDeliverables);
+  }, [initialDeliverables]);
+    const [activeDeliverable, setActiveDeliverable] = useState<LivrableResponse | null>(
     initialDeliverables.length > 0 ? initialDeliverables[0] : null
   );
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
@@ -222,7 +228,8 @@ export const DeliverablesManager = ({
                     size="sm" 
                     className="text-red-600 hover:text-red-700 hover:bg-red-50"
                     onClick={(e) => {
-                      
+                      e.stopPropagation(); // Pour ne pas déclencher onClick sur le parent
+                      onDeleteDeliverable(deliverable.id);
                     }}
                   >
                     <Trash2 className="w-4 h-4" />
