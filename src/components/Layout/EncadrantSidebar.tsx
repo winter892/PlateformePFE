@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
@@ -9,6 +9,7 @@ import {
   User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getUserById } from '@/services/userService';
 
 interface SidebarProps {
   onProfileClick?: () => void;
@@ -18,6 +19,7 @@ const EncadrentSidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
   const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
   const navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState<any>(null);
   
   const menuItems = [
     { icon: LayoutDashboard, label: 'Tableau de bord', path: '/IndexEncadrant' },
@@ -25,6 +27,22 @@ const EncadrentSidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
     { icon: BellRing, label: 'Notifications', path: '/EncadrantNotifications' },
     { icon: BarChart2, label: 'Statistiques', path: '/statistics' },
   ];
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const id = localStorage.getItem('id');
+      if (id) {
+        try {
+          const data = await getUserById(id);
+          setUserInfo(data);
+        } catch (error) {
+          console.error("Erreur lors du chargement des données utilisateur:", error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   return (
     <div className="w-64 h-full fixed bg-gradient-to-b from-purple-600 to-purple-800 text-white shadow-lg">
@@ -66,7 +84,9 @@ const EncadrentSidebar: React.FC<SidebarProps> = ({ onProfileClick }) => {
             <User className="w-5 h-5 text-white" />
           </div>
           <div>
-            <p className="text-sm font-medium">M.OUTANOUTE</p>
+            <p className="text-sm font-medium">
+              {userInfo ? `${userInfo.nom} ${userInfo.prenom}` : 'Chargement...'}
+            </p>
             <p className="text-xs opacity-80">Encadrant</p>
           </div>
         </button>
