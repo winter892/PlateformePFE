@@ -4,7 +4,7 @@ export interface Task {
   title: string;
   description?: string;
   status: 'à faire' | 'en cours' | 'terminé';
-  dueDate: String;
+  dueDate: string;
   
 }
 

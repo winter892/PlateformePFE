@@ -53,7 +53,6 @@ export const TaskForm = ({
           >
             <option value="à faire">à faire</option>
             <option value="en cours">en cours</option>
-            <option value="terminé">terminé</option>
           </select>
         </div>
         <div className="space-y-2">
