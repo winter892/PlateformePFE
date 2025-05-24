@@ -3,6 +3,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { groups } from '@/lib/mock-data';
+import { getFichierFromDeliverable } from '@/services/EtudiantsService';
+  import { Deliverable } from '../pages/DashboardEtudiant/Deliverables';
+  
 
 export const useDeliverable = () => {
   const { groupId, taskId, deliverableId } = useParams();
@@ -18,40 +21,57 @@ export const useDeliverable = () => {
     loadDeliverableData();
   }, [groupId, taskId, deliverableId, navigate]);
 
-  const loadDeliverableData = () => {
-    setTimeout(() => {
-      const group = groups.find(g => g.id === Number(groupId));
-      if (!group) {
-        toast.error("Groupe non trouvé");
-        navigate('/groups');
-        return;
-      }
-      const mockDeliverable = {
-        id: Number(deliverableId),
-        title: "Rapport d'analyse des besoins",
-        type: "pdf",
-        content: "https://example.com/sample.pdf",
-        submissionDate: "2023-05-15",
-        status: "submitted",
-        annotations: [],
-        student: {
-          id: 1,
-          name: "Marie Dupont",
-          role: "Chef de projet",
-          avatar: "/avatar1.png"
-        }
-      };
-      setDeliverable(mockDeliverable);
-      setLoading(false);
-    }, 1000);
-  };
+  function formatBytes(bytes: number, decimals = 2): string {
+    if (!+bytes) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
+  const loadDeliverableData = async () => {
+    console.log("id du livrable ",deliverableId)
+    if (!deliverableId) {
+      toast.error("ID de livrable manquant");
+      return;
+    }
+  
+    try {
+      // ✅ Appel API pour récupérer le fichier réel
+      const blob = await getFichierFromDeliverable(deliverableId);
+      console.log("Blob récupéré :", blob); // Vérifiez ici si le blob est valide
 
+      const fileUrl = URL.createObjectURL(blob);
+      console.log("URL du fichier :", fileUrl);
+      const realDeliverable: Deliverable = {
+        id: deliverableId,
+        name: "Nom du fichier",
+        taskName: "Nom de la tâche associée",
+        submittedAt: new Date().toISOString(),
+        dueDate: new Date().toISOString(),
+        status: 'en attente',
+        fileUrl: fileUrl,
+        fileSize: formatBytes(blob.size),
+        fileType: blob.type,
+        comments: 0
+      };
+  
+      setDeliverable(realDeliverable);
+    } catch (error) {
+      console.error("Erreur de chargement du livrable :", error);
+      toast.error("Erreur lors du chargement du livrable.");
+      navigate("/groups"); // ou un autre fallback ?
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
   return {
     deliverable,
     loading,
     reviewStatus,
     setReviewStatus,
-    groupId,
-    taskId,
+  
   };
 };

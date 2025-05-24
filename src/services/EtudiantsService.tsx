@@ -131,31 +131,39 @@ export const AjouterUneLivrable = (formData: FormData) => {
  
 };
 
-/*export const AjouterUneLivrable = async (Liv: Livrable) => {
+//récuperer un livrable (le fichier) avec n'inport quel format 
+
+export const getFichierFromDeliverable = async (deliverableId: string): Promise<Blob> => {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`http://localhost:8080/api/fichiers/livrable/${deliverableId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  // Vérifiez si la réponse est correcte 
+  if (!response.ok) {
+    throw new Error("Erreur lors du chargement du fichier.");
+  }
+  return await response.blob(); // On récupère le fichier en tant que Blob
+};
+
+//récuperer les information d'un livrable par son id 
+export const getLivrableById = async (livrableId) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.post(`http://localhost:8080/api/AddLivrable`, 
-      {
-      nom_fichier: Liv.nom_Fichier,
-      descreption: Liv.descreption,
-      tache : {
-        id: Number(Liv.tache_id)    },
-      },{
+    const response = await axios.get(`http://localhost:8080/api/livrable/${livrableId}`, {
       headers: {
-          Authorization: `Bearer ${token}`,
-        }
-
-      }
-       
-    );
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     return response.data;
   } catch (error) {
-    console.error('Erreur lors de l ajout de livrable:', error);
+    console.error("Erreur lors de la récupération du projet :", error);
     throw error;
   }
-};*/
-
+};
+//récupérer id du projet par l'id de l'utilisateur
 export const getProjetIdByUser = async (userId) => {
   try {
     const token = localStorage.getItem('token');

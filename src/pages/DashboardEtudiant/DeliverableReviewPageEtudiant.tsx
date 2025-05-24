@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 //import DashboardLayout from '@/components/Layout/DashboardLayout';
 import DeliverableViewerEtudiant from '@/pages/DashboardEtudiant/DeliverableViewerEtudiant';
-import ChatPanel from '@/pages/DashboardEtudiant/ChatPanelEtudiant';
+import ChatPanel from '@/pages/DashboardEtudiant/chatEtudiant/ChatPanelEtudiant';
 import ReviewHeaderEtudiant from '@/pages/DashboardEtudiant/ReviewHeaderEtudiant';
-import ResizablePanelEtudiant from '@/pages/DashboardEtudiant/ResizablePanelEtudiant';
+import ResizablePanelEtudiant from '@/pages/DashboardEtudiant/chatEtudiant/ResizablePanelEtudiant';
 import LoadingState from '@/pages/DashboardEtudiant/LoadingStateEtudiant';
 import { useDeliverable } from '@/hooks/useDeliverable';
 import { useChat } from '@/hooks/useChat';
@@ -14,7 +14,7 @@ import { ArrowLeft } from 'lucide-react';
 
 const DeliverableReviewPageEtudiant = () => {
   const navigate = useNavigate();
-  const { deliverable, loading, reviewStatus, setReviewStatus, groupId, taskId } = useDeliverable();
+  const { deliverable, loading, reviewStatus, setReviewStatus} = useDeliverable();
   const { 
     messages, 
     newMessage, 
@@ -30,10 +30,8 @@ const DeliverableReviewPageEtudiant = () => {
   const [showAllGroupsConfirm, setShowAllGroupsConfirm] = useState(false);
 
   const handleNavigateBack = () => {
-    if (groupId && taskId) {
-      navigate(`/groups/${groupId}/tasks/${taskId}`);
-    } else {
-      navigate('/groups');
+    if (deliverable) {
+      navigate(`/tasks`);
     }
   };
 
@@ -133,7 +131,7 @@ const DeliverableReviewPageEtudiant = () => {
         <div className={`transition-all duration-300 bg-gray-50 ${layoutConfig.viewerWidth}`}>
           <div className="h-full flex flex-col">
             <ReviewHeaderEtudiant 
-              deliverable={deliverable}
+              deliverables={deliverable}
               reviewStatus={reviewStatus}
               onRequestChanges={handleRequestChanges}
               onApproveDeliverable={handleApproveDeliverable}
@@ -144,7 +142,6 @@ const DeliverableReviewPageEtudiant = () => {
             <div className="flex-1 overflow-auto p-6">
               <DeliverableViewerEtudiant 
                 deliverable={deliverable} 
-                onAddAnnotation={handleAddAnnotation} 
               />
             </div>
           </div>

@@ -45,9 +45,9 @@ export const DeliverablesManager = ({
     fichier:''
   });
     const navigate = useNavigate();
-  
-  const navigateToDeliverable = (groupId: number, taskId: number, deliverableId: number) => {
-    navigate(`/groups/${groupId}/tasks/${taskId}`);
+  console.log(deliverables);
+    const navigateToDeliverable = (deliverableId: string) => {
+    navigate(`/Livrables/${deliverableId}`);
     setIsNewDeliverableFormVisible(false);
   };
    
@@ -220,7 +220,7 @@ export const DeliverablesManager = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" className="text-gray-500 hover:text-green-600 hover:bg-green-50" onClick={() => navigateToDeliverable( 1, 107, 1)}>
+                <Button variant="ghost" size="sm" className="text-gray-500 hover:text-green-600 hover:bg-green-50" onClick={() => navigateToDeliverable(deliverable.id)}>
                   <Eye className="w-4 h-4" />
                 </Button>
                 <Button 

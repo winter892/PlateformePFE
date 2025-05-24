@@ -1,8 +1,8 @@
 
 import React from 'react';
 import ChatHeader from './ChatHeaderEtudiant';
-import MessagesContainer from './MessagesContainerEtudiant';
-import MessageInput from './MessageInputEtudiant';
+import MessagesContainer from '../messageEtudiant/MessagesContainerEtudiant';
+import MessageInput from '../messageEtudiant/MessageInputEtudiant';
 import { ChatPanelProps } from '@/components/DeliverableReview/interfaces/ChatInterfaces';
 import { formatTime, groupMessagesByDate } from '@/components/DeliverableReview/utils/dateUtils';
 

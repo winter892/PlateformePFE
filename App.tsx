@@ -68,7 +68,7 @@ const App = () => (
           <Route path="/tasks" element={<><EtudiantSidebar /><Tasks /></>} />
           <Route path="/Etudiantprofile" element={<><EtudiantSidebar /><Profile /></>} />
           <Route path="/EtudiantNotifications" element={<><EtudiantSidebar /><Notifications /></>} />
-          <Route path="/groups/:groupId/tasks/:taskId" element={<DeliverableReviewPageEtudiant />} />
+          <Route path="/Livrables/:deliverableId" element={<DeliverableReviewPageEtudiant />} />
           <Route path="/StudentForm" element={<StudentForm />} />
 
 

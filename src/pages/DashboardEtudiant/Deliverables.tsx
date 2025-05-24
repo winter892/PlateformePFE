@@ -6,18 +6,19 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { motion } from 'framer-motion';
 
-interface Deliverable {
+export interface Deliverable {
   id: string;
-  name: string;
-  taskName: string;
-  submittedAt: string;
-  dueDate: string;
-  status: 'accepté' | 'en attente' | 'révision requise';
-  fileUrl: string;
-  fileSize: string;
-  fileType: string;
-  comments: number;
+  name: string; // nom du livrable
+  taskName: string; // nom de la tâche associée
+  submittedAt: string; // dateSoumission
+  dueDate: string; // dateLimite
+  status: 'accepté' | 'en attente' | 'révision requise'; // statut
+  fileUrl: string; // URL d'accès au fichier (à construire)
+  fileSize: string; // taille formatée
+  fileType: string; // type MIME
+  comments: number; // nombre de commentaires
 }
+
 
 const Deliverables = () => {
   const [deliverables, setDeliverables] = useState<Deliverable[]>([
