@@ -1,9 +1,9 @@
 
 import React, { useState,useEffect  } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { Eye, FileText, Plus, Upload ,Trash2} from 'lucide-react';
 import { useRef } from "react";
+import { toast } from "@/components/ui/use-toast";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {LivrableResponse,LivrableCreate, Comment, Fichier } from '@/types/task';
@@ -92,7 +92,13 @@ export const DeliverablesManager = ({
       const response = await AjouterUneLivrable(formData);
       const result = response.data;
   
-      console.log('Livrable ajouté avec succès :', result);
+      toast({
+        title: "Livrable Ajouté",
+        description: `Livrable "${result.nom_fichier}" ajouté avec succès !`,
+        className: "text-green-800 border-green-300",
+      });
+      
+
       setDeliverables(prev => [...prev, result]);
       setIsNewDeliverableFormVisible(false);
       setNewDeliverable({ name: '', description: '', taskId: '', fichier: '' });

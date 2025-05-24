@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getFichierFromDeliverable } from '@/services/EtudiantsService';
-
+import { File ,FileText, ExternalLink} from "lucide-react";
 interface DeliverableViewerProps {
   deliverable: any;
 }
@@ -47,6 +47,7 @@ const DeliverableViewerEtudiant: React.FC<DeliverableViewerProps> = ({ deliverab
 
     if (fileType === 'application/pdf') {
       return <iframe src={fileUrl} title="PDF Viewer" className="w-full h-[80vh] border rounded" />;
+      
     }
 
     if (fileType === 'text/plain' || fileType === 'text/javascript') {
@@ -54,35 +55,38 @@ const DeliverableViewerEtudiant: React.FC<DeliverableViewerProps> = ({ deliverab
     }
 
     if (isOfficeDocument(fileType)) {
+
       return (
-        <div className="text-center">
-          <p className="mb-4 text-gray-600">
-            Ce fichier est un document Office. Cliquez ci-dessous pour le visualiser :
+        <div className="text-center border border-gray-200 rounded-xl p-6 shadow-sm bg-white max-w-md mx-auto">
+          <div className="flex justify-center mb-4 text-green-600">
+            <File size={32} />
+          </div>
+          <p className="mb-2 text-gray-700 font-medium">
+            Ce fichier ne peut pas être prévisualisé dans l'application.
           </p>
-          <a
-            href={`https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(window.location.origin + fileUrl)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            Ouvrir avec Office Online
-          </a>
+          <p className="mb-4 text-sm text-gray-500">
+            Type : <strong>officedocument</strong>
+          </p>
+          <p className="text-sm text-gray-500">
+          Vous pouvez le télécharger.
+        </p>
         </div>
       );
+      
     }
+    
 
     return (
-      <div className="text-center">
-        <p className="mb-4 text-gray-600">
-          Aperçu non disponible pour ce type de fichier (<strong>{fileType}</strong>).
+      <div className="text-center border border-gray-200 rounded-xl p-6 shadow-sm bg-white max-w-md mx-auto">
+        <div className="flex justify-center mb-4 text-green-600">
+          <File size={32} />
+        </div>
+        <p className="mb-2 text-gray-700 font-medium">
+          Aperçu non disponible pour ce type de fichier : <strong>{fileType}</strong>
         </p>
-        <a
-          href={fileUrl}
-          download={deliverable.name || 'livrable'}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-        >
-          Télécharger le livrable
-        </a>
+        <p className="text-sm text-gray-500">
+          Vous pouvez le télécharger.
+        </p>
       </div>
     );
   };

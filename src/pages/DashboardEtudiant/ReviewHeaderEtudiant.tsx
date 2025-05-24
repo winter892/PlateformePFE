@@ -4,6 +4,7 @@ import { ArrowLeft, Download, Edit3, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { LivrableResponse } from '@/types/task';
 import { getLivrableById } from '@/services/EtudiantsService';
+import { getFichierFromDeliverable } from "@/services/EtudiantsService";
 
 interface ReviewHeaderProps {
   deliverables: LivrableResponse[];
@@ -43,7 +44,28 @@ const ReviewHeaderEtudiant: React.FC<ReviewHeaderProps> = ({
 
     fetchLivrable();
   }, [deliverableId]);
-console.log("llallla",deliverableId);
+//telecharger une livrable 
+const handleDownload = async () => {
+  try {
+    toast.info("Le téléchargement démarrera bientôt...");
+
+    const blob = await getFichierFromDeliverable(deliverableId);
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = livrable.nom_fichier || "livrable";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url); // Libérer l'URL après le téléchargement
+  } catch (error) {
+    toast.error("Erreur lors du téléchargement du fichier.");
+    console.error("Erreur téléchargement livrable :", error);
+  }
+};
+
 
   return (
     <div className="bg-white border-b border-green-100 p-4">
@@ -76,21 +98,21 @@ console.log("llallla",deliverableId);
             </div>
           ) : (
             <h1 className="text-xl font-medium text-green-900">
-              Aucun livrable trouvé pour cette tâche
+             Chargement du fichier...
             </h1>
           )}
         </div>
 
         <div className="flex space-x-2">
           <button
-            onClick={() => toast.info('Le téléchargement démarrera bientôt...')}
+             onClick={handleDownload}
             className="px-3 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors flex items-center"
           >
             <Download size={16} className="mr-1" />
             Télécharger
           </button>
 
-          {reviewStatus.status === 'pending' && !showAllGroupsConfirm && (
+          {/*reviewStatus.status === 'pending' && !showAllGroupsConfirm && (
             <button
               onClick={() => onApproveDeliverable(false)}
               className="px-3 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors flex items-center"
