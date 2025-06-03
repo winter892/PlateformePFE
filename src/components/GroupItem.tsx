@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react';
-import { getGroupes } from "@/services/userService";
-import { Group, Project, Task } from '../types';
+import { Group, Project } from '@/types';
 import { Users, FileText, CheckSquare } from 'lucide-react';
-
+import React from 'react';
 interface GroupItemProps {
   group: Group;
   project: Project;
-  tasks: Task[];
+  progress: number;
+  status: 'in_progress' | 'completed' | 'pending';
   onClick: (group: Group) => void;
   onTasksClick: (groupId: number) => void;
 }
@@ -14,58 +13,51 @@ interface GroupItemProps {
 const GroupItem: React.FC<GroupItemProps> = ({
   group,
   project,
-  tasks,
+  progress,
+  status,
   onClick,
   onTasksClick
 }) => {
-  const [loading, setLoading] = useState<boolean>(false); // État de chargement
-  const [error, setError] = useState<string | null>(null); // État d'erreur
-
-
-  const groupTasks = tasks.filter(task => task.projectId === project.id);
-
   return (
     <div className="bg-white rounded-lg border border-violet-200 p-4 hover:shadow-md transition-shadow">
-      {loading ? (
-        <div>Chargement des groupes...</div> // Affichage pendant le chargement
-      ) : error ? (
-        <div className="text-red-500">{error}</div> // Affichage en cas d'erreur
-      ) : (
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center">
+          <div className="p-2 rounded-full bg-violet-100 mr-3">
+            <Users size={18} className="text-violet-700" />
+          </div>
+          <h3 className="font-medium text-violet-900">{group.intitule}</h3>
+        </div>
+        
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            status === 'completed' ? 'bg-green-100 text-green-800' : 
+            status === 'pending' ? 'bg-gray-100 text-gray-800' : 
+            'bg-blue-100 text-blue-800'
+          }`}
+        >
+          {status === 'completed' ? 'Terminé' : status === 'pending' ? 'À faire' : 'En cours'}
+        </span>
+      </div>
+      
+      <div className="flex items-center text-sm text-violet-600 mb-3">
+        <FileText size={16} className="mr-2" />
+        <span>{project.titre}</span>
+      </div>
+      
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-xs text-violet-500">Progression</span>
+          <span className="text-xs font-medium text-violet-700">{progress}%</span>
+        </div>
+        <div className="w-full bg-violet-200 rounded-full h-1.5">
+          <div
+            className="bg-violet-600 h-1.5 rounded-full"
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+      </div>
+      {group.members && group.members.length > 0 && (
         <>
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center">
-              <div className="p-2 rounded-full bg-violet-100 mr-3">
-                <Users size={18} className="text-violet-700" />
-              </div>
-              <h3 className="font-medium text-violet-900">{group.intitule}</h3> {/* Affichage du nom du groupe */}
-            </div>
-            
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                project.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-              }`}
-            >
-              {project.status === 'completed' ? 'Terminé' : 'En cours'}
-            </span>
-          </div>
-          
-          <div className="flex items-center text-sm text-violet-600 mb-3">
-            <FileText size={16} className="mr-2" />
-            <span>{project.titre}</span>
-          </div>
-          
-          <div className="mb-4">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs text-violet-500">Progression</span>
-              <span className="text-xs font-medium text-violet-700">{project.progress}%</span>
-            </div>
-            <div className="w-full bg-violet-200 rounded-full h-1.5">
-              <div
-                className="bg-violet-600 h-1.5 rounded-full"
-                style={{ width: `${project.progress}%` }}
-              ></div>
-            </div>
-          </div>
           
           <div className="flex flex-wrap mb-4">
             {group.members && Array.isArray(group.members) ? (
@@ -105,3 +97,5 @@ const GroupItem: React.FC<GroupItemProps> = ({
 };
 
 export default GroupItem;
+// This component displays a group item with its details, including the group name, project title, progress, status, and members.
+// It also provides buttons to view details and tasks associated with the group.

@@ -10,6 +10,7 @@ export interface Project {
 }
 
 export interface Task {
+  dateLimite: string | number | Date;
   id: number;
   title: string;
   description: string;
@@ -28,13 +29,16 @@ export interface Comment {
 }
 
 export interface Group {
+  progress: number;
+  status: string;
   id: number;
   intitule: string;
-  description:string;
-  members: string[];
+  description: string;
+  members?: string[]; // Optionnel car nous allons récupérer les membres via l'API
   projet_id: number;
-  progress?: number; // Added for GroupPanel compatibility
-  project?: string; // Added for GroupPanel compatibility
+  projet?: Project; // Ajouté pour la relation avec le projet
+  encadrant_id?: number;
+  filiere_id?: number;
 }
 
 export interface Notification {
@@ -111,4 +115,10 @@ export interface Etudiant{
   filiere_id : number,
 
 
+}
+export interface Filiere {
+  id: number;
+  nom: string;
+  description: string;
+  departement_id: number;
 }

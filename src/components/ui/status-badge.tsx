@@ -51,3 +51,5 @@ const Badge = ({ status, className }: BadgeProps) => {
 };
 
 export default Badge;
+// This code defines a reusable Badge component that displays different statuses with appropriate styles.
+// It uses the `cn` utility for conditional class names and applies different background and text colors based on the status prop.
