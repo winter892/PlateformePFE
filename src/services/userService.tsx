@@ -50,7 +50,12 @@ export const getEncadrants = async (departementId) => {
 //pour les etudiants 
 export const getEtudiants = async (filiereId) => {
   try {
-    const response = await axios.get(`http://localhost:8080/api/Etudiants/${filiereId}`);
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`http://localhost:8080/api/Etudiants/${filiereId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des etudiants :", error);
@@ -60,7 +65,12 @@ export const getEtudiants = async (filiereId) => {
 //pour les groupes par filieres
 export const getGroupesByFiliere=async(filiere_Id)=>{
   try {
-    const response = await axios.get(`http://localhost:8080/api/Groupes/${filiere_Id}`);
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`http://localhost:8080/api/groupe/Groupes/${filiere_Id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des groupes :", error);
@@ -82,7 +92,7 @@ export const getGroupes=async()=>{
 //recupere le titre d'un proet d'un groupe donné
 export const getProjectName = async(Groupe_Id)=>{
   try {
-    const response = await axios.get(`http://localhost:8080/api/ProjetctName/${Groupe_Id}`);
+    const response = await axios.get(`http://localhost:8080/api/groupe/ProjetctName/${Groupe_Id}`);
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des donneés :", error);
@@ -94,7 +104,7 @@ export const getProjectName = async(Groupe_Id)=>{
 //recuperer le nom d'encadrant d'un groupe
 export const getEncadrantName =async(Groupe_id)=>{
   try {
-    const response = await axios.get(`http://localhost:8080/api/EncadrantName/${Groupe_id}`);
+    const response = await axios.get(`http://localhost:8080/api/groupe/EncadrantName/${Groupe_id}`);
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des donneés :", error);
@@ -115,7 +125,12 @@ export const getJurys = async () => {
 //recuperer les etudiants d'un groupe 
 export const getEtudiantsByGroupe = async (GroupeId) => {
   try {
-    const response = await axios.get(`http://localhost:8080/api/Etudiants/${GroupeId}`);
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`http://localhost:8080/api/Etudiants/${GroupeId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des etudiants :", error);

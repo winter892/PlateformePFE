@@ -25,7 +25,7 @@ interface TaskPayload {
   titre: string;
   description: string;
   statut: string;
-  dateLimite: String; // format "YYYY-MM-DD"
+  dateLimite: string; // format "YYYY-MM-DD"
   projet_id: number;
 }
 
