@@ -10,6 +10,7 @@ export interface Project {
 }
 
 export interface Task {
+  deliverables: any;
   dateLimite: string | number | Date;
   id: number;
   title: string;
@@ -121,4 +122,4 @@ export interface Filiere {
   nom: string;
   description: string;
   departement_id: number;
-}
+} 

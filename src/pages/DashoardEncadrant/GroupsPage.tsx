@@ -2,20 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import GroupItem from '@/components/GroupItem';
-import { Plus, X, Printer, FileText, Users, CheckSquare, ArrowLeft, Search, Loader2 } from 'lucide-react';
+import { Plus, X, Printer, FileText, Users, CheckSquare, ArrowLeft, Search, Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
   getTaches,
-  getTacheStats
+  getTacheStats,
+  getLivrableByTacheid
 } from '@/services/EtudiantsService';
 import { 
-  getGroupesByFiliere,
   getEtudiants,
   getEtudiantsByGroupe,
 } from '@/services/userService';
 import { Group, Project, Task } from '@/types';
 
-const GroupsPage: React.FC = () => {
+export const GroupsPage: React.FC = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem('id');
   
@@ -70,9 +70,62 @@ const GroupsPage: React.FC = () => {
         toast.error("Erreur de chargement des informations encadrant");
       }
     };
-
+    
     if (userId) fetchEncadrantData();
   }, [userId]);
+
+  // Fonction pour construire la liste des groupes
+  const buildGroupsList = async (studentsData: any[]): Promise<Group[]> => {
+    try {
+      const uniqueGroupsMap = new Map<number, any>();
+      studentsData.forEach((student: any) => {
+        if (student.groupe && !uniqueGroupsMap.has(student.groupe.id)) {
+          uniqueGroupsMap.set(student.groupe.id, student.groupe);
+        }
+      });
+
+      return await Promise.all(
+        Array.from(uniqueGroupsMap.values()).map(async (group: any) => {
+          try {
+            const stats = await getTacheStats(group.projet.id);
+            const progress = stats.pourcentageTermine || 0;
+            let status: 'in_progress' | 'completed' | 'pending' = 'pending';
+            
+            if (progress >= 100) status = 'completed';
+            else if (progress > 0) status = 'in_progress';
+
+            const members = studentsData.filter((s: any) => s.groupe?.id === group.id);
+            const memberNames = members.map((m: any) => `${m.nom} ${m.prenom}`);
+
+            return {
+              id: group.id,
+              intitule: group.intitule,
+              description: group.description || '',
+              projet: group.projet,
+              projet_id: group.projet?.id ?? 0,
+              encadrant: group.encadrant,
+              filiere: group.filiere,
+              members: memberNames,
+              progress,
+              status
+            };
+          } catch (error) {
+            console.error(`Erreur stats pour groupe ${group.id}`, error);
+            return {
+              ...group,
+              members: [],
+              progress: 0,
+              status: 'pending'
+            };
+          }
+        })
+      );
+    } catch (error) {
+      console.error("Erreur construction liste groupes", error);
+      toast.error("Erreur lors du chargement des groupes");
+      return [];
+    }
+  };
 
   // Récupérer les groupes de la filière
   useEffect(() => {
@@ -81,45 +134,10 @@ const GroupsPage: React.FC = () => {
       
       setIsLoadingGroups(true);
       try {
-        const groupsData = await getGroupesByFiliere(encadrantFiliereId);
-        
-        const groupsWithStats = await Promise.all(groupsData.map(async (group: any) => {
-          try {
-            const stats = await getTacheStats(group.projet.id);
-            
-            const progress = stats.pourcentageTermine || 0;
-            let status: 'in_progress' | 'completed' | 'pending' = 'pending';
-            
-            if (progress === 0) {
-              status = 'pending';
-            } else if (progress < 100) {
-              status = 'in_progress';
-            } else {
-              status = 'completed';
-            }
-            
-            const members = await getEtudiantsByGroupe(group.id);
-            const memberNames = members.map((m: any) => `${m.nom} ${m.prenom}`);
-            
-            return {
-              ...group,
-              project: group.projet,
-              members: memberNames,
-              progress,
-              status
-            };
-          } catch (error) {
-            console.error("Erreur récupération stats:", error);
-            return {
-              ...group,
-              project: group.projet,
-              progress: 0,
-              status: 'pending'
-            };
-          }
-        }));
-        
-        setGroups(groupsWithStats);
+        const studentsData = await getEtudiants(encadrantFiliereId);
+        const groupsData = await buildGroupsList(studentsData);
+        setGroups(groupsData);
+        setStudents(studentsData.filter((student: any) => !student.groupe));
       } catch (error) {
         console.error("Erreur récupération groupes:", error);
         toast.error("Erreur de chargement des groupes");
@@ -131,46 +149,28 @@ const GroupsPage: React.FC = () => {
     fetchGroups();
   }, [encadrantFiliereId]);
 
-  // Récupérer les étudiants de la filière
-  useEffect(() => {
-    const fetchStudents = async () => {
-      if (!encadrantFiliereId) return;
+  // Gestion du clic sur un groupe
+  const handleGroupClick = (group: Group) => {
+    setSelectedGroup(group);
+    setShowGroupDetailModal(true);
+  };
 
-      setLoadingStudents(true);
-      try {
-        const studentsData = await getEtudiants(encadrantFiliereId);
-        setStudents(studentsData);
-      } catch (err) {
-        setErrorStudents('Erreur lors du chargement des étudiants');
-        console.error(err);
-      } finally {
-        setLoadingStudents(false);
-      }
-    };
-
-    fetchStudents();
-  }, [encadrantFiliereId]);
-
-  // Filtrer les groupes
-  const filteredGroups = groups.filter(group => {
-    const matchesStatus = filterStatus === 'all' || group.status === filterStatus;
-    const matchesSearch = group.intitule.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         (group.projet?.titre?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
-    return matchesStatus && matchesSearch;
-  });
-
-  // Pagination
-  const indexOfLastGroup = currentPage * groupsPerPage;
-  const indexOfFirstGroup = indexOfLastGroup - groupsPerPage;
-  const currentGroups = filteredGroups.slice(indexOfFirstGroup, indexOfLastGroup);
-  const totalPages = Math.ceil(filteredGroups.length / groupsPerPage);
-
-  // Fonction pour basculer la sélection d'un étudiant
-  const toggleStudentSelection = (studentId: number) => {
-    if (selectedStudents.includes(studentId)) {
-      setSelectedStudents(selectedStudents.filter(id => id !== studentId));
-    } else {
-      setSelectedStudents([...selectedStudents, studentId]);
+  // Fonction pour rafraîchir les données
+  const refreshData = async () => {
+    if (!encadrantFiliereId) return;
+    
+    setIsLoadingGroups(true);
+    try {
+      const studentsData = await getEtudiants(encadrantFiliereId);
+      const groupsData = await buildGroupsList(studentsData);
+      setGroups(groupsData);
+      setStudents(studentsData.filter((student: any) => !student.groupe));
+      toast.success("Données actualisées");
+    } catch (error) {
+      console.error("Erreur actualisation données:", error);
+      toast.error("Erreur lors de l'actualisation");
+    } finally {
+      setIsLoadingGroups(false);
     }
   };
 
@@ -204,22 +204,9 @@ const GroupsPage: React.FC = () => {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Erreur lors de la création du groupe');
       }
-      
-      const newGroup = await response.json();
-      
-      // Ajouter le nouveau groupe à la liste
-      setGroups(prevGroups => [
-        ...prevGroups,
-        {
-          ...newGroup,
-          project: newGroup.projet,
-          members: students
-            .filter(s => selectedStudents.includes(s.id))
-            .map(s => `${s.nom} ${s.prenom}`),
-          progress: 0,
-          status: 'pending'
-        }
-      ]);
+
+      // Rafraîchir les données après création
+      await refreshData();
       
       // Réinitialiser les états
       setShowCreateModal(false);
@@ -238,51 +225,100 @@ const GroupsPage: React.FC = () => {
     }
   };
 
-  // Autres fonctions utilitaires
-  const handleGroupClick = (group: Group) => {
-    setSelectedGroup(group);
-    setShowGroupDetailModal(true);
-  };
+  // Fonction pour récupérer les tâches et livrables d'un groupe
+  const getGroupTasksAndDeliverables = async (groupId: number) => {
+    try {
+      const group = groups.find(g => g.id === groupId);
+      if (!group) return [];
 
-  const handleTasksClick = async (groupId: number) => {
-    setSelectedGroupId(groupId);
-    setShowTasksModal(true);
-    
-    const group = groups.find(g => g.id === groupId);
-    if (group?.projet?.id) {
-      const tasks = await getTasksForProject(group.projet.id);
-      setTasks(tasks);
+      // Récupérer les membres du groupe
+      const studentsData = await getEtudiants(encadrantFiliereId!);
+      const members = studentsData.filter((student: any) => student.groupe?.id === groupId);
+      
+      let allTasks: any[] = [];
+      
+      // Pour chaque membre, récupérer ses tâches
+      for (const member of members) {
+        try {
+          const memberTasks = await getTaches(member.id);
+          const tasksWithMember = memberTasks.map((task: any) => ({
+            ...task,
+            memberId: member.id,
+            memberName: `${member.nom} ${member.prenom}`
+          }));
+          allTasks = [...allTasks, ...tasksWithMember];
+        } catch (error) {
+          console.error(`Erreur tâches pour membre ${member.id}`, error);
+        }
+      }
+
+      // Pour chaque tâche, récupérer les livrables
+      const tasksWithDeliverables = await Promise.all(
+        allTasks.map(async (task: any) => {
+          // On garde le statut d'origine pour l'affichage
+          let status = task.statut;
+          if (status === 'terminé') status = 'completed';
+          // sinon on laisse "en cours", "en retard", "problème", etc.
+
+          const deliverables = await getLivrableByTacheid(task.id);
+          return {
+            ...task,
+            statut: status,
+            deliverables: deliverables.map((livrable: any) => ({
+              id: livrable.id,
+              nom_fichier: livrable.nom_fichier,
+              dateCreation: livrable.fichier?.dateCreation || null,
+            })),
+          };
+        })
+      );
+
+      return tasksWithDeliverables;
+    } catch (error) {
+      console.error("Erreur globale dans getGroupTasksAndDeliverables", error);
+      toast.error("Erreur lors de la récupération des tâches et livrables");
+      return [];
     }
   };
 
-  const getTasksForProject = async (projectId: number) => {
+  // Gestion du clic sur le bouton "Tâches"
+  const handleTasksClick = async (groupId: number) => {
+    setSelectedGroupId(groupId);
+    setShowTasksModal(true);
     setIsLoadingTasks(true);
+
     try {
-      const group = groups.find(g => g.projet?.id === projectId);
-      if (!group) return [];
-
-      const allTasks: Task[] = [];
-      const members = await getEtudiantsByGroupe(group.id);
-      
-      for (const member of members) {
-        const tasks = await getTaches(member.id);
-        allTasks.push(...tasks);
-      }
-
-      return allTasks;
+      const tasks = await getGroupTasksAndDeliverables(groupId);
+      setTasks(tasks);
+      toast.success("Tâches chargées avec succès");
     } catch (error) {
-      console.error("Erreur récupération tâches:", error);
-      return [];
+      console.error("Erreur lors du chargement des tâches:", error);
+      toast.error("Erreur lors du chargement des tâches");
+      setTasks([]);
     } finally {
       setIsLoadingTasks(false);
     }
   };
 
-  const filterTasks = (tasks: Task[]) => {
+  // Filtrer les groupes
+  const filteredGroups = groups.filter(group => {
+    const matchesStatus = filterStatus === 'all' || group.status === filterStatus;
+    const matchesSearch = group.intitule.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         (group.projet?.titre?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+    return matchesStatus && matchesSearch;
+  });
+
+  // Pagination
+  const indexOfLastGroup = currentPage * groupsPerPage;
+  const indexOfFirstGroup = indexOfLastGroup - groupsPerPage;
+  const currentGroups = filteredGroups.slice(indexOfFirstGroup, indexOfLastGroup);
+  const totalPages = Math.ceil(filteredGroups.length / groupsPerPage);
+
+  // Filtrer les tâches par titre
+  const filterTasks = (tasks: any[]) => {
     if (!taskSearchTerm) return tasks;
-    return tasks.filter(task => 
-      task.title.toLowerCase().includes(taskSearchTerm.toLowerCase()) || 
-      (task.description?.toLowerCase().includes(taskSearchTerm.toLowerCase()) ?? false)
+    return tasks.filter(task =>
+      task.titre.toLowerCase().includes(taskSearchTerm.toLowerCase())
     );
   };
 
@@ -298,6 +334,15 @@ const GroupsPage: React.FC = () => {
   const navigateToDeliverable = (groupId: number, taskId: number, deliverableId: number) => {
     navigate(`/groups/${groupId}/tasks/${taskId}/deliverables/${deliverableId}`);
     setShowTasksModal(false);
+  };
+
+  // Fonction pour basculer la sélection d'un étudiant
+  const toggleStudentSelection = (studentId: number) => {
+    if (selectedStudents.includes(studentId)) {
+      setSelectedStudents(selectedStudents.filter(id => id !== studentId));
+    } else {
+      setSelectedStudents([...selectedStudents, studentId]);
+    }
   };
 
   // Composant de pagination
@@ -338,11 +383,18 @@ const GroupsPage: React.FC = () => {
         <h1 className="text-2xl font-semibold text-violet-900">Gestion des Groupes</h1>
         <div className="flex gap-3">
           <button 
+            className="flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+            onClick={refreshData}
+          >
+            <RefreshCw size={18} className="mr-2" />
+            Actualiser
+          </button>
+          <button 
             className="flex items-center px-4 py-2 bg-violet-100 text-violet-700 rounded-lg hover:bg-violet-200 transition-colors" 
             onClick={handlePrintGroupsList}
           >
             <Printer size={18} className="mr-2" />
-            Imprimer la liste
+            Imprimer
           </button>
           <button 
             className="flex items-center px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors" 
@@ -732,27 +784,39 @@ const GroupsPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  {filterTasks(tasks).map(task => (
+                  {filterTasks(tasks)
+                    .filter(task => task.statut !== 'à faire' && task.statut !== 'pending') // Exclure "à faire"
+                    .map(task => (
                     <div 
                       key={task.id} 
                       className="bg-white rounded-lg p-4 border border-violet-200 hover:shadow-md transition-shadow cursor-pointer" 
                       onClick={() => handleTaskClick(task)}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium text-violet-800">{task.title}</h3>
+                        <h3 className="font-medium text-violet-800">{task.titre}</h3>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          task.status === 'completed' ? 'bg-green-100 text-green-800' : 
-                          task.status === 'problem' ? 'bg-red-100 text-red-800' : 
-                          'bg-amber-100 text-amber-800'
+                          task.statut === 'completed' || task.statut === 'terminé'
+                            ? 'bg-green-100 text-green-800'
+                            : task.statut === 'en retard'
+                            ? 'bg-red-100 text-red-800'
+                            : task.statut === 'problème'
+                            ? 'bg-orange-100 text-orange-800'
+                            : 'bg-amber-100 text-amber-800'
                         }`}>
-                          {task.status === 'completed' ? 'Terminée' : task.status === 'problem' ? 'En retard' : 'En cours'}
+                          {task.statut === 'completed' || task.statut === 'terminé'
+                            ? 'Terminée'
+                            : task.statut === 'en retard'
+                            ? 'En retard'
+                            : task.statut === 'problème'
+                            ? 'En problème'
+                            : 'En cours'}
                         </span>
                       </div>
                       
                       <p className="text-sm text-violet-600 mb-3 line-clamp-2">{task.description}</p>
                       
                       <div className="flex justify-between items-center text-xs text-violet-500">
-                        <span>Date limite: {new Date(task.dueDate).toLocaleDateString()}</span>
+                        <span>Date limite: {new Date(task.dateLimite).toLocaleDateString()}</span>
                       </div>
                     </div>
                   ))}
@@ -813,37 +877,23 @@ const GroupsPage: React.FC = () => {
                     />
                   </div>
                   
-                  {/* Exemple de livrables */}
                   <div className="space-y-4">
-                    <div 
-                      className="border border-violet-200 rounded-lg p-4 hover:bg-violet-50 transition-colors cursor-pointer" 
-                      onClick={() => navigateToDeliverable(selectedGroupId || 1, selectedTask.id, 1)}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex items-center">
+                    {selectedTask.deliverables && selectedTask.deliverables.map((livrable: any) => (
+                      <div key={livrable.id} className="border border-violet-200 rounded-lg p-4">
+                        <div className="flex items-center mb-2">
                           <FileText size={18} className="text-violet-600 mr-2" />
-                          <h4 className="font-medium text-violet-800">Rapport d'analyse</h4>
+                          <h4 className="font-medium text-violet-800">{livrable.nom_fichier}</h4>
                         </div>
-                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Soumis</span>
+                        <p className="text-xs text-violet-500">
+                          {livrable.dateCreation
+                            ? `Créé le: ${new Date(livrable.dateCreation).toLocaleDateString()}`
+                            : ''}
+                        </p>
                       </div>
-                      <p className="text-sm text-violet-600 mb-2">Document d'analyse des besoins et spécifications</p>
-                      <p className="text-xs text-violet-500">Soumis le: {new Date().toLocaleDateString()}</p>
-                    </div>
-                    
-                    <div 
-                      className="border border-violet-200 rounded-lg p-4 hover:bg-violet-50 transition-colors cursor-pointer" 
-                      onClick={() => navigateToDeliverable(selectedGroupId || 1, selectedTask.id, 2)}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex items-center">
-                          <FileText size={18} className="text-violet-600 mr-2" />
-                          <h4 className="font-medium text-violet-800">Diagramme de classes</h4>
-                        </div>
-                        <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded-full text-xs">En attente</span>
-                      </div>
-                      <p className="text-sm text-violet-600 mb-2">Modélisation UML des classes du système</p>
-                      <p className="text-xs text-violet-500">Date limite: {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
-                    </div>
+                    ))}
+                    {selectedTask.deliverables && selectedTask.deliverables.length === 0 && (
+                      <div className="text-violet-500 text-sm">Aucun livrable pour cette tâche.</div>
+                    )}
                   </div>
                 </div>
               </div>
