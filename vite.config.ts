@@ -19,7 +19,13 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  define: {
+    global: 'window' // <-- Ceci résout l'erreur "global is not defined"
+  }
+
+
  
 }));
+
 
 

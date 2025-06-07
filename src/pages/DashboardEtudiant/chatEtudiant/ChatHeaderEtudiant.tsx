@@ -33,7 +33,7 @@ const ChatHeaderEtudiant: React.FC<ChatHeaderProps> = ({ onToggleChat }) => {
         <div className="flex items-center mt-1">
           <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
           <span className="text-xs text-green-600">
-            {studentInfo ? `${studentInfo.nom} ${studentInfo.prenom} - Membre de projet` : "Chargement..."}
+            {studentInfo ? `${studentInfo.nom} ${studentInfo.prenom} ` : "Chargement..."}
           </span>
         </div>
       </div>

@@ -5,10 +5,7 @@ export interface Message {
     senderName: string;
     content: string;
     timestamp: Date;
-    attachments?: {
-      name: string;
-      url: string;
-    }[];
+    
   }
   
   export interface ChatPanelProps {

@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -33,6 +34,8 @@ import DeliverableReviewPageEtudiant from "./src/pages/DashboardEtudiant/Deliver
 import AdminForm from "@/components/dashboardAdmin/AdminForm";
 import SupervisorForm from "@/components/dashboardEncadrent/SupervisorForm";
 import StudentForm from "@/components/dashboardEtudiant/StudentForm";
+//chat
+import Chat from "@/pages/DashboardEtudiant/chatEtudiant/chat";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -76,6 +79,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
           <Route path="/" element={<Homepage />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/chat" element={<Chat />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
