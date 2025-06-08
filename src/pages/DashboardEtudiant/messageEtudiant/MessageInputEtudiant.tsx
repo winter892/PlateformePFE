@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Send, Paperclip } from 'lucide-react';
+import { Send } from 'lucide-react';
 
 interface MessageInputProps {
   newMessage: string;
@@ -24,19 +23,19 @@ const MessageInputEtudiant: React.FC<MessageInputProps> = ({
         className="w-full p-3 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-300 focus:border-green-500 outline-none resize-none" 
         placeholder="Écrivez votre message..." 
         rows={3}
+        aria-label="Écrire un message"
       ></textarea>
       
-      <div className="flex justify-between items-center mt-2">
-        <div className="flex space-x-2">
-          <button className="w-8 h-8 flex items-center justify-center rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition-colors">
-            <Paperclip size={16} />
-          </button>
-        </div>
-        
+      <div className="flex mt-2 justify-end">
         <button 
           onClick={onSendMessage} 
           disabled={newMessage.trim() === ''} 
-          className={`px-4 py-2 rounded-lg flex items-center ${newMessage.trim() === '' ? 'bg-green-100 text-green-400 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'} transition-colors`}
+          className={`px-4 py-2 rounded-lg flex items-center ${
+            newMessage.trim() === '' 
+              ? 'bg-green-100 text-green-400 cursor-not-allowed' 
+              : 'bg-green-600 text-white hover:bg-green-700'
+          } transition-colors`}
+          aria-label="Envoyer le message"
         >
           <Send size={16} className="mr-1" />
           Envoyer
