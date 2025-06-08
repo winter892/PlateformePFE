@@ -14,7 +14,7 @@ import { ArrowLeft } from 'lucide-react';
 
 const DeliverableReviewPage = () => {
   const navigate = useNavigate();
-  const { deliverable, loading, reviewStatus, setReviewStatus, groupId, taskId } = useDeliverable();
+  const { deliverable, loading, reviewStatus, setReviewStatus } = useDeliverable();
   const { 
     messages, 
     newMessage, 
@@ -30,11 +30,7 @@ const DeliverableReviewPage = () => {
   const [showAllGroupsConfirm, setShowAllGroupsConfirm] = useState(false);
 
   const handleNavigateBack = () => {
-    if (groupId && taskId) {
-      navigate(`/groups/${groupId}/tasks/${taskId}/deliverables`);
-    } else {
-      navigate('/groups');
-    }
+    navigate('/groups');
   };
 
   const handleAddAnnotation = (annotation: string) => {

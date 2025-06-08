@@ -14,6 +14,8 @@ import {
   getEtudiantsByGroupe,
 } from '@/services/userService';
 import { Group, Project, Task } from '@/types';
+import { Comment } from '@/types/task';
+
 
 export const GroupsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -36,6 +38,8 @@ export const GroupsPage: React.FC = () => {
   const [errorStudents, setErrorStudents] = useState('');
   const [encadrantFiliereId, setEncadrantFiliereId] = useState<number | null>(null);
   const [encadrantId, setEncadrantId] = useState<number | null>(null);
+  const [encadrantNom, setEncadrantNom] = useState('');
+  const [encadrantPrenom, setEncadrantPrenom] = useState('');
   const [taskSearchTerm, setTaskSearchTerm] = useState('');
   const [deliverableSearchTerm, setDeliverableSearchTerm] = useState('');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -47,6 +51,9 @@ export const GroupsPage: React.FC = () => {
   const [groupsPerPage] = useState(6);
   const [filterStatus, setFilterStatus] = useState<'all' | 'in_progress' | 'completed' | 'pending'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDeliverable, setSelectedDeliverable] = useState<any>(null);
+  const [isDeliverableModalOpen, setIsDeliverableModalOpen] = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
 
   // Récupérer les informations de l'encadrant
   useEffect(() => {
@@ -65,6 +72,8 @@ export const GroupsPage: React.FC = () => {
         const data = await response.json();
         setEncadrantFiliereId(data.filiere?.id);
         setEncadrantId(data.id);
+        setEncadrantNom(data.nom);
+        setEncadrantPrenom(data.prenom);
       } catch (error) {
         console.error("Erreur récupération encadrant:", error);
         toast.error("Erreur de chargement des informations encadrant");
@@ -268,6 +277,7 @@ export const GroupsPage: React.FC = () => {
               id: livrable.id,
               nom_fichier: livrable.nom_fichier,
               dateCreation: livrable.fichier?.dateCreation || null,
+              fichier: livrable.fichier || null, // <-- ajoute ceci !
             })),
           };
         })
@@ -375,6 +385,22 @@ export const GroupsPage: React.FC = () => {
       </nav>
     </div>
   );
+
+  // Fonction pour ajouter un commentaire
+  const handleAddComment = (deliverableId: string, text: string) => {
+    // Ajoute le commentaire via API ou localement
+    // setComments([...comments, { ... }]);
+  };
+
+  // Fonction pour ajouter un livrable
+  const handleAddDeliverable = (name: string, taskId: string, description: string, fichier: any) => {
+    // Ajoute un livrable via API ou localement
+  };
+
+  // Fonction pour supprimer un livrable
+  const handleDeleteDeliverable = (id: string) => {
+    // Supprime un livrable via API ou localement
+  };
 
   return (
     <DashboardLayout>
@@ -797,18 +823,14 @@ export const GroupsPage: React.FC = () => {
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           task.statut === 'completed' || task.statut === 'terminé'
                             ? 'bg-green-100 text-green-800'
-                            : task.statut === 'en retard'
+                            : (task.statut === 'en retard' || task.statut === 'problème')
                             ? 'bg-red-100 text-red-800'
-                            : task.statut === 'problème'
-                            ? 'bg-orange-100 text-orange-800'
                             : 'bg-amber-100 text-amber-800'
                         }`}>
                           {task.statut === 'completed' || task.statut === 'terminé'
                             ? 'Terminée'
-                            : task.statut === 'en retard'
+                            : (task.statut === 'en retard' || task.statut === 'problème')
                             ? 'En retard'
-                            : task.statut === 'problème'
-                            ? 'En problème'
                             : 'En cours'}
                         </span>
                       </div>
@@ -879,7 +901,14 @@ export const GroupsPage: React.FC = () => {
                   
                   <div className="space-y-4">
                     {selectedTask.deliverables && selectedTask.deliverables.map((livrable: any) => (
-                      <div key={livrable.id} className="border border-violet-200 rounded-lg p-4">
+                      <div 
+                        key={livrable.id}
+                        className="border border-violet-200 rounded-lg p-4 cursor-pointer"
+                        onClick={() => {
+                          setSelectedDeliverable(livrable);
+                          setIsDeliverableModalOpen(true);
+                        }}
+                      >
                         <div className="flex items-center mb-2">
                           <FileText size={18} className="text-violet-600 mr-2" />
                           <h4 className="font-medium text-violet-800">{livrable.nom_fichier}</h4>
@@ -906,6 +935,73 @@ export const GroupsPage: React.FC = () => {
                   Fermer
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de détail du livrable */}
+      {isDeliverableModalOpen && selectedDeliverable && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+            {/* Header du chat avec nom/prénom encadrant */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-violet-100 bg-violet-50">
+              <div>
+                <div className="text-lg font-semibold text-violet-900">
+                  {encadrantNom} {encadrantPrenom} - Encadrant
+                </div>
+                <div className="text-sm text-violet-600">
+                  Livrable : {selectedDeliverable.nom_fichier}
+                </div>
+              </div>
+              <button
+                className="text-violet-500 hover:text-violet-700"
+                onClick={() => setIsDeliverableModalOpen(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            {/* Corps : DeliverablesManager */}
+            <div className="p-0">
+              <DeliverablesManager
+                deliverables={selectedTask?.deliverables || []}
+                taskId={selectedTask?.id?.toString()}
+                comments={comments}
+                onAddComment={handleAddComment}
+                onAddDeliverable={handleAddDeliverable}
+                onDeleteDeliverable={handleDeleteDeliverable}
+              />
+            </div>
+            {/* Pied de page : Boutons */}
+            <div className="flex justify-end gap-2 px-6 py-4 border-t border-violet-100 bg-violet-50">
+              <a
+                href={selectedDeliverable.fichier?.chemin || '#'}
+                download={selectedDeliverable.nom_fichier}
+                className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Télécharger
+              </a>
+              <button
+                className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                onClick={() => {
+                  // Logique de validation ici
+                  toast.success('Livrable validé !');
+                  setIsDeliverableModalOpen(false);
+                }}
+              >
+                Valider
+              </button>
+              <button
+                className="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+                onClick={() => {
+                  // Logique de modification ici
+                  toast.info('Fonction de modification à implémenter');
+                }}
+              >
+                Modifier
+              </button>
             </div>
           </div>
         </div>
