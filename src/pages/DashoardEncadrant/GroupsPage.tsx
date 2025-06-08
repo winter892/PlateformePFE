@@ -811,7 +811,6 @@ export const GroupsPage: React.FC = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   {filterTasks(tasks)
-                    .filter(task => task.statut !== 'à faire' && task.statut !== 'pending') // Exclure "à faire"
                     .map(task => (
                     <div 
                       key={task.id} 
@@ -825,12 +824,16 @@ export const GroupsPage: React.FC = () => {
                             ? 'bg-green-100 text-green-800'
                             : (task.statut === 'en retard' || task.statut === 'problème')
                             ? 'bg-red-100 text-red-800'
+                            : (task.statut === 'pending' || task.statut === 'à faire')
+                            ? 'bg-amber-100 text-amber-800'
                             : 'bg-amber-100 text-amber-800'
                         }`}>
                           {task.statut === 'completed' || task.statut === 'terminé'
                             ? 'Terminée'
                             : (task.statut === 'en retard' || task.statut === 'problème')
                             ? 'En retard'
+                            : (task.statut === 'pending' || task.statut === 'à faire')
+                            ? 'À faire'
                             : 'En cours'}
                         </span>
                       </div>
