@@ -751,7 +751,7 @@ export const GroupsPage: React.FC = () => {
                           style={{ width: `${selectedGroup.progress}%` }}
                         ></div>
                       </div>
-                      <p className="text-xs text-violet-500">{selectedGroup.progress}% complété</p>
+                      <p className="text-xs text-violet-500">{Math.round(selectedGroup.progress)}% complété</p>
                     </div>
                   </>
                 )}

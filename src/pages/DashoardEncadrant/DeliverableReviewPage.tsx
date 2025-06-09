@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import DashboardLayout from '@/components/Layout/DashboardLayout';
 import DeliverableViewer from '@/components/DeliverableReview/DeliverableViewer';
 import ChatPanel from '@/components/DeliverableReview/ChatPanel';
 import ReviewHeader from '@/components/DeliverableReview/ReviewHeader';

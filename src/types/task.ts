@@ -19,7 +19,6 @@ export interface LivrableResponse {
     dateLimite: string;
     description: string;
   };
-  
   fichier: Fichier;
 }
 

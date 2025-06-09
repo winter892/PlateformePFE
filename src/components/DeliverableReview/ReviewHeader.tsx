@@ -96,7 +96,10 @@ const handleApproveDeliverable = async () => {
   }
 };
 
-  
+  if (!livrable || !livrable.fichier) {
+  return <div>Chargement du livrable...</div>;
+}
+
   return (
     <div className="bg-white border-b border-violet-100 p-4">
       <div className="flex justify-between items-center">
@@ -108,7 +111,8 @@ const handleApproveDeliverable = async () => {
             <ArrowLeft size={20} />
           </button>
           <div>
-              <h1 className="text-xl font-medium text-green-900">{livrable.nom_fichier}</h1>
+          <h1 className="text-xl font-medium text-green-900">{livrable.nom_fichier}</h1>
+
             <div className="flex items-center text-sm text-violet-600">
                {livrable.fichier?.dateCreation && (
                   <span className="mr-2">
