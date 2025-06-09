@@ -131,8 +131,8 @@ const StudentForm: React.FC = () => {
       if (!response.ok) {
         throw new Error(data.error || "Erreur lors de l'inscription");
       }
-       // Vérifie le contenu de la réponse, pas juste le status HTTP
-       if (data.statusCode === 500 && data.error?.includes("email")) {
+      // Vérifie le contenu de la réponse, pas juste le status HTTP
+      if (data.statusCode === 500 && data.error?.includes("email")) {
         toast({
           title: "Email déjà utilisé",
           description: "Un compte avec cette adresse e-mail existe déjà.",
@@ -145,6 +145,24 @@ const StudentForm: React.FC = () => {
         title: "Inscription réussie 🎓",
         description: `Bienvenue ${formData.firstName} ${formData.lastName} !`
       });
+
+      // Récupérer l'ID utilisateur puis enregistrer la notification
+      try {
+        const userRes = await fetch(`http://localhost:8080/api/utilisateur/${encodeURIComponent(formData.email)}`);
+        const userData = await userRes.json();
+        if (userRes.ok && userData.id) {
+          await fetch("http://localhost:8080/api/notifications", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              textNotif: `Bienvenue ${formData.firstName} ${formData.lastName}, votre compte a été créé avec succès.`,
+              userId: userData.id
+            })
+          });
+        }
+      } catch (notifError) {
+        console.error("Erreur lors de l'enregistrement de la notification:", notifError);
+      }
 
       setTimeout(() => navigate('/login', { state: { userType: 'etudiant' } }), 2000);
 

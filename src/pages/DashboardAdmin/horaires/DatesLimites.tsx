@@ -5,6 +5,7 @@ import Header from "../../../components/dashboardAdmin/Header";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Button } from "../../../components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { getEtudiants } from "../../../services/userService";
 
 interface Filiere {
   id: number;
@@ -16,7 +17,6 @@ interface DateLimite {
   filiere: Filiere;
   description: string;
   date: string;
-  notification: boolean;
 }
 
 const DatesLimites = () => {
@@ -41,7 +41,6 @@ const DatesLimites = () => {
     filiereId: 0,
     description: "",
     date: "",
-    notification: true,
   });
 
   const authFetch = React.useCallback(async (url: string, options: RequestInit = {}) => {
@@ -146,7 +145,6 @@ const DatesLimites = () => {
       filiere: { id: newDateLimite.filiereId },
       description: newDateLimite.description,
       date: newDateLimite.date,
-      notification: newDateLimite.notification,
     };
 
     try {
@@ -169,6 +167,26 @@ const DatesLimites = () => {
       } else {
         setDatesLimites(prev => [...prev, data]);
         setSuccess("Date limite ajoutée avec succès");
+
+        //IN AJOUT NOTIFICATIONS ---
+
+        // --- AJOUT NOTIFICATIONS POUR TOUS LES ETUDIANTS DE LA FILIERE ---
+        try {
+          const etudiants = await getEtudiants(newDateLimite.filiereId);
+          for (const etudiant of etudiants) {
+            await fetch("http://localhost:8080/api/notifications", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                textNotif: `Les dépôts de rapport pour ${data.filiere.intitule} doivent être le ${data.date} : ${data.description}`,
+                userId: etudiant.id
+              })
+            });
+          }
+        } catch (notifError) {
+          console.error("Erreur lors de l'envoi des notifications aux étudiants :", notifError);
+        }
+        // --- FIN AJOUT NOTIFICATIONS ---
       }
       resetForm();
     } catch (error) {
@@ -207,7 +225,6 @@ const DatesLimites = () => {
       filiereId: dateLimite.filiere.id,
       description: dateLimite.description,
       date: dateLimite.date,
-      notification: dateLimite.notification,
     });
   };
 
@@ -216,7 +233,6 @@ const DatesLimites = () => {
       filiereId: 0,
       description: "",
       date: "",
-      notification: true,
     });
     setIsEditing(false);
     setEditingId(null);
@@ -340,21 +356,7 @@ const DatesLimites = () => {
                   />
                 </div>
 
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="notification"
-                    className="mr-2"
-                    checked={newDateLimite.notification}
-                    onChange={(e) =>
-                      setNewDateLimite({ ...newDateLimite, notification: e.target.checked })
-                    }
-                    disabled={loading.submit}
-                  />
-                  <label htmlFor="notification" className="text-sm font-medium">
-                    Envoyer une notification
-                  </label>
-                </div>
+                
               </div>
 
               <div className="mt-4 flex justify-end gap-2">
@@ -389,7 +391,6 @@ const DatesLimites = () => {
                   <th className="border p-2">Filière</th>
                   <th className="border p-2">Description</th>
                   <th className="border p-2">Date</th>
-                  <th className="border p-2">Notification</th>
                   <th className="border p-2">Actions</th>
                 </tr>
               </thead>
@@ -400,7 +401,6 @@ const DatesLimites = () => {
                       <td className="border p-2">{d.filiere?.intitule}</td>
                       <td className="border p-2">{d.description}</td>
                       <td className="border p-2">{d.date}</td>
-                      <td className="border p-2">{d.notification ? "Oui" : "Non"}</td>
                       <td className="border p-2 flex justify-center gap-2">
                         <Button 
                           size="sm" 
@@ -428,7 +428,7 @@ const DatesLimites = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={5} className="border p-4 text-center text-gray-500">
+                    <td colSpan={4} className="border p-4 text-center text-gray-500">
                       Aucune date limite trouvée
                     </td>
                   </tr>
