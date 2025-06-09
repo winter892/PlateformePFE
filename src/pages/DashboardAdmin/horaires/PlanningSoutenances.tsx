@@ -3,23 +3,26 @@ import Select from 'react-select';
 import { Plus, Trash2, Edit, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
-import {
-  getDepartements,
-  getFilieres,
-  getGroupesByFiliere,
-  getProjectName,
-  getEncadrantName,
-  getBlocs,
-  getSallesByBloc,
-  getJurys,
-  getSoutenances,
-  addSoutenance,
-  deleteSoutenance,
-} from '@/services/userService';
+import axios from 'axios';
 import Layout from '../../../components/dashboardAdmin/Layout';
 import Header from '../../../components/dashboardAdmin/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
+
+// Configuration Axios
+const api = axios.create({
+  baseURL: "http://localhost:8080/api",
+  timeout: 10000,
+});
+
+// Intercepteur pour ajouter le token aux requêtes
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 interface Soutenance {
   id: number;
@@ -72,16 +75,131 @@ const PlanningSoutenances = () => {
     heure: '',
   });
 
+  // Fonctions API directes
+  const fetchDepartements = async (): Promise<any[]> => {
+    try {
+      const response = await api.get("/departements");
+      return response.data || [];
+    } catch (error) {
+      console.error("Erreur lors de la récupération des départements:", error);
+      toast({
+        variant: 'destructive',
+        title: 'Erreur',
+        description: 'Impossible de charger les départements',
+      });
+      return [];
+    }
+  };
+
+  const fetchFilieres = async (departementId: number): Promise<any[]> => {
+    try {
+      const response = await api.get(`/filieres/${departementId}`);
+      return response.data || [];
+    } catch (error) {
+      console.error("Erreur lors de la récupération des filières:", error);
+      return [];
+    }
+  };
+
+  const fetchGroupesByFiliere = async (filiereId: number): Promise<any[]> => {
+    try {
+      const response = await api.get(`/groupe/Groupes/${filiereId}`);
+      return response.data || [];
+    } catch (error) {
+      console.error("Erreur lors de la récupération des groupes:", error);
+      return [];
+    }
+  };
+
+  const fetchProjectName = async (GroupeId: number): Promise<string> => {
+    try {
+      const response = await api.get(`/groupe/ProjetctName/${GroupeId}`);
+      return response.data || "";
+    } catch (error) {
+      console.error("Erreur lors de la récupération du projet:", error);
+      return "";
+    }
+  };
+
+  const fetchEncadrantName = async (GroupeId: number): Promise<string> => {
+    try {
+      const response = await api.get(`/groupe/EncadrantName/${GroupeId}`);
+      return response.data || "";
+    } catch (error) {
+      console.error("Erreur lors de la récupération de l'encadrant:", error);
+      return "";
+    }
+  };
+
+  const fetchBlocs = async (): Promise<any[]> => {
+    try {
+      const response = await api.get("/bloc");
+      return response.data || [];
+    } catch (error) {
+      console.error("Erreur lors de la récupération des blocs:", error);
+      return [];
+    }
+  };
+
+  const fetchSallesByBloc = async (blocId: number): Promise<any[]> => {
+    try {
+      const response = await api.get(`/salle/byBloc/${blocId}`);
+      return response.data || [];
+    } catch (error) {
+      console.error("Erreur lors de la récupération des salles:", error);
+      return [];
+    }
+  };
+
+  const fetchJurys = async (): Promise<any[]> => {
+    try {
+      const response = await api.get("/Jurys");
+      return response.data || [];
+    } catch (error) {
+      console.error("Erreur lors de la récupération des jurys:", error);
+      return [];
+    }
+  };
+
+  const fetchSoutenances = async (): Promise<any[]> => {
+    try {
+      const response = await api.get("/soutenances");
+      return response.data || [];
+    } catch (error) {
+      console.error("Erreur lors de la récupération des soutenances:", error);
+      return [];
+    }
+  };
+
+  const postSoutenance = async (soutenanceData: any): Promise<any> => {
+    try {
+      const response = await api.post("/soutenances", soutenanceData);
+      return response.data;
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de la soutenance:", error);
+      throw error;
+    }
+  };
+
+  const deleteSoutenanceAPI = async (id: number): Promise<void> => {
+    try {
+      await api.delete(`/soutenances/${id}`);
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la soutenance:", error);
+      throw error;
+    }
+  };
+
   // Chargement initial des données
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         setLoading(true);
         const [departementsData, blocsData, jurysData, soutenancesData] = await Promise.all([
-          getDepartements(),
-          getBlocs(),
-          getJurys(),
-          getSoutenances(),
+          fetchDepartements(),
+          fetchBlocs(),
+          fetchJurys(),
+          fetchSoutenances(),
         ]);
 
         setDepartments(departementsData);
@@ -119,7 +237,7 @@ const PlanningSoutenances = () => {
 
     if (departementId) {
       try {
-        const filieresData = await getFilieres(departementId);
+        const filieresData = await fetchFilieres(departementId);
         setFilieres(filieresData);
       } catch (error) {
         console.error('Error fetching filieres:', error);
@@ -139,7 +257,7 @@ const PlanningSoutenances = () => {
 
     if (filiereId) {
       try {
-        const groupesData = await getGroupesByFiliere(filiereId);
+        const groupesData = await fetchGroupesByFiliere(filiereId);
         setGroupes(groupesData);
       } catch (error) {
         console.error('Error fetching groupes:', error);
@@ -157,8 +275,8 @@ const PlanningSoutenances = () => {
     if (groupeId) {
       try {
         const [projet, encadrant] = await Promise.all([
-          getProjectName(groupeId),
-          getEncadrantName(groupeId),
+          fetchProjectName(groupeId),
+          fetchEncadrantName(groupeId),
         ]);
         setSelectedProjet(projet);
         setSelectedEncadrant(encadrant);
@@ -180,7 +298,7 @@ const PlanningSoutenances = () => {
 
     if (blocId) {
       try {
-        const sallesData = await getSallesByBloc(blocId);
+        const sallesData = await fetchSallesByBloc(blocId);
         setSalles(sallesData);
       } catch (error) {
         console.error('Error fetching salles:', error);
@@ -226,7 +344,7 @@ const PlanningSoutenances = () => {
         juryIds: selectedJurys,
       };
 
-      const newSoutenance = await addSoutenance(soutenanceData);
+      const newSoutenance = await postSoutenance(soutenanceData);
       setSoutenances((prev) => [...prev, newSoutenance]);
 
       toast({
@@ -243,7 +361,7 @@ const PlanningSoutenances = () => {
       setSelectedSalle(null);
       setSelectedJurys([]);
       setFormData({ date: '', heure: '' });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding soutenance:', error);
       toast({
         variant: 'destructive',
@@ -256,7 +374,7 @@ const PlanningSoutenances = () => {
   // Suppression d'une soutenance
   const handleDeleteSoutenance = async (soutenanceId: number) => {
     try {
-      await deleteSoutenance(soutenanceId);
+      await deleteSoutenanceAPI(soutenanceId);
       setSoutenances((prev) => prev.filter((s) => s.id !== soutenanceId));
       toast({
         title: 'Succès',
