@@ -1,255 +1,304 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
-import { Calendar as CalendarIcon, Plus, Trash2, Edit, ArrowLeft } from "lucide-react";
-import Layout from "../../../components/dashboardAdmin/Layout";
-import Header from "../../../components/dashboardAdmin/Header";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
-import { Button } from "../../../components/ui/button";
-import { toast, useToast } from "@/hooks/use-toast";
-import { useLocation, useNavigate } from "react-router-dom";
-import { getDepartements, getFilieres,getProjectName, getEncadrantName,getJurys,getGroupesByFiliere,addSoutenance} from "@/services/userService";
+import { Plus, Trash2, Edit, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
+import {
+  getDepartements,
+  getFilieres,
+  getGroupesByFiliere,
+  getProjectName,
+  getEncadrantName,
+  getBlocs,
+  getSallesByBloc,
+  getJurys,
+  getSoutenances,
+  addSoutenance,
+  deleteSoutenance,
+} from '@/services/userService';
+import Layout from '../../../components/dashboardAdmin/Layout';
+import Header from '../../../components/dashboardAdmin/Header';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
 
-// Type pour les données de soutenance
 interface Soutenance {
-  id: string;
-  Groupe: string;
-  projet: string;
+  id: number;
+  groupe: {
+    id: number;
+    intitule: string;
+    projet: string;
+    encadrant: string;
+    filiere: string;
+  };
   date: string;
   heure: string;
-  salle: string;
-  jury: string[];
+  salle: {
+    id: number;
+    nom: string;
+    bloc: string;
+  };
+  jurys: Array<{
+    id: number;
+    nom_complet: string;
+    specialite: string;
+  }>;
 }
 
 const PlanningSoutenances = () => {
-  const [departments, setDepartments] = useState<any[]>([]); // Liste des départements récupérés
-  const [filieres, setFilieres] = useState<any[]>([]); // Liste des filières récupérées
-  const [groupes, setGroupes] = useState<any[]>([]); // Liste des groupes récupérées
-  const [juryOptions, setJuryOptions] = useState<any[]>([]);
-  const [soutenances, setSoutenances] = useState<Soutenance[]>([]); // Liste des soutenances récupérées
-
-  const [selectedDepartement, setSelectedDepartement] = useState<string | number>(""); // ID du département sélectionné
-  const [selectedFiliere, setSelectedFiliere] = useState<string>(""); // la filiere selectioné
-  const [selectedBloc, setSelectedBloc] = useState<string>(""); // bloc selectioné
-
-  const [selectedGroupe, setSelectedGroupe] = useState<string>(""); //le groupe selectioné
-  const [selectedProjet, setSelectedProjet] = useState(""); // Intitulé du projet du groupe sélectionné
-  const [selectedEncadrant, setSelectedEncadrant] = useState(""); // Intitulé d'encadrant du groupe selectionné'
-  const [jury, setJury] = useState([]);
-
-
-
-
-  // pour la navigation
-  const location = useLocation();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [departments, setDepartments] = useState<any[]>([]);
+  const [filieres, setFilieres] = useState<any[]>([]);
+  const [groupes, setGroupes] = useState<any[]>([]);
+  const [blocs, setBlocs] = useState<any[]>([]);
+  const [salles, setSalles] = useState<any[]>([]);
+  const [juryOptions, setJuryOptions] = useState<any[]>([]);
+  const [soutenances, setSoutenances] = useState<Soutenance[]>([]);
 
- 
-  
-  // Récupérer les départements lors du chargement initiale
+  // États pour les sélections
+  const [selectedDepartement, setSelectedDepartement] = useState<number | null>(null);
+  const [selectedFiliere, setSelectedFiliere] = useState<number | null>(null);
+  const [selectedGroupe, setSelectedGroupe] = useState<number | null>(null);
+  const [selectedProjet, setSelectedProjet] = useState('');
+  const [selectedEncadrant, setSelectedEncadrant] = useState('');
+  const [selectedBloc, setSelectedBloc] = useState<number | null>(null);
+  const [selectedSalle, setSelectedSalle] = useState<number | null>(null);
+  const [selectedJurys, setSelectedJurys] = useState<number[]>([]);
+
+  // État pour le formulaire
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    date: '',
+    heure: '',
+  });
+
+  // Chargement initial des données
   useEffect(() => {
-    const fetchDepartementsAndSoutenances = async () => {
+    const loadInitialData = async () => {
       try {
-        const departementsData = await getDepartements();
-
-        console.log("Départements récupérés:", departementsData);
+        setLoading(true);
+        const [departementsData, blocsData, jurysData, soutenancesData] = await Promise.all([
+          getDepartements(),
+          getBlocs(),
+          getJurys(),
+          getSoutenances(),
+        ]);
 
         setDepartments(departementsData);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des données:", error);
-      }
-    };
+        setBlocs(blocsData);
+        setSoutenances(soutenancesData);
 
-    fetchDepartementsAndSoutenances();
-  }, []);
-
-  // Récupérer les filières en fonction du département sélectionné
-  const handleDepartementChange = async (e) => {
-    const departementId = e.target.value; // Récupérer l'ID du département sélectionné
-    setSelectedDepartement(departementId); // Mettre à jour l’état
-
-    if (departementId) {
-      try {
-        const filieresData = await getFilieres(departementId); // Charger les filières de ce département
-        if (filieresData.length === 0) {
-          // Si le département n'a pas de filières
-          setFilieres([]);
-          alert("Ce département n'a pas de filières disponibles.");
-          
-        } else {
-          setFilieres(filieresData);
-        }
-      } catch (error) {
-        console.error("Erreur lors de la récupération des filières :", error);
-        setFilieres([]); // En cas d'erreur, on vide la liste
-      }
-    } else {
-      setFilieres([]); // Si aucun département n'est sélectionné, on vide la liste
-    }
-  };
-
-    //Récuperer les groupes d'une filiere
-   // Récupérer les groupes en fonction du filiere sélectionné
-
-   const handlFiliereChange = async (e) => {
-    const filiereId = e.target.value; // Récupérer l'ID du département sélectionné
-    setSelectedFiliere(filiereId); // Mettre à jour l’état
-
-    if (filiereId) {
-      try {
-        const GroupeData = await getGroupesByFiliere(filiereId); // Charger les groupes de cette filiere
-        setGroupes(GroupeData);
-        if (GroupeData.length === 0) {
-          // si la fiiere ne contion aucun groupe 
-          setGroupes([]);
-
-          alert("cette filiere ne contient aucun groupe (cela pour le test)");
-          
-        } else {
-          setGroupes(GroupeData);
-        }
-      } catch (error) {
-        console.error("Erreur lors de la récupération des groupes :", error);
-        setGroupes([]); // En cas d'erreur, on vide la liste
-      }
-    } else {
-      setGroupes([]); // Si aucun filiere n'a ete sélectionné, on vide la liste
-    }
-  }; 
-  const handleGroupeChange = async (e) => {
-    const groupeId = e.target.value;
-    setSelectedGroupe(groupeId);
-  
-    if (groupeId) {
-      try {
-        // Appels parallèles aux deux APIs
-        const [nameOfProject, nameofEncadrant] = await Promise.all([
-          getProjectName(groupeId),
-          getEncadrantName(groupeId)
-        ]);
-  
-        setSelectedProjet(nameOfProject);
-        setSelectedEncadrant(nameofEncadrant);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des infos du groupe :", error);
-        setSelectedProjet("");
-        setSelectedEncadrant("");
-      }
-    } else {
-      setSelectedProjet("");
-      setSelectedEncadrant("");
-    }
-  };
-  
-  //récupereé tout les jurys
-  
-  useEffect(() => {
-    const fetchJurys = async () => {
-      try {
-        const response = await getJurys();
-        console.log("Réponse des jurys:", response); // Ajoute ceci pour vérifier la réponse
-
-        const options = response.map(jury => ({
+        const options = jurysData.map((jury: any) => ({
           value: jury.id,
-          label: jury.nom_complet,
+          label: `${jury.nom_complet} (${jury.specialite})`,
         }));
         setJuryOptions(options);
       } catch (error) {
-        console.error("Erreur lors du chargement des jurys :", error);
+        console.error('Initial load error:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Erreur',
+          description: 'Impossible de charger les données initiales',
+        });
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchJurys();
+    loadInitialData();
   }, []);
-  // Pour le jury
-const handleJuryChange = (selectedOptions) => {
-  const values = selectedOptions.map(option => option.value);
-  setJury(values);
-};
-//les blocs
-const handleBlocChange = async (e) => {
-  const BlocId = e.target.value; // Récupérer l'ID du département sélectionné
-  setSelectedDepartement(BlocId); // Mettre à jour l’état
 
-  if (BlocId) {
-    try {
-      const salleData = await getFilieres(BlocId); // Charger les filières de ce département
-      if (salleData.length === 0) {
-        // Si le département n'a pas de filières
+  // Gestion des changements de sélection
+  const handleDepartementChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const departementId = Number(e.target.value);
+    setSelectedDepartement(departementId);
+    setSelectedFiliere(null);
+    setSelectedGroupe(null);
+    setSelectedProjet('');
+    setSelectedEncadrant('');
+
+    if (departementId) {
+      try {
+        const filieresData = await getFilieres(departementId);
+        setFilieres(filieresData);
+      } catch (error) {
+        console.error('Error fetching filieres:', error);
         setFilieres([]);
-        alert("Ce département n'a pas de filières disponibles.");
-        
-      } else {
-        setFilieres(salleData);
       }
-    } catch (error) {
-      console.error("Erreur lors de la récupération des filières :", error);
-      setFilieres([]); // En cas d'erreur, on vide la liste
-    }
-  } else {
-    setFilieres([]); // Si aucun département n'est sélectionné, on vide la liste
-  }
-};
-
-  // État pour le formulaire d'ajout
-  const [showForm, setShowForm] = useState(false);
-  const [newSoutenance, setNewSoutenance] = useState<Omit<Soutenance, 'id'>>({
-    Groupe: "",
-    projet: "",
-    date: "",
-    heure: "",
-    salle: "",
-    jury: []
-  });
-
-//les informations recupérer du le forulaire
-const handleAddSoutenance = async () => {
-  try {
-    const dataToSend = {
-      groupeId: selectedGroupe,
-      date: newSoutenance.date,
-      heure: newSoutenance.heure,
-      salle: newSoutenance.salle,
-      juryIds: jury,
-    };
-
-    await addSoutenance(dataToSend);
-    toast({ title: "Soutenance ajoutée avec succès !" });
-    setShowForm(false);
-
-    // Reset form
-    setNewSoutenance({
-      Groupe: "",
-      projet: "",
-      date: "",
-      heure: "",
-      salle: "",
-      jury: [],
-    });
-    setJury([]);
-  } catch (error) {
-    console.error("Erreur lors de l'ajout de la soutenance:", error);
-    toast({ variant: "destructive", title: "Erreur lors de l'ajout de la soutenance." });
-  }
-};
-
-
-  // Fonction pour supprimear une soutenance
-  const handleDeleteSoutenance = async (id:string) => {
-    try {
-     // await getSoutenances(); // Vous pouvez appeler une fonction de suppression de soutenance ici
-      setSoutenances(soutenances.filter(s => s.id !== id));
-    } catch (error) {
-      console.error("Erreur lors de la suppression de la soutenance:", error);
+    } else {
+      setFilieres([]);
     }
   };
 
+  const handleFiliereChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const filiereId = Number(e.target.value);
+    setSelectedFiliere(filiereId);
+    setSelectedGroupe(null);
+    setSelectedProjet('');
+    setSelectedEncadrant('');
+
+    if (filiereId) {
+      try {
+        const groupesData = await getGroupesByFiliere(filiereId);
+        setGroupes(groupesData);
+      } catch (error) {
+        console.error('Error fetching groupes:', error);
+        setGroupes([]);
+      }
+    } else {
+      setGroupes([]);
+    }
+  };
+
+  const handleGroupeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const groupeId = Number(e.target.value);
+    setSelectedGroupe(groupeId);
+
+    if (groupeId) {
+      try {
+        const [projet, encadrant] = await Promise.all([
+          getProjectName(groupeId),
+          getEncadrantName(groupeId),
+        ]);
+        setSelectedProjet(projet);
+        setSelectedEncadrant(encadrant);
+      } catch (error) {
+        console.error('Error fetching group info:', error);
+        setSelectedProjet('');
+        setSelectedEncadrant('');
+      }
+    } else {
+      setSelectedProjet('');
+      setSelectedEncadrant('');
+    }
+  };
+
+  const handleBlocChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const blocId = Number(e.target.value);
+    setSelectedBloc(blocId);
+    setSelectedSalle(null);
+
+    if (blocId) {
+      try {
+        const sallesData = await getSallesByBloc(blocId);
+        setSalles(sallesData);
+      } catch (error) {
+        console.error('Error fetching salles:', error);
+        setSalles([]);
+      }
+    } else {
+      setSalles([]);
+    }
+  };
+
+  const handleSalleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const salleId = Number(e.target.value);
+    setSelectedSalle(salleId);
+  };
+
+  const handleJuryChange = (selectedOptions: any) => {
+    const values = selectedOptions ? selectedOptions.map((option: any) => option.value) : [];
+    setSelectedJurys(values);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Ajout d'une nouvelle soutenance
+  const handleAddSoutenance = async () => {
+    if (!selectedGroupe || !formData.date || !formData.heure || !selectedSalle || selectedJurys.length === 0) {
+      toast({
+        variant: 'destructive',
+        title: 'Erreur',
+        description: 'Veuillez remplir tous les champs obligatoires',
+      });
+      return;
+    }
+
+    try {
+      const soutenanceData = {
+        groupeId: selectedGroupe,
+        date: formData.date,
+        heure: formData.heure,
+        salleId: selectedSalle,
+        juryIds: selectedJurys,
+      };
+
+      const newSoutenance = await addSoutenance(soutenanceData);
+      setSoutenances((prev) => [...prev, newSoutenance]);
+
+      toast({
+        title: 'Succès',
+        description: 'La soutenance a été ajoutée avec succès',
+      });
+
+      // Réinitialiser le formulaire
+      setShowForm(false);
+      setSelectedGroupe(null);
+      setSelectedProjet('');
+      setSelectedEncadrant('');
+      setSelectedBloc(null);
+      setSelectedSalle(null);
+      setSelectedJurys([]);
+      setFormData({ date: '', heure: '' });
+    } catch (error) {
+      console.error('Error adding soutenance:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Erreur',
+        description: error.response?.data?.message || 'Une erreur est survenue lors de l\'ajout',
+      });
+    }
+  };
+
+  // Suppression d'une soutenance
+  const handleDeleteSoutenance = async (soutenanceId: number) => {
+    try {
+      await deleteSoutenance(soutenanceId);
+      setSoutenances((prev) => prev.filter((s) => s.id !== soutenanceId));
+      toast({
+        title: 'Succès',
+        description: 'La soutenance a été supprimée avec succès',
+      });
+    } catch (error) {
+      console.error('Error deleting soutenance:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Erreur',
+        description: 'Impossible de supprimer la soutenance',
+      });
+    }
+  };
+
+  // Formatage de la date pour l'affichage
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('fr-FR', options);
+  };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex justify-center items-center h-screen">
+          <p>Chargement en cours...</p>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      <button onClick={() => navigate('/gestion-horaires')} className="mb-8 flex items-center p-2 rounded-md transition border bg-blue-100 hover:bg-blue-200">
+      <button
+        onClick={() => navigate('/gestion-horaires')}
+        className="mb-8 flex items-center p-2 rounded-md transition border bg-blue-100 hover:bg-blue-200"
+      >
         <ArrowLeft className="w-5 h-5 mr-2" /> Retour
       </button>
+
       <Header title="Planning des soutenances" />
-      
+
       <Card className="mb-6">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Calendrier des soutenances</CardTitle>
@@ -258,135 +307,167 @@ const handleAddSoutenance = async () => {
             Ajouter une soutenance
           </Button>
         </CardHeader>
+
         <CardContent>
           {showForm && (
-            <div className="bg-blue-100 p-4 rounded-md mb-6">
-              <h3 className="font-semibold mb-4">Nouvelle soutenance</h3>
+            <div className="bg-blue-50 p-4 rounded-md mb-6 border border-blue-200">
+              <h3 className="font-semibold mb-4 text-lg text-blue-800">Nouvelle soutenance</h3>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Départements */}
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Département</label>
-                      <select
-                        className="w-full p-2 border rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                        transition-all duration-200 ease-in-out max-h-40 overflow-y-auto" 
-                        value={selectedDepartement}
-                        onChange={handleDepartementChange}
-                      >
-                        <option value="">Sélectionner un département</option>
-                        {departments.map((dep) => (
-                          <option key={dep.id} value={dep.id}>{dep.intitule}</option>
-                        ))}
-                      </select>
-                    </div>
+                {/* Département */}
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Département *</label>
+                  <select
+                    className="w-full p-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={selectedDepartement || ''}
+                    onChange={handleDepartementChange}
+                  >
+                    <option value="">Sélectionner un département</option>
+                    {departments.map((dep) => (
+                      <option key={dep.id} value={dep.id}>
+                        {dep.intitule}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 {/* Filière */}
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Filière</label>
-                      <select
-                        className="w-full p-2 border rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                        transition-all duration-200 ease-in-out max-h-40 overflow-y-auto" 
-                        value={selectedFiliere}
-                        onChange={handlFiliereChange}
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Filière *</label>
+                  <select
+                    className="w-full p-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={selectedFiliere || ''}
+                    onChange={handleFiliereChange}
+                    disabled={!selectedDepartement}
+                  >
+                    <option value="">Sélectionner une filière</option>
+                    {filieres.map((filiere) => (
+                      <option key={filiere.id} value={filiere.id}>
+                        {filiere.intitule}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-                      >
-                        <option value="">Sélectionner une filière</option>
-                        {filieres.map((filiere) => (
-                          <option key={filiere.id} value={filiere.id}>{filiere.intitule}</option>
-                        ))}
-                      </select>
-                    </div>
-                {/* groupes */}
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Groupe</label>
-                      <select
-                        className="w-full p-2 border rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                        transition-all duration-200 ease-in-out max-h-40 overflow-y-auto" 
-                        value={selectedGroupe}
-                        onChange={handleGroupeChange}
-                  
-                      >
-                        <option value="">Sélectionner un groupe</option>
-                        {groupes.map((grp) => (
-                          <option key={grp.id} value={grp.id}>{grp.intitule}</option>
-                        ))}
-                      </select>
-                    </div>
-                
+                {/* Groupe */}
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Groupe *</label>
+                  <select
+                    className="w-full p-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={selectedGroupe || ''}
+                    onChange={handleGroupeChange}
+                    disabled={!selectedFiliere}
+                  >
+                    <option value="">Sélectionner un groupe</option>
+                    {groupes.map((groupe) => (
+                      <option key={groupe.id} value={groupe.id}>
+                        {groupe.intitule}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 {/* Projet */}
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Projet</label>
-                      <input
-                        type="text"
-                        className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
-                        value={selectedProjet}
-                        readOnly
-                      />
-                    </div>
-                    {/* encadrant */}
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Encadrant</label>
-                      <input
-                        type="text"
-                        className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
-                        value={selectedEncadrant}
-                        readOnly
-                      />
-                    </div>
-                     {/*date*/}
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Date</label>
-                      <input 
-                        type="date" 
-                        className="w-full p-2 border rounded-md"
-                        value={newSoutenance.date}
-                        onChange={(e) => setNewSoutenance({...newSoutenance, date: e.target.value})}
-                      />
-                    </div>
-                      {/*heure*/}
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Heure</label>
-                      <input 
-                        type="time" 
-                        className="w-full p-2 border rounded-md"
-                        value={newSoutenance.heure}
-                        onChange={(e) => setNewSoutenance({...newSoutenance, heure: e.target.value})}
-                      />
-                    </div>
-                    {/* bloc */}
-                
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Bloc</label>
-                      <input
-                        type="text"
-                        className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
-                        value={"E"}
-                        
-                      />
-                    </div>
-                    {/* salle */}
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Salle</label>
-                      <input
-                        type="text"
-                        className="w-full p-2 border rounded-md bg-gray-100 cursor-not-allowed"
-                        value={"E4"}
-                        
-                      />
-                    </div>
-                       {/*Jury*/}
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Jury</label>
-                        <Select
-                          isMulti
-                          options={juryOptions}
-                          value={juryOptions.filter(option => jury.includes(option.value))}
-                          onChange={handleJuryChange}
-                        />
-                    </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Projet</label>
+                  <input
+                    type="text"
+                    className="w-full p-2 border rounded-md bg-gray-50 cursor-not-allowed"
+                    value={selectedProjet}
+                    readOnly
+                  />
+                </div>
 
+                {/* Encadrant */}
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Encadrant</label>
+                  <input
+                    type="text"
+                    className="w-full p-2 border rounded-md bg-gray-50 cursor-not-allowed"
+                    value={selectedEncadrant}
+                    readOnly
+                  />
+                </div>
+
+                {/* Date */}
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Date *</label>
+                  <input
+                    type="date"
+                    name="date"
+                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={formData.date}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                {/* Heure */}
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Heure *</label>
+                  <input
+                    type="time"
+                    name="heure"
+                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={formData.heure}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                {/* Bloc */}
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Bloc *</label>
+                  <select
+                    className="w-full p-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={selectedBloc || ''}
+                    onChange={handleBlocChange}
+                  >
+                    <option value="">Sélectionner un bloc</option>
+                    {blocs.map((bloc) => (
+                      <option key={bloc.id} value={bloc.id}>
+                        {bloc.nom}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Salle */}
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Salle *</label>
+                  <select
+                    className="w-full p-2 border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={selectedSalle || ''}
+                    onChange={handleSalleChange}
+                    disabled={!selectedBloc}
+                  >
+                    <option value="">Sélectionner une salle</option>
+                    {salles.map((salle) => (
+                      <option key={salle.id} value={salle.id}>
+                        {salle.nom} (Capacité: {salle.capacite})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Jury */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Jury *</label>
+                  <Select
+                    isMulti
+                    options={juryOptions}
+                    value={juryOptions.filter((option) => selectedJurys.includes(option.value))}
+                    onChange={handleJuryChange}
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                    placeholder="Sélectionner les membres du jury..."
+                    noOptionsMessage={() => 'Aucun jury disponible'}
+                  />
+                </div>
               </div>
+
               <div className="mt-4 flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowForm(false)}>Annuler</Button>
+                <Button variant="outline" onClick={() => setShowForm(false)}>
+                  Annuler
+                </Button>
                 <Button onClick={handleAddSoutenance}>Enregistrer</Button>
               </div>
             </div>
@@ -394,44 +475,87 @@ const handleAddSoutenance = async () => {
 
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-blue-100 ">
+              <thead className="bg-blue-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Groupe</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Projet</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Filiere</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Encadrant</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Heure</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Salle</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-indigo-700 uppercase tracking-wider">Jury</th>
-             
-
-
-
+                  <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
+                    Groupe
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
+                    Projet
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
+                    Filière
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
+                    Encadrant
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
+                    Heure
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
+                    Salle/Bloc
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
+                    Jury
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
+
               <tbody className="bg-white divide-y divide-gray-200">
-                {soutenances.map((soutenance) => (
-                  <tr >
-                    <td className="px-6 py-4 whitespace-nowrap"> Groupe A</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{soutenance.projet}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{soutenance.date}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{soutenance.heure}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{soutenance.salle}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{soutenance.jury}</td>
-                    <td className="px-6 py-4 whitespace-nowrap flex gap-2">
-                      
-                      <Button variant="ghost" size="sm" onClick={() => handleDeleteSoutenance(soutenance.id)}>
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
+                {soutenances.length > 0 ? (
+                  soutenances.map((soutenance) => (
+                    <tr key={soutenance.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">{soutenance.groupe.intitule}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{soutenance.groupe.projet}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{soutenance.groupe.filiere}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{soutenance.groupe.encadrant}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{formatDate(soutenance.date)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{soutenance.heure}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {soutenance.salle.nom} ({soutenance.salle.bloc})
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {soutenance.jurys.map((jury) => (
+                            <span
+                              key={jury.id}
+                              className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full"
+                            >
+                              {jury.nom_complet}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap flex gap-2">
+                        <Button variant="ghost" size="sm">
+                          <Edit className="h-4 w-4 text-blue-500" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteSoutenance(soutenance.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={9} className="px-6 py-4 text-center text-gray-500">
+                      Aucune soutenance programmée
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
-        
-          
         </CardContent>
       </Card>
     </Layout>
