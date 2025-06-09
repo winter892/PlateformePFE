@@ -209,10 +209,16 @@ export default function Tasks() {
     setIsDeliverablesDialogOpen(true);
   };
 
-  const handleAddDeliverable = (name: string, taskId: string, description: string, fichier:Fichier) => {
+  const handleAddDeliverable = (name: string, taskId: number, description: string, fichier:Fichier) => {
     const deliverable: LivrableResponse = {
       id: uuidv4(),
-      tache_id: taskId,
+      tache: {
+        id: taskId,
+        titre: "",
+        statut: "",
+        dateLimite: "",
+        description: "",
+      },
       nom_fichier: name,
       descreption: description,
       fichier:fichier

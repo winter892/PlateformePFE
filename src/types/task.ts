@@ -12,10 +12,16 @@ export interface LivrableResponse {
   id: string;
   nom_fichier: string;
   descreption: string;
-  tache_id: string;
+  tache: {
+    id: number;
+    titre: string;
+    statut: string;
+    dateLimite: string;
+    description: string;
+  };
   fichier: Fichier;
-
 }
+
 export interface Fichier {
   id: number;
   chemin: string;
