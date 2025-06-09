@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import GroupItem from '@/components/GroupItem';
-import { Plus, X, Printer, FileText, Users, CheckSquare, ArrowLeft, Search, Loader2, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Plus, X, Printer, FileText, Users,Eye, CheckSquare, ArrowLeft, Search, Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
   getTaches,
@@ -163,7 +164,10 @@ export const GroupsPage: React.FC = () => {
     setSelectedGroup(group);
     setShowGroupDetailModal(true);
   };
-
+  const navigateToDeliverableDetail = (deliverableId: string) => {
+    navigate(`/delivablesEncadrant/${deliverableId}`);
+    setIsDeliverableModalOpen(false);
+  };
   // Fonction pour rafraîchir les données
   const refreshData = async () => {
     if (!encadrantFiliereId) return;
@@ -811,7 +815,6 @@ export const GroupsPage: React.FC = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   {filterTasks(tasks)
-                    .filter(task => task.statut !== 'à faire' && task.statut !== 'pending') // Exclure "à faire"
                     .map(task => (
                     <div 
                       key={task.id} 
@@ -825,12 +828,16 @@ export const GroupsPage: React.FC = () => {
                             ? 'bg-green-100 text-green-800'
                             : (task.statut === 'en retard' || task.statut === 'problème')
                             ? 'bg-red-100 text-red-800'
+                            : (task.statut === 'pending' || task.statut === 'à faire')
+                            ? 'bg-amber-100 text-amber-800'
                             : 'bg-amber-100 text-amber-800'
                         }`}>
                           {task.statut === 'completed' || task.statut === 'terminé'
                             ? 'Terminée'
                             : (task.statut === 'en retard' || task.statut === 'problème')
                             ? 'En retard'
+                            : (task.statut === 'pending' || task.statut === 'à faire')
+                            ? 'À faire'
                             : 'En cours'}
                         </span>
                       </div>
@@ -918,6 +925,9 @@ export const GroupsPage: React.FC = () => {
                             ? `Créé le: ${new Date(livrable.dateCreation).toLocaleDateString()}`
                             : ''}
                         </p>
+                         <Button variant="ghost" size="sm" className="text-gray-500 hover:text-green-600 hover:bg-green-50" onClick={() => navigateToDeliverableDetail(livrable.id)}>
+                              <Eye className="w-4 h-4" />
+                            </Button>
                       </div>
                     ))}
                     {selectedTask.deliverables && selectedTask.deliverables.length === 0 && (
@@ -962,7 +972,7 @@ export const GroupsPage: React.FC = () => {
               </button>
             </div>
             {/* Corps : DeliverablesManager */}
-            <div className="p-0">
+            {/* <div className="p-0">
               <DeliverablesManager
                 deliverables={selectedTask?.deliverables || []}
                 taskId={selectedTask?.id?.toString()}

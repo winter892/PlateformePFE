@@ -142,3 +142,37 @@ export const getEtudiantsByGroupe = async (GroupeId) => {
 export const addSoutenance = async (soutenanceData) => {
   return await axios.post("/api/soutenances", soutenanceData);
 };
+//réccuperer une tache par id
+export const getTacheById = async (tacheId) => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`http://localhost:8080/api/TachesById/${tacheId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la tâche :", error);
+    return null;
+  }
+};
+
+//update le statut d'une tache
+export const updateTacheStatut = async (tacheId :number, statut: string) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(`http://localhost:8080/api/updateStatutTache/${tacheId}`, {
+    method: "PUT",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ statut }), 
+  });
+
+  if (!response.ok) {
+    throw new Error("Échec de la mise à jour du statut de la tâche");
+  }
+
+  return await response.text();
+};

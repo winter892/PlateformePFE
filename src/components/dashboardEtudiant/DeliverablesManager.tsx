@@ -13,7 +13,7 @@ interface DeliverablesManagerProps {
   deliverables: LivrableResponse[];
   comments: Comment[];
   onAddComment: (deliverableId: string, text: string) => void;
-  onAddDeliverable: (name: string, taskId: string, description: string,fichier:Fichier) => void;
+  onAddDeliverable: (name: string, taskId: number, description: string,fichier:Fichier) => void;
   taskId: string;
   onDeleteDeliverable: (id: string) => void;
 }

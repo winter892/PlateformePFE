@@ -106,11 +106,8 @@ const DeliverableReviewPage = () => {
   
   return (
     
-    <DashboardLayout>
-      <button className="mb-8 flex items-center p-2 rounded-md transition  hover:bg-violet-100">
-                        <ArrowLeft className="w-5 h-5 mr-2" /> Retour
-                      </button>
-      <div className="flex h-[calc(100vh-7rem)] overflow-hidden">
+    
+      <div className="flex h-[calc(100vh-0.5rem)] overflow-hidden">
         <ResizablePanel 
           chatExpanded={chatExpanded} 
           onToggle={toggleChatPanel}
@@ -140,13 +137,12 @@ const DeliverableReviewPage = () => {
             <div className="flex-1 overflow-auto p-6">
               <DeliverableViewer 
                 deliverable={deliverable} 
-                onAddAnnotation={handleAddAnnotation} 
               />
             </div>
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    
   );
 };
 
