@@ -62,7 +62,7 @@ const App = () => (
           <Route path="/EncadrantNotifications" element={<NotificationsPage />} />
           <Route path="/statistics" element={<StatisticsPage />} />
           <Route path="/EncadrantProfile" element={<TeacherProfile />} />
-          <Route path="/groups/:groupId/tasks/:taskId/deliverables/:deliverableId" element={<DeliverableReviewPage />} />
+          <Route path="/delivablesEncadrant/:deliverableId" element={<DeliverableReviewPage />} />
           <Route path="/SupervisorForm" element={<SupervisorForm />} />
 
 

@@ -47,7 +47,7 @@ const GroupItem: React.FC<GroupItemProps> = ({
       <div className="mb-4">
         <div className="flex justify-between items-center mb-1">
           <span className="text-xs text-violet-500">Progression</span>
-          <span className="text-xs font-medium text-violet-700">{progress}%</span>
+          <span className="text-xs font-medium text-violet-700">{Math.round(progress)}%</span>
         </div>
         <div className="w-full bg-violet-200 rounded-full h-1.5">
           <div

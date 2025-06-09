@@ -19,11 +19,7 @@ interface ReviewHeaderProps {
 }
 
 const ReviewHeaderEtudiant: React.FC<ReviewHeaderProps> = ({
-  deliverables,
-  reviewStatus,
-  onRequestChanges,
-  onApproveDeliverable,
-  showAllGroupsConfirm,
+
   handleNavigateBack,
 }) => {
   const { deliverableId } = useParams();

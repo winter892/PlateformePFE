@@ -35,17 +35,7 @@ const DeliverableReviewPageEtudiant = () => {
     }
   };
 
-  const handleAddAnnotation = (annotation: string) => {
-    toast.success("Annotation ajoutée");
-    const annotationMessage = {
-      id: messages.length + 1,
-      sender: 'teacher' as const,
-      senderName: 'MohammedOUTANNOUT',
-      content: `J'ai ajouté une annotation: "${annotation}"`,
-      timestamp: new Date()
-    };
-    setMessages([...messages, annotationMessage]);
-  };
+  
 
   const handleApproveDeliverable = (applyToAll = false) => {
     setReviewStatus({

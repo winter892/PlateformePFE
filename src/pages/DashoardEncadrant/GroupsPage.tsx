@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import GroupItem from '@/components/GroupItem';
-import { Plus, X, Printer, FileText, Users, CheckSquare, ArrowLeft, Search, Loader2, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Plus, X, Printer, FileText, Users,Eye, CheckSquare, ArrowLeft, Search, Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
   getTaches,
@@ -163,7 +164,10 @@ export const GroupsPage: React.FC = () => {
     setSelectedGroup(group);
     setShowGroupDetailModal(true);
   };
-
+  const navigateToDeliverableDetail = (deliverableId: string) => {
+    navigate(`/delivablesEncadrant/${deliverableId}`);
+    setIsDeliverableModalOpen(false);
+  };
   // Fonction pour rafraîchir les données
   const refreshData = async () => {
     if (!encadrantFiliereId) return;
@@ -747,19 +751,10 @@ export const GroupsPage: React.FC = () => {
                           style={{ width: `${selectedGroup.progress}%` }}
                         ></div>
                       </div>
-                      <p className="text-xs text-violet-500">{selectedGroup.progress}% complété</p>
+                      <p className="text-xs text-violet-500">{Math.round(selectedGroup.progress)}% complété</p>
                     </div>
                   </>
                 )}
-              </div>
-              
-              <div className="flex justify-end space-x-3 pt-4 border-t border-violet-100">
-                <button 
-                  className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-colors" 
-                  onClick={() => setShowGroupDetailModal(false)}
-                >
-                  Fermer
-                </button>
               </div>
             </div>
           </div>
@@ -771,12 +766,7 @@ export const GroupsPage: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
-              <button 
-                onClick={() => setShowTasksModal(false)} 
-                className="mb-8 flex items-center p-2 rounded-md transition hover:bg-violet-100"
-              >
-                <ArrowLeft className="w-5 h-5 mr-2" /> Retour
-              </button>
+            
               
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-violet-900">
@@ -847,15 +837,6 @@ export const GroupsPage: React.FC = () => {
                   ))}
                 </div>
               )}
-              
-              <div className="flex justify-end">
-                <button 
-                  className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-colors" 
-                  onClick={() => setShowTasksModal(false)}
-                >
-                  Fermer
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -866,13 +847,6 @@ export const GroupsPage: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
-              <button 
-                onClick={() => { setSelectedTask(null); }} 
-                className="mb-8 flex items-center p-2 rounded-md transition hover:bg-violet-100"
-              >
-                <ArrowLeft className="w-5 h-5 mr-2" /> Retour
-              </button>
-              
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold text-violet-900">{selectedTask.title}</h2>
                 <button 
@@ -903,25 +877,41 @@ export const GroupsPage: React.FC = () => {
                   </div>
                   
                   <div className="space-y-4">
-                    {selectedTask.deliverables && selectedTask.deliverables.map((livrable: any) => (
-                      <div 
+                    { selectedTask.deliverables && selectedTask.deliverables.map((livrable: any) => (
+                     <div 
                         key={livrable.id}
-                        className="border border-violet-200 rounded-lg p-4 cursor-pointer"
+                        className="border border-violet-200 rounded-lg p-4 cursor-pointer relative"
                         onClick={() => {
                           setSelectedDeliverable(livrable);
                           setIsDeliverableModalOpen(true);
                         }}
                       >
-                        <div className="flex items-center mb-2">
-                          <FileText size={18} className="text-violet-600 mr-2" />
-                          <h4 className="font-medium text-violet-800">{livrable.nom_fichier}</h4>
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center">
+                            <FileText size={18} className="text-violet-600 mr-2" />
+                            <h4 className="font-medium text-violet-800">{livrable.nom_fichier}</h4>
+                          </div>
+
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-gray-500 hover:text-violet-600 hover:bg-violet-50"
+                            onClick={(e) => {
+                              e.stopPropagation(); // empêche le onClick du parent
+                              navigateToDeliverableDetail(livrable.id);
+                            }}
+                          >
+                            <Eye className="w-8 h-4" />
+                          </Button>
                         </div>
+
                         <p className="text-xs text-violet-500">
                           {livrable.dateCreation
                             ? `Créé le: ${new Date(livrable.dateCreation).toLocaleDateString()}`
                             : ''}
                         </p>
                       </div>
+
                     ))}
                     {selectedTask.deliverables && selectedTask.deliverables.length === 0 && (
                       <div className="text-violet-500 text-sm">Aucun livrable pour cette tâche.</div>
@@ -929,86 +919,12 @@ export const GroupsPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
-              <div className="flex justify-end space-x-3 pt-4 border-t border-violet-100">
-                <button 
-                  className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-colors" 
-                  onClick={() => setSelectedTask(null)}
-                >
-                  Fermer
-                </button>
-              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modal de détail du livrable */}
-      {isDeliverableModalOpen && selectedDeliverable && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto p-0">
-            {/* Header du chat avec nom/prénom encadrant */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-violet-100 bg-violet-50">
-              <div>
-                <div className="text-lg font-semibold text-violet-900">
-                  {encadrantNom} {encadrantPrenom} - Encadrant
-                </div>
-                <div className="text-sm text-violet-600">
-                  Livrable : {selectedDeliverable.nom_fichier}
-                </div>
-              </div>
-              <button
-                className="text-violet-500 hover:text-violet-700"
-                onClick={() => setIsDeliverableModalOpen(false)}
-              >
-                <X size={20} />
-              </button>
-            </div>
-            {/* Corps : DeliverablesManager */}
-            <div className="p-0">
-              <DeliverablesManager
-                deliverables={selectedTask?.deliverables || []}
-                taskId={selectedTask?.id?.toString()}
-                comments={comments}
-                onAddComment={handleAddComment}
-                onAddDeliverable={handleAddDeliverable}
-                onDeleteDeliverable={handleDeleteDeliverable}
-              />
-            </div>
-            {/* Pied de page : Boutons */}
-            <div className="flex justify-end gap-2 px-6 py-4 border-t border-violet-100 bg-violet-50">
-              <a
-                href={selectedDeliverable.fichier?.chemin || '#'}
-                download={selectedDeliverable.nom_fichier}
-                className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Télécharger
-              </a>
-              <button
-                className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-                onClick={() => {
-                  // Logique de validation ici
-                  toast.success('Livrable validé !');
-                  setIsDeliverableModalOpen(false);
-                }}
-              >
-                Valider
-              </button>
-              <button
-                className="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
-                onClick={() => {
-                  // Logique de modification ici
-                  toast.info('Fonction de modification à implémenter');
-                }}
-              >
-                Modifier
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+     
     </DashboardLayout>
   );
 };
