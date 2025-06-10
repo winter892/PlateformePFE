@@ -66,8 +66,9 @@ const DatesLimites = () => {
     }
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || 'Erreur de requête');
+      const errorData = await response.text();
+      console.error("Réponse brute du backend :", errorData);
+      throw new Error(errorData || 'Erreur de requête');
     }
 
     return response.json();
@@ -146,6 +147,8 @@ const DatesLimites = () => {
       description: newDateLimite.description,
       date: newDateLimite.date,
     };
+
+    console.log("Payload envoyé :", payload);
 
     try {
       const url = isEditing 
