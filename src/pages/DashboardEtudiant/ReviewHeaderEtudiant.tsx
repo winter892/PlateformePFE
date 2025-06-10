@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Edit3, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Download} from 'lucide-react';
 import { toast } from 'sonner';
 import { LivrableResponse } from '@/types/task';
 import { getLivrableById } from '@/services/EtudiantsService';
@@ -12,9 +12,6 @@ interface ReviewHeaderProps {
     progress: number;
     status: 'pending' | 'approved' | 'needsRevision';
   };
-  onRequestChanges: (applyToAll: boolean) => void;
-  onApproveDeliverable: (applyToAll: boolean) => void;
-  showAllGroupsConfirm: boolean;
   handleNavigateBack: () => void;
 }
 

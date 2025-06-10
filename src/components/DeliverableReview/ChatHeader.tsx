@@ -27,12 +27,12 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onToggleChat }) => {
   }, [iduser]);
 
   return (
-    <div className="px-4 py-3 border-b border-green-100 flex items-center justify-between">
+    <div className="px-4 py-3 border-b border-violet-100 flex items-center justify-between">
       <div>
-        <h3 className="font-medium text-green-900">Discussion en direct</h3>
+        <h3 className="font-medium text-violet-900">Discussion en direct</h3>
         <div className="flex items-center mt-1">
           <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-          <span className="text-xs text-green-600">
+          <span className="text-xs text-violet-600">
             {studentInfo ? `${studentInfo.nom} ${studentInfo.prenom} ` : "Chargement..."}
           </span>
         </div>

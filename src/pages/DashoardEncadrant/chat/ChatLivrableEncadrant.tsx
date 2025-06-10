@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import useMessages, { MessageLivrable } from "@/hooks/useMessages";
-import ChatHeaderEtudiant from '@/pages/DashboardEtudiant/chatEtudiant/ChatHeaderEtudiant';
-import MessageInputEtudiant from '@/pages/DashboardEtudiant/messageEtudiant/MessageInputEtudiant';
+import ChatHeader from '@/components/DeliverableReview/ChatHeader';
+import MessageInput from '@/components/DeliverableReview/MessageInput';
 import { getUserById } from '@/services/userService';
 import { ChatLivrableProps } from '@/components/DeliverableReview/interfaces/ChatInterfaces';
-import MessagesContainerEtudiant from '@/pages/DashboardEtudiant/messageEtudiant/MessagesContainerEtudiant'; // ✅
-import { RawMessage, Message } from './ChatInterfaces'; // ✅
+import MessagesContainer from '@/components/DeliverableReview/MessagesContainer'; // ✅
+import { RawMessage, Message } from '@/pages/DashboardEtudiant/chat/ChatInterfaces'; // ✅
 
-const ChatLivrable: React.FC<ChatLivrableProps> = ({ livrableId, userId, onToggleChat = () => {} }) => {
+const ChatLivrableEncadrant: React.FC<ChatLivrableProps> = ({ livrableId, userId, onToggleChat = () => {} }) => {
   const messages: MessageLivrable[] = useMessages(livrableId);
   const [contenu, setContenu] = useState<string>("");
   const [userInfo, setUserInfo] = useState<any>(null);
@@ -58,8 +58,8 @@ const ChatLivrable: React.FC<ChatLivrableProps> = ({ livrableId, userId, onToggl
       const sender =
         msg.auteur.id === currentUser.id
           ? "self"
-          : msg.auteur.role === "ENCADRANT"
-          ? "teacher"
+          : msg.auteur.role === "ETUDIANT"
+          ? "student"
           : "other";
 
       grouped[date].push({
@@ -115,19 +115,19 @@ const rawMessages: RawMessage[] = messages.map((msg) => ({
   return (
     <div className="flex flex-col h-screen">
       {/* Header du chat */}
-      <ChatHeaderEtudiant onToggleChat={onToggleChat ?? (() => {})} />
+      <ChatHeader onToggleChat={onToggleChat ?? (() => {})} />
 
       {/* Corps principal du chat */}
       <div className="flex flex-col flex-1 border p-2 shadow overflow-hidden">
         {/* Liste des messages avec structure avancée */}
-        <MessagesContainerEtudiant
+        <MessagesContainer
           groupedMessages={groupMessagesByDate(rawMessages)}
           formatTime={formatTime}
           messagesEndRef={messagesEndRef}
         />
 
         {/* Input message */}
-        <MessageInputEtudiant
+        <MessageInput
           newMessage={contenu}
           onMessageChange={setContenu}
           onSendMessage={envoyerMessage}
@@ -143,4 +143,4 @@ const rawMessages: RawMessage[] = messages.map((msg) => ({
   );
 };
 
-export default ChatLivrable;
+export default ChatLivrableEncadrant;

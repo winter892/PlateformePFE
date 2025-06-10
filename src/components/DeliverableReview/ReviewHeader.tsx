@@ -15,18 +15,13 @@ interface ReviewHeaderProps {
     progress: number;
     status: 'pending' | 'approved' | 'needsRevision';
   };
-  onRequestChanges: (applyToAll: boolean) => void;
   onApproveDeliverable: (applyToAll: boolean) => void;
-  showAllGroupsConfirm: boolean;
   handleNavigateBack: () => void;
 }
 
 const ReviewHeader: React.FC<ReviewHeaderProps> = ({
-  deliverable,
-  reviewStatus,
-  onRequestChanges,
+  
   onApproveDeliverable,
-  showAllGroupsConfirm,
   handleNavigateBack
 }) => {
     const { deliverableId } = useParams();
@@ -42,7 +37,7 @@ useEffect(() => {
       
       const data = await getLivrableById(deliverableId);
       setLivrable(data);
-console.log("Livrable récupéré :", data);
+      console.log("Livrable récupéré :", data);
       if (data && data.tache.id) {
         console.log("ID de la tâche :", data.tache.id);
         const tache = await getTacheById(data.tache.id);

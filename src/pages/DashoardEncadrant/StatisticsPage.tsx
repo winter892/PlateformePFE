@@ -41,7 +41,7 @@ const StatisticsPage = () => {
   const progressData = projects.map(project => {
     const group = groups.find(g => g.id === project.groupId);
     return {
-      name: group ? group.name : `Groupe ${project.groupId}`,
+      name: group ? group.intitule : `Groupe ${project.groupId}`,
       progress: project.progress
     };
   });

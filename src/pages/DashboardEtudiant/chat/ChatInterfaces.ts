@@ -15,6 +15,6 @@ export interface Message {
   id: number;
   content: string;
   timestamp: Date;
-  sender: 'self' | 'teacher' | 'other';
+  sender: 'self' | 'teacher' | 'other'| 'student';
   senderName: string;
 }
