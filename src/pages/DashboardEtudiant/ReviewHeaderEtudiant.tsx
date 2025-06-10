@@ -108,34 +108,7 @@ const handleDownload = async () => {
             Télécharger
           </button>
 
-          {/*reviewStatus.status === 'pending' && !showAllGroupsConfirm && (
-            <button
-              onClick={() => onApproveDeliverable(false)}
-              className="px-3 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors flex items-center"
-            >
-              <CheckCircle size={16} className="mr-1" />
-              Valider ce livrable
-            </button>
-          )}
-
-          {/*showAllGroupsConfirm && (
-            <>
-              <button
-                onClick={() => onRequestChanges(true)}
-                className="px-3 py-2 text-sm bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors flex items-center"
-              >
-                <Edit3 size={16} className="mr-1" />
-                Demander des modifications pour tous
-              </button>
-              <button
-                onClick={() => onApproveDeliverable(true)}
-                className="px-3 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors flex items-center"
-              >
-                <CheckCircle size={16} className="mr-1" />
-                Valider pour tous
-              </button>
-            </>
-          )*/}
+          
         </div>
       </div>
     </div>

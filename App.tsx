@@ -34,8 +34,8 @@ import DeliverableReviewPageEtudiant from "./src/pages/DashboardEtudiant/Deliver
 import AdminForm from "@/components/dashboardAdmin/AdminForm";
 import SupervisorForm from "@/components/dashboardEncadrent/SupervisorForm";
 import StudentForm from "@/components/dashboardEtudiant/StudentForm";
+import ChatLivrable from "@/pages/DashboardEtudiant/chat/ChatLivrable";
 //chat
-import Chat from "@/pages/DashboardEtudiant/chatEtudiant/chat";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -75,11 +75,12 @@ const App = () => (
           <Route path="/StudentForm" element={<StudentForm />} />
 
 
+
+
           {/** Autres */}
           <Route path="*" element={<NotFound />} />
           <Route path="/" element={<Homepage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/chat" element={<Chat />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

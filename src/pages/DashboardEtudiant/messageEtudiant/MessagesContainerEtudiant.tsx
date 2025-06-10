@@ -1,7 +1,6 @@
-
 import React from 'react';
-import MessageItem from './MessageItemEtudiant';
-import { Message } from '@/components/DeliverableReview/interfaces/ChatInterfaces';
+import MessageItemEtudiant from './MessageItemEtudiant';
+import { Message } from '@/pages/DashboardEtudiant/chat/ChatInterfaces';
 
 interface MessagesContainerProps {
   groupedMessages: {
@@ -21,24 +20,24 @@ const MessagesContainerEtudiant: React.FC<MessagesContainerProps> = ({
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
       {groupedMessages.map((group, groupIndex) => (
         <div key={groupIndex}>
-          {/* Date separator */}
+          {/* Séparateur de date */}
           <div className="flex items-center justify-center my-3">
             <div className="border-t border-violet-100 flex-grow"></div>
             <div className="mx-3 text-xs text-violet-500 font-medium">{group.date}</div>
             <div className="border-t border-violet-100 flex-grow"></div>
           </div>
-          
-          {/* Messages for this date */}
+
+          {/* Messages */}
           {group.messages.map(message => (
-            <MessageItem 
-              key={message.id} 
-              message={message} 
-              formatTime={formatTime} 
+            <MessageItemEtudiant
+              key={message.id}
+              message={message}
+              formatTime={formatTime}
             />
           ))}
         </div>
       ))}
-      
+
       <div ref={messagesEndRef} />
     </div>
   );

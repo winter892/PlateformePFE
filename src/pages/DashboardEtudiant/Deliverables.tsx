@@ -21,45 +21,7 @@ export interface Deliverable {
 
 
 const Deliverables = () => {
-  const [deliverables, setDeliverables] = useState<Deliverable[]>([
-    {
-      id: '1',
-      name: 'Rapport d\'analyse.pdf',
-      taskName: 'Analyser les besoins du projet',
-      submittedAt: '2023-10-14',
-      dueDate: '2023-10-15',
-      status: 'accepté',
-      fileUrl: '/documents/rapport.pdf',
-      fileSize: '1.2 MB',
-      fileType: 'PDF',
-      comments: 3
-    },
-    {
-      id: '2',
-      name: 'Schéma d\'architecture.png',
-      taskName: 'Concevoir l\'architecture',
-      submittedAt: '2023-10-20',
-      dueDate: '2023-10-22',
-      status: 'en attente',
-      fileUrl: '/documents/schema.png',
-      fileSize: '3.5 MB',
-      fileType: 'PNG',
-      comments: 1
-    },
-    {
-      id: '3',
-      name: 'Prototype initial.zip',
-      taskName: 'Développer le prototype',
-      submittedAt: '2023-11-01',
-      dueDate: '2023-11-05',
-      status: 'révision requise',
-      fileUrl: '/documents/prototype.zip',
-      fileSize: '8.7 MB',
-      fileType: 'ZIP',
-      comments: 5
-    }
-  ]);
-  
+  const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [isNewDeliverableDialogOpen, setIsNewDeliverableDialogOpen] = useState(false);

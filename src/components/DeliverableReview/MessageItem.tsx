@@ -21,16 +21,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, formatTime }) => {
         </div>
         <p className="text-sm whitespace-pre-wrap">{message.content}</p>
         
-        {message.attachments && message.attachments.length > 0 && (
-          <div className="mt-2 space-y-1">
-            {message.attachments.map((attachment, index) => (
-              <div key={index} className="bg-white bg-opacity-50 rounded p-2 text-xs flex items-center">
-                <div className="mr-2">📎</div>
-                <span className="truncate flex-1">{attachment.name}</span>
-              </div>
-            ))}
-          </div>
-        )}
+      
       </div>
     </div>
   );

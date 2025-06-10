@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate ,useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 //import DashboardLayout from '@/components/Layout/DashboardLayout';
 import DeliverableViewerEtudiant from '@/pages/DashboardEtudiant/DeliverableViewerEtudiant';
@@ -10,6 +10,8 @@ import ResizablePanelEtudiant from '@/pages/DashboardEtudiant/chatEtudiant/Resiz
 import LoadingState from '@/pages/DashboardEtudiant/LoadingStateEtudiant';
 import { useDeliverable } from '@/hooks/useDeliverable';
 import { useChat } from '@/hooks/useChat';
+
+import ChatLivrable from "@/pages/DashboardEtudiant/chat/ChatLivrable"; 
 import { ArrowLeft } from 'lucide-react';
 
 const DeliverableReviewPageEtudiant = () => {
@@ -28,6 +30,7 @@ const DeliverableReviewPageEtudiant = () => {
   } = useChat();
   
   const [showAllGroupsConfirm, setShowAllGroupsConfirm] = useState(false);
+    const { deliverableId } = useParams();
 
   const handleNavigateBack = () => {
     if (deliverable) {
@@ -95,27 +98,27 @@ const DeliverableReviewPageEtudiant = () => {
     return <LoadingState />;
   }
 
-  
-  return (
-    
-   <div>
+  const userIdd = localStorage.getItem('id');
+  const teken = localStorage.getItem('token');
+  const userIddd= parseInt(userIdd);
+  const deliverableIdd = parseInt(deliverableId || '0');
 
- 
-      <div className="flex h-[calc(100vh-1rem)] overflow-hidden">
-     
-        <ResizablePanelEtudiant 
-          chatExpanded={chatExpanded} 
-          onToggle={toggleChatPanel}
-          layoutConfig={layoutConfig}
-        >
-          <ChatPanel 
-            messages={messages} 
-            newMessage={newMessage} 
-            onMessageChange={setNewMessage} 
-            onSendMessage={handleSendMessage} 
-            messagesEndRef={messagesEndRef} 
-            onToggleChat={toggleChatPanel} 
-          />
+  if (!userIdd || !deliverableIdd) {
+    return <div className="p-4">Livrable non trouvé.</div>;
+  }
+  console.log("id user ",teken);
+  return (
+
+   
+      <div className="flex h-[calc(100vh-0.5rem)] overflow-hidden">
+
+        <ResizablePanelEtudiant
+        chatExpanded={chatExpanded}
+        onToggle={toggleChatPanel}
+        layoutConfig={layoutConfig}
+      >
+        <ChatLivrable onToggleChat={toggleChatPanel} livrableId={deliverableIdd} userId={userIddd} />
+
         </ResizablePanelEtudiant>
         
         <div className={`transition-all duration-300 bg-gray-50 ${layoutConfig.viewerWidth}`}>
@@ -138,8 +141,6 @@ const DeliverableReviewPageEtudiant = () => {
         </div>
       </div>
 
-   </div>
-     
     
   );
 };

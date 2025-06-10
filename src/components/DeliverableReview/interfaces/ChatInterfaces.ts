@@ -17,3 +17,8 @@ export interface Message {
     onToggleChat: () => void;
   }
   
+  export interface ChatLivrableProps {
+  livrableId: number;
+  userId: number;
+  onToggleChat: () => void;
+}
