@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Eye, EyeOff } from 'lucide-react';
@@ -146,9 +145,36 @@ const SupervisorForm: React.FC = () => {
       toast({
         title: "Compte créé avec succès",
         description: `Le compte de ${formData.firstName} ${formData.lastName} a été enregistré avec succès.`,
-        duration: 3000, // facultatif, contrôle le temps d'affichage
-       
+        duration: 3000,
       });
+      
+      // Enregistrer une notification pour l'encadrant créé
+      try {
+        // Ajoute un petit délai pour laisser le backend enregistrer l'utilisateur
+        await new Promise(r => setTimeout(r, 400));
+        const userRes = await fetch(`http://localhost:8080/api/utilisateur/${encodeURIComponent(formData.email)}`);
+        const userData = await userRes.json();
+        console.log("userData", userData); // <-- Ajoute ce log
+        if (userRes.ok && userData.id) {
+          const notifRes = await fetch("http://localhost:8080/api/notifications", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              textNotif: `Bienvenue ${formData.firstName} ${formData.lastName}, votre compte a été créé avec succès.`,
+              userId: userData.id
+            })
+          });
+          if (!notifRes.ok) {
+            const notifErr = await notifRes.text();
+            console.error("Erreur notification:", notifErr);
+          }
+        } else {
+          console.error("Impossible de récupérer l'utilisateur pour la notification");
+        }
+      } catch (notifError) {
+        console.error("Erreur lors de l'enregistrement de la notification:", notifError);
+      }
+      
       // Rediriger après 3 secondes
 setTimeout(() => {
   handleSpaceClick('encadrant')}, 3000);

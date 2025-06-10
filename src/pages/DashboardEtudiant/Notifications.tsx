@@ -1,11 +1,11 @@
-
-import React from 'react';
-import { Bell, Clock, CheckCircle2, AlertCircle, FileText, User, MessageSquare } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bell, Clock, CheckCircle2, AlertCircle, FileText, User, MessageSquare, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 
 const Notifications = () => {
-  const notifications = [
+  const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all');
+  const [notifications, setNotifications] = useState([
     {
       id: 1,
       type: 'task',
@@ -61,7 +61,25 @@ const Notifications = () => {
       bgColor: 'bg-blue-100',
       read: true
     },
-  ];
+  ]);
+
+  // Filtrage
+  const filteredNotifications = notifications.filter(n => {
+    if (filter === 'all') return true;
+    if (filter === 'unread') return !n.read;
+    if (filter === 'read') return n.read;
+    return true;
+  });
+
+  // Marquer tout comme lu
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })));
+  };
+
+  // Supprimer les notifications lues
+  const deleteRead = () => {
+    setNotifications(notifications.filter(n => !n.read));
+  };
 
   const container = {
     hidden: { opacity: 0 },
@@ -91,43 +109,86 @@ const Notifications = () => {
             <Bell className="mr-3 h-7 w-7 text-green-600" />
             Notifications
           </motion.h1>
-          
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Button variant="outline" className="text-sm">
-              Marquer tout comme lu
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="text-sm"
+              onClick={markAllAsRead}
+            >
+              Tout marquer comme lu
             </Button>
-          </motion.div>
+            <Button
+              variant="destructive"
+              className="text-sm flex items-center"
+              onClick={deleteRead}
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              Supprimer les lus
+            </Button>
+          </div>
         </div>
-        
+
+        {/* Filtres */}
+        <div className="flex gap-2 mb-6">
+          <button
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              filter === 'all'
+                ? 'bg-violet-100 text-violet-700'
+                : 'bg-white text-violet-700 border border-violet-100'
+            }`}
+            onClick={() => setFilter('all')}
+          >
+            Toutes
+          </button>
+          <button
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              filter === 'unread'
+                ? 'bg-violet-100 text-violet-700'
+                : 'bg-white text-violet-700 border border-violet-100'
+            }`}
+            onClick={() => setFilter('unread')}
+          >
+            Non lues
+          </button>
+          <button
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              filter === 'read'
+                ? 'bg-violet-100 text-violet-700'
+                : 'bg-white text-violet-700 border border-violet-100'
+            }`}
+            onClick={() => setFilter('read')}
+          >
+            Lues
+          </button>
+        </div>
+
         <motion.div 
           className="space-y-4"
           variants={container}
           initial="hidden"
           animate="show"
         >
-          {notifications.length > 0 ? (
-            notifications.map((notification, index) => (
+          {filteredNotifications.length > 0 ? (
+            filteredNotifications.map((notification, index) => (
               <motion.div
                 key={notification.id}
                 variants={item}
-                className={`p-4 border ${notification.read ? 'bg-white' : 'bg-green-50'} rounded-lg shadow-sm relative ${notification.read ? '' : 'border-green-200'}`}
+                className={`w-full p-4 border ${
+                  notification.read ? 'bg-white' : 'bg-green-50'
+                } rounded-lg shadow-sm relative ${
+                  notification.read ? '' : 'border-green-200'
+                } flex items-center`} // <-- allonge la carte
               >
                 {!notification.read && (
                   <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-green-500"></div>
                 )}
-                <div className="flex">
-                  <div className={`${notification.bgColor} p-3 rounded-full mr-4 flex-shrink-0`}>
-                    <notification.icon className={`h-5 w-5 ${notification.color}`} />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-800">{notification.title}</h3>
-                    <p className="text-gray-600 text-sm mt-1">{notification.description}</p>
-                    <p className="text-gray-400 text-xs mt-2">{notification.time}</p>
-                  </div>
+                <div className={`${notification.bgColor} p-3 rounded-full mr-4 flex-shrink-0`}>
+                  <notification.icon className={`h-5 w-5 ${notification.color}`} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-gray-800">{notification.title}</h3>
+                  <p className="text-gray-600 text-sm mt-1">{notification.description}</p>
+                  <p className="text-gray-400 text-xs mt-2">{notification.time}</p>
                 </div>
               </motion.div>
             ))

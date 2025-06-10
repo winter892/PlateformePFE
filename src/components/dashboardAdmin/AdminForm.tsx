@@ -96,6 +96,28 @@ const AdminForm = () => {
         description: `${formData.firstName} ${formData.lastName} a été enregistré avec succès`,
       });
 
+      // Enregistrer une notification pour l'admin créé
+      try {
+        // Attendre un peu pour que l'utilisateur soit bien créé côté backend
+        await new Promise(r => setTimeout(r, 400));
+        const userRes = await fetch(`http://localhost:8080/api/utilisateur/${encodeURIComponent(formData.email)}`);
+        const userData = await userRes.json();
+        if (userRes.ok && userData.id) {
+          await fetch("http://localhost:8080/api/notifications", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              textNotif: `Bienvenue ${formData.firstName} ${formData.lastName}, votre compte a été créé avec succès.`,
+              userId: userData.id
+            })
+          });
+        } else {
+          console.error("Impossible de récupérer l'utilisateur pour la notification");
+        }
+      } catch (notifError) {
+        console.error("Erreur lors de l'enregistrement de la notification:", notifError);
+      }
+
       setTimeout(() => {
         handleSpaceClick('admin')}, 3000);
       const handleSpaceClick = (userType: string) => {
