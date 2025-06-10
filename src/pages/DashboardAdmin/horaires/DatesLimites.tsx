@@ -100,8 +100,9 @@ const DatesLimites = () => {
       if (selectedDepartement !== "") {
         setLoading(prev => ({ ...prev, fetchPublic: true }));
         try {
-          const data = await fetch(`http://localhost:8080/api/filieres/${selectedDepartement}`)
-            .then(res => res.json());
+          const res = await fetch(`http://localhost:8080/api/filieres/${selectedDepartement}`);
+          const text = await res.text();
+          const data = text ? JSON.parse(text) : [];
           setFilieres(data);
         } catch (error) {
           console.error(error);
@@ -170,13 +171,29 @@ const DatesLimites = () => {
           prev.map(item => item.id === editingId ? { ...item, ...data } : item)
         );
         setSuccess("Date limite mise à jour avec succès");
+
+        // --- AJOUT NOTIFICATIONS POUR TOUS LES ETUDIANTS DE LA FILIERE (MODIFICATION) ---
+        try {
+          const etudiants = await getEtudiants(newDateLimite.filiereId);
+          for (const etudiant of etudiants) {
+            await fetch("http://localhost:8080/api/notifications", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                textNotif: `Mise à jour : les dépôts de rapport pour ${data.filiere.intitule} doivent être le ${data.date} : ${data.description}`,
+                userId: etudiant.id
+              })
+            });
+          }
+        } catch (notifError) {
+          console.error("Erreur lors de l'envoi des notifications aux étudiants :", notifError);
+        }
+        // --- FIN AJOUT NOTIFICATIONS ---
       } else {
         setDatesLimites(prev => [...prev, data]);
         setSuccess("Date limite ajoutée avec succès");
 
-        //IN AJOUT NOTIFICATIONS ---
-
-        // --- AJOUT NOTIFICATIONS POUR TOUS LES ETUDIANTS DE LA FILIERE ---
+        // --- AJOUT NOTIFICATIONS POUR TOUS LES ETUDIANTS DE LA FILIERE (CREATION) ---
         try {
           const etudiants = await getEtudiants(newDateLimite.filiereId);
           for (const etudiant of etudiants) {
@@ -226,7 +243,7 @@ const DatesLimites = () => {
     setShowForm(true);
     setIsEditing(true);
     setEditingId(dateLimite.id);
-    setSelectedDepartement(dateLimite.filiere.id);
+    setSelectedDepartement(dateLimite.filiere.departement.id);
     setNewDateLimite({
       filiereId: dateLimite.filiere.id,
       description: dateLimite.description,
