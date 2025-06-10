@@ -15,9 +15,9 @@ const MessageItemEtudiant: React.FC<MessageItemProps> = ({ message, formatTime }
       <div
         className={`max-w-[80%] rounded-lg p-3 break-words ${
           isTeacher
-            ? 'bg-green-100 text-violet-900'
+            ? 'bg-violet-100 text-violet-900'
             : isSelf
-            ? 'bg-violet-100 text-green-900'
+            ? 'bg-green-100 text-green-900'
             : 'bg-blue-100 text-blue-900'
         }`}
       >
