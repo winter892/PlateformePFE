@@ -10,6 +10,10 @@ import { getEtudiants } from "../../../services/userService";
 interface Filiere {
   id: number;
   intitule: string;
+  departement: {
+    id: number;
+    intitule: string;
+  };
 }
 
 interface DateLimite {
