@@ -71,7 +71,10 @@ const DatesLimites = () => {
       throw new Error(errorData || 'Erreur de requête');
     }
 
-    return response.json();
+    // Correction ici : si pas de contenu, ne pas parser en JSON
+    const text = await response.text();
+    if (!text) return null;
+    return JSON.parse(text);
   }, [navigate]);
 
   useEffect(() => {
