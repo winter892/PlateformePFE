@@ -418,7 +418,14 @@ const generateModernPDFWithGroups = async (
   };
 
   // Fonction pour récupérer les tâches et livrables d'un groupe
-  const getGroupTasksAndDeliverables = async (groupId: number) => {
+  const   // ...dans getGroupTasksAndDeliverables, juste avant le map pour les livrables...
+  // Supprimer les doublons de tâches par id
+  const uniqueTasksMap = new Map();
+  for (const task of allTasks) {
+    uniqueTasksMap.set(task.id, task);
+  }
+  allTasks = Array.from(uniqueTasksMap.values());
+  // ...puis continuez avec le map pour les livrables...getGroupTasksAndDeliverables = async (groupId: number) => {
     try {
       const group = groups.find(g => g.id === groupId);
       if (!group) return [];
