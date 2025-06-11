@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { updateTacheStatut } from './userService';
 //récuperer les taches de l'etudiant connecté
 export const getTaches = async (etudiantId: number) => {
   try {
@@ -11,9 +11,17 @@ export const getTaches = async (etudiantId: number) => {
       },
     });
 
-    console.log("Réponse de l'API:", response);
+    const tasks = Array.isArray(response.data) ? response.data : [];
 
-    return Array.isArray(response.data) ? response.data : [];
+    for (const task of tasks) {
+      const livrables = await getLivrableByTacheid(task.id);
+      if (!livrables.length && task.status !== "à faire") {
+        await updateTacheStatut(task.id, "à faire");
+        task.status = "à faire";
+      }
+    }
+
+    return tasks;
   } catch (error) {
     console.error("Erreur lors de la récupération des tâches :", error);
     return [];

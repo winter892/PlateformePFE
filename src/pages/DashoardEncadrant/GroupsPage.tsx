@@ -186,7 +186,7 @@ const generateModernPDFWithGroups = async (
       
       // Format des membres avec codes APOGEE très clairs
       const memberNames = etudiants.length > 0
-        ? etudiants.map(e => `${e.nom} ${e.prenom}\nCode APOGEE: ${e.code_APOGEE}`).join("\n\n")
+        ? etudiants.map(e => `${e.nom} ${e.prenom}\n | ${e.code_APOGEE} |`).join("\n\n")
         : "Aucun membre assigné";
 
       tableRows.push([

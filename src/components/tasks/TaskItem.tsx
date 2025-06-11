@@ -15,7 +15,7 @@ interface TaskItemProps {
   onViewDeliverables: (taskId: string) => void;
 }
 
-export const TaskItem = ({ task, onDelete, onEdit, onViewDeliverables }: TaskItemProps) => {
+export const TaskItem = ({ task, onDelete, onViewDeliverables }: TaskItemProps) => {
   
     
   const getStatusColor = (status: string) => {
