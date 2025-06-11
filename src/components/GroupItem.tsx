@@ -36,7 +36,7 @@ const GroupItem: React.FC<GroupItemProps> = ({
           }`}
         >
           {status === 'completed' ? 'Terminé' : status === 'pending' ? 'À faire' : 'En cours'}
-        </span>
+        </span> 
       </div>
       
       <div className="flex items-center text-sm text-violet-600 mb-3">

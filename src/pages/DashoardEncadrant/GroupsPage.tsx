@@ -3,19 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/Layout/DashboardLayout';
 import GroupItem from '@/components/GroupItem';
 import { Button } from '@/components/ui/button';
+import jsPDF from 'jspdf';
 import { Plus, X, Printer, FileText, Users,Eye, CheckSquare, ArrowLeft, Search, Loader2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 import { 
   getTaches,
   getTacheStats,
-  getLivrableByTacheid
+  getLivrableByTacheid,
+  getEtudiantByGroupId,
 } from '@/services/EtudiantsService';
 import { 
   getEtudiants,
-  getEtudiantsByGroupe,
+  getUserById,
 } from '@/services/userService';
-import { Group, Project, Task } from '@/types';
+import { Group, Project, Task,Etudiant } from '@/types';
 import { Comment } from '@/types/task';
+import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 
 export const GroupsPage: React.FC = () => {
@@ -39,6 +43,7 @@ export const GroupsPage: React.FC = () => {
   const [errorStudents, setErrorStudents] = useState('');
   const [encadrantFiliereId, setEncadrantFiliereId] = useState<number | null>(null);
   const [encadrantId, setEncadrantId] = useState<number | null>(null);
+  const [encadrantEmail, setEncadrantEmail] = useState('');
   const [encadrantNom, setEncadrantNom] = useState('');
   const [encadrantPrenom, setEncadrantPrenom] = useState('');
   const [taskSearchTerm, setTaskSearchTerm] = useState('');
@@ -55,6 +60,16 @@ export const GroupsPage: React.FC = () => {
   const [selectedDeliverable, setSelectedDeliverable] = useState<any>(null);
   const [isDeliverableModalOpen, setIsDeliverableModalOpen] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
+const colors = {
+  primary: '#2563eb',     // Blue 600
+  secondary: '#64748b',   // Slate 500
+  accent: '#06b6d4',      // Cyan 500
+  surface: '#f8fafc',     // Slate 50
+  text: '#1e293b',        // Slate 800
+  textLight: '#64748b',   // Slate 500
+  border: '#e2e8f0',      // Slate 200
+  success: '#059669',     // Emerald 600
+};
 
   // Récupérer les informations de l'encadrant
   useEffect(() => {
@@ -74,6 +89,7 @@ export const GroupsPage: React.FC = () => {
         setEncadrantFiliereId(data.filiere?.id);
         setEncadrantId(data.id);
         setEncadrantNom(data.nom);
+        setEncadrantEmail(data.adresseEmail);
         setEncadrantPrenom(data.prenom);
       } catch (error) {
         console.error("Erreur récupération encadrant:", error);
@@ -83,6 +99,169 @@ export const GroupsPage: React.FC = () => {
     
     if (userId) fetchEncadrantData();
   }, [userId]);
+  //importer limage 
+  const loadLogoAsBase64 = (url: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous"; // pour éviter des problèmes CORS
+    img.src = url;
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return reject("Canvas context null");
+      ctx.drawImage(img, 0, 0);
+      resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = reject;
+  });
+};
+
+//pour imprimer la liste des groupe 
+
+const generateModernPDFWithGroups = async (
+  groups: Group[],
+  encadrantNom: string,
+  encadrantPrenom: string,
+  encadrantEmail: string
+) => {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.width;
+  const pageHeight = doc.internal.pageSize.height;
+
+  // Header avec logo centré en haut et titre centré en dessous
+  const drawHeader = async () => {
+    // Logo centré en haut
+    try {
+      const logoBase64 = await loadLogoAsBase64('/logo_est_bm.png');
+      if (logoBase64) {
+        doc.addImage(logoBase64, 'PNG', (pageWidth - 30) / 2, 10, 20, 20);
+      }
+    } catch (error) {
+      console.log('Logo not found, continuing without it');
+    }
+
+    // Titre centré en dessous du logo
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text("Liste des Groupes et Projets", pageWidth / 2, 40, { align: "center" });
+  };
+
+  // Informations encadrant sans icônes, structure claire
+  const drawSupervisorInfo = (startY: number) => {
+    // Titre de la section plus petit
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Informations de l'Encadrant", pageWidth / 2, startY, { align: "center" });
+    
+    // Ligne de séparation sous le titre
+    doc.setDrawColor(150, 150, 150);
+    doc.setLineWidth(0.5);
+    doc.line(60, startY + 2, pageWidth - 60, startY + 2);
+    
+    let currentY = startY + 15;
+    
+    // Nom sans icône, centré
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(`Nom : ${encadrantNom} ${encadrantPrenom}`, pageWidth / 2, currentY, { align: "center" });
+    
+    currentY += 8;
+    
+    // Email sans icône, centré
+    doc.text(`Email : ${encadrantEmail}`, pageWidth / 2, currentY, { align: "center" });
+    
+    return currentY + 20;
+  };
+
+  // Tableau bien structuré et centré
+  const drawTable = async (startY: number) => {
+    const tableRows: any[] = [];
+    
+    for (const group of groups) {
+      const etudiants: Etudiant[] = await getEtudiantByGroupId(group.id);
+      
+      // Format des membres avec codes APOGEE très clairs
+      const memberNames = etudiants.length > 0
+        ? etudiants.map(e => `${e.nom} ${e.prenom}\nCode APOGEE: ${e.code_APOGEE}`).join("\n\n")
+        : "Aucun membre assigné";
+
+      tableRows.push([
+        group.intitule,
+        group.projet?.titre || "Projet non défini",
+        memberNames,
+        group.projet?.description || "Description à venir"
+      ]);
+    }
+
+    autoTable(doc, {
+      startY: startY,
+      head: [["Groupe", "Projet", "Membres", "Description"]],
+      body: tableRows,
+      theme: 'plain',
+      styles: { 
+        fontSize: 10, 
+        cellPadding: 8,
+        valign: 'top',
+        textColor: [0, 0, 0],
+        lineColor: [200, 200, 200],
+        lineWidth: 0.5,
+        halign: 'center',
+      },
+      headStyles: {
+        fillColor: [52, 152, 219], // Bleu pour le header uniquement
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        halign: 'center',
+        fontSize: 11,
+        cellPadding: 10,
+      },
+      // Pas de couleur alternée pour les lignes - tout en blanc
+      columnStyles: {
+        0: { cellWidth: 35, halign: 'center', fontStyle: 'bold' },
+        1: { cellWidth: 40, halign: 'center' },
+        2: { cellWidth: 50, halign: 'center', fontSize: 9 },
+        3: { cellWidth: 55, halign: 'left', fontSize: 9 }
+      },
+      margin: { left: 15, right: 15 },
+      tableWidth: 'auto',
+    });
+  };
+
+  // Footer simple et centré
+  const drawFooter = () => {
+    const footerY = pageHeight - 15;
+    
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal');
+    
+    const currentDate = new Date().toLocaleDateString('fr-FR');
+    doc.text(`Généré le ${currentDate}`, 20, footerY);
+    doc.text(`${groups.length} groupe(s)`, pageWidth - 20, footerY, { align: 'right' });
+  };
+
+  // Génération du PDF
+  await drawHeader();
+  
+  let currentY = 55;
+  currentY = drawSupervisorInfo(currentY);
+  
+  await drawTable(currentY);
+  drawFooter();
+
+  // Sauvegarde
+  const timestamp = new Date().toISOString().split('T')[0];
+  doc.save(`groupes-projets-${timestamp}.pdf`);
+};
+
+
+
+
+
 
   // Fonction pour construire la liste des groupes
   const buildGroupsList = async (studentsData: any[]): Promise<Group[]> => {
@@ -340,10 +519,10 @@ export const GroupsPage: React.FC = () => {
     setSelectedTask(task);
   };
 
-  const handlePrintGroupsList = () => {
+ /* const handlePrintGroupsList = () => {
     console.log('Printing groups list');
     toast.info("Impression de la liste des groupes en cours...");
-  };
+  };*/
 
   const navigateToDeliverable = (groupId: number, taskId: number, deliverableId: number) => {
     navigate(`/groups/${groupId}/tasks/${taskId}/deliverables/${deliverableId}`);
@@ -419,13 +598,17 @@ export const GroupsPage: React.FC = () => {
             <RefreshCw size={18} className="mr-2" />
             Actualiser
           </button>
-          <button 
-            className="flex items-center px-4 py-2 bg-violet-100 text-violet-700 rounded-lg hover:bg-violet-200 transition-colors" 
-            onClick={handlePrintGroupsList}
-          >
-            <Printer size={18} className="mr-2" />
-            Imprimer
-          </button>
+
+          <Button
+          className="flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+
+          onClick={() => generateModernPDFWithGroups(currentGroups, encadrantNom, encadrantPrenom, encadrantEmail)
+}>
+  Télécharger PDF
+</Button>
+
+
+
           <button 
             className="flex items-center px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors" 
             onClick={() => setShowCreateModal(true)}

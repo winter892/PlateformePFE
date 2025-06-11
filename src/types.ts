@@ -35,9 +35,10 @@ export interface Group {
   id: number;
   intitule: string;
   description: string;
-  members?: string[]; // Optionnel car nous allons récupérer les membres via l'API
+  members?: string[]; // Liste simplifiée (noms uniquement)
+   detailedMembers?: Etudiant[]; // Étudiants détaillés
   projet_id: number;
-  projet?: Project; // Ajouté pour la relation avec le projet
+  projet?: Project;
   encadrant_id?: number;
   filiere_id?: number;
 }
@@ -111,7 +112,7 @@ export interface Etudiant{
   nom: string,
   prenom: string,
   codePfe: string,
-  codeApogee: number,
+  code_APOGEE: number,
   groupe_id: number,
   filiere_id : number,
 

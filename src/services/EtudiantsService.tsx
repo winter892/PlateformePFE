@@ -196,7 +196,26 @@ export async function getTacheStats(ProjetId) {
     throw error;
   }
 }
+//récupérer tout info etudiant par groupe id 
+//récuperer les taches de l'etudiant connecté
+export const getEtudiantByGroupId = async (groupeId) => {
+  try {
+    const token = localStorage.getItem('token');
 
+    const response = await axios.get(`http://localhost:8080/api/groupe/EtudiantByGroupe/${groupeId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log("Réponse de l'API:", response);
+
+    return Array.isArray(response.data) ? response.data : [];
+  } catch (error) {
+    console.error("Erreur lors de la récupération des etudaint par groupe :", error);
+    return [];
+  }
+};
 
 
 
