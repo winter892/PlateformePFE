@@ -35,7 +35,7 @@ import AdminForm from "@/components/dashboardAdmin/AdminForm";
 import SupervisorForm from "@/components/dashboardEncadrent/SupervisorForm";
 import StudentForm from "@/components/dashboardEtudiant/StudentForm";
 import ChatLivrable from "@/pages/DashboardEtudiant/chat/ChatLivrable";
-//chat
+import AdminProfile from "./src/pages/DashboardAdmin/AdminProfile";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -55,6 +55,7 @@ const App = () => (
           <Route path="/statistiques" element={<Statistiques />} />
           <Route path="/parametres" element={<Parametres />} />
           <Route path="/AdminForm" element={<AdminForm />} />
+          <Route path="/AdminProfile" element={<AdminProfile />} />
 
           {/** Encadrant */}
           <Route path="/IndexEncadrant" element={<IndexEncadrant />} />
