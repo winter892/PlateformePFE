@@ -68,7 +68,7 @@ const colors = {
   text: '#1e293b',        // Slate 800
   textLight: '#64748b',   // Slate 500
   border: '#e2e8f0',      // Slate 200
-  success: '#059669',     // Emerald 600
+  success: '#059669',     
 };
 
   // Récupérer les informations de l'encadrant
